@@ -1,6 +1,16 @@
 import typing
 
 class DNABase:
+    """An enumeration of DNA bases, as defined by IUPAC.
+
+    DNABases may be instantiated either directly by their variant, or by
+    their IUPAC code. For example:
+
+    >>> DNABase.THYMINE
+    >>> DNABase('T')
+
+    A ValueError is raised if the code is not valid."""
+
     ADENINE: DNABase
     CYTOSINE: DNABase
     GUANINE: DNABase
@@ -18,9 +28,7 @@ class DNABase:
     ANY: DNABase
     GAP: DNABase
 
-    def __new__(self, code: str) -> DNABase:
-        """Not implemented."""
-        pass
+    def __new__(self, code: str) -> DNABase: ...
     @property
     def code(self) -> str:
         """Not implemented."""
