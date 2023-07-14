@@ -40,12 +40,8 @@ class DNABase:
     def transcribe(self) -> RNABase:
         """Not implemented."""
         pass
-    def __repr__(self) -> str:
-        """Not implemented."""
-        pass
-    def __str__(self) -> str:
-        """Not implemented."""
-        pass
+    def __repr__(self) -> str: ...
+    def __str__(self) -> str: ...
     def __eq__(self, other: object) -> bool: ...
     def __ne__(self, other: object) -> bool: ...
     def __bool__(self) -> bool:

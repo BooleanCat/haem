@@ -43,14 +43,33 @@ def test__new__invalid_code(code: str, message: str) -> None:
     assert str(excinfo.value) == message
 
 
-def test__repr__not_implemented() -> None:
-    with pytest.raises(NotImplementedError):
-        repr(haem.DNABase.ADENINE)
+def test__repr__() -> None:
+    assert repr(haem.DNABase.ADENINE) == "DNABase.ADENINE"
 
 
-def test__str__not_implemented() -> None:
-    with pytest.raises(NotImplementedError):
-        str(haem.DNABase.ADENINE)
+@pytest.mark.parametrize(
+    "base,text",
+    [
+        (haem.DNABase.ADENINE, "adenine"),
+        (haem.DNABase.CYTOSINE, "cytosine"),
+        (haem.DNABase.GUANINE, "guanine"),
+        (haem.DNABase.THYMINE, "thymine"),
+        (haem.DNABase.ADENINE_CYTOSINE, "adenine/cytosine"),
+        (haem.DNABase.ADENINE_GUANINE, "adenine/guanine"),
+        (haem.DNABase.ADENINE_THYMINE, "adenine/thymine"),
+        (haem.DNABase.CYTOSINE_GUANINE, "cytosine/guanine"),
+        (haem.DNABase.CYTOSINE_THYMINE, "cytosine/thymine"),
+        (haem.DNABase.GUANINE_THYMINE, "guanine/thymine"),
+        (haem.DNABase.ADENINE_CYTOSINE_GUANINE, "adenine/cytosine/guanine"),
+        (haem.DNABase.ADENINE_CYTOSINE_THYMINE, "adenine/cytosine/thymine"),
+        (haem.DNABase.ADENINE_GUANINE_THYMINE, "adenine/guanine/thymine"),
+        (haem.DNABase.CYTOSINE_GUANINE_THYMINE, "cytosine/guanine/thymine"),
+        (haem.DNABase.ANY, "any"),
+        (haem.DNABase.GAP, "gap"),
+    ],
+)
+def test__str__(base: haem.DNABase, text: str) -> None:
+    assert str(base) == text
 
 
 def test_code_not_implemented() -> None:
@@ -74,11 +93,6 @@ def test__eq__() -> None:
 
 def test__ne__() -> None:
     assert haem.DNABase.ADENINE != haem.DNABase.CYTOSINE
-
-
-def test__gt__not_supported() -> None:
-    with pytest.raises(TypeError):
-        haem.DNABase.ADENINE > haem.DNABase.CYTOSINE  # type: ignore
 
 
 @pytest.mark.parametrize("op", [operator.gt, operator.ge, operator.lt, operator.le])

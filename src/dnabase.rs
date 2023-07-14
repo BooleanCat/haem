@@ -83,12 +83,6 @@ impl DNABase {
         }
     }
 
-    fn __repr__(&self) -> PyResult<String> {
-        Err(pyo3::exceptions::PyNotImplementedError::new_err(
-            "not implemented",
-        ))
-    }
-
     #[getter]
     fn get_code(&self) -> PyResult<char> {
         Err(pyo3::exceptions::PyNotImplementedError::new_err(
@@ -131,5 +125,26 @@ impl DNABase {
         Err(pyo3::exceptions::PyNotImplementedError::new_err(
             "not implemented",
         ))
+    }
+
+    fn __str__(&self) -> String {
+        match self {
+            Self::Adenine => "adenine".to_string(),
+            Self::Cytosine => "cytosine".to_string(),
+            Self::Guanine => "guanine".to_string(),
+            Self::Thymine => "thymine".to_string(),
+            Self::AdenineCytosine => "adenine/cytosine".to_string(),
+            Self::AdenineGuanine => "adenine/guanine".to_string(),
+            Self::AdenineThymine => "adenine/thymine".to_string(),
+            Self::CytosineGuanine => "cytosine/guanine".to_string(),
+            Self::CytosineThymine => "cytosine/thymine".to_string(),
+            Self::GuanineThymine => "guanine/thymine".to_string(),
+            Self::AdenineCytosineGuanine => "adenine/cytosine/guanine".to_string(),
+            Self::AdenineCytosineThymine => "adenine/cytosine/thymine".to_string(),
+            Self::AdenineGuanineThymine => "adenine/guanine/thymine".to_string(),
+            Self::CytosineGuanineThymine => "cytosine/guanine/thymine".to_string(),
+            Self::Any => "any".to_string(),
+            Self::Gap => "gap".to_string(),
+        }
     }
 }
