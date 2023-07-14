@@ -54,12 +54,34 @@ class DNABase:
         pass
 
 class RNABase:
+    """An enumeration of RNA bases, as defined by IUPAC.
+
+    RNABases may be instantiated either directly by their variant, or by
+    their IUPAC code. For example:
+
+    >>> RNABase.URACIL
+    >>> RNABase('U')
+
+    A ValueError is raised if the code is not valid."""
+
     ADENINE: RNABase
     CYTOSINE: RNABase
+    GUANINE: RNABase
+    URACIL: RNABase
+    ADENINE_CYTOSINE: RNABase
+    ADENINE_GUANINE: RNABase
+    ADENINE_URACIL: RNABase
+    CYTOSINE_GUANINE: RNABase
+    CYTOSINE_URACIL: RNABase
+    GUANINE_URACIL: RNABase
+    ADENINE_CYTOSINE_GUANINE: RNABase
+    ADENINE_CYTOSINE_URACIL: RNABase
+    ADENINE_GUANINE_URACIL: RNABase
+    CYTOSINE_GUANINE_URACIL: RNABase
+    ANY: RNABase
+    GAP: RNABase
 
-    def __new__(self, code: str) -> RNABase:
-        """Not implemented."""
-        pass
+    def __new__(self, code: str) -> RNABase: ...
     @property
     def code(self) -> str:
         """Not implemented."""
@@ -68,12 +90,8 @@ class RNABase:
     def complement(self) -> RNABase:
         """Not implemented."""
         pass
-    def __repr__(self) -> str:
-        """Not implemented."""
-        pass
-    def __str__(self) -> str:
-        """Not implemented."""
-        pass
+    def __repr__(self) -> str: ...
+    def __str__(self) -> str: ...
     def __eq__(self, other: object) -> bool: ...
     def __ne__(self, other: object) -> bool: ...
     def __bool__(self) -> bool:
