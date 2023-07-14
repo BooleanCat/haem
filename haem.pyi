@@ -45,7 +45,7 @@ class DNABase:
     def __eq__(self, other: object) -> bool: ...
     def __ne__(self, other: object) -> bool: ...
     def __bool__(self) -> bool:
-        """Not implemented."""
+        """Casting to bool is False for DNABase.GAP and True otherwise."""
         pass
     def __invert__(self) -> DNABase:
         """See `DNABase.complement`."""
@@ -95,7 +95,7 @@ class RNABase:
     def __eq__(self, other: object) -> bool: ...
     def __ne__(self, other: object) -> bool: ...
     def __bool__(self) -> bool:
-        """Not implemented."""
+        """Casting to bool is False for RNABase.GAP and True otherwise."""
         pass
     def __invert__(self) -> RNABase:
         """See `RNABase.complement`."""

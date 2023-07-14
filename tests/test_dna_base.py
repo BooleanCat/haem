@@ -103,9 +103,11 @@ def test_unsupported_comparison(
         op(haem.DNABase.ADENINE, haem.DNABase.CYTOSINE)
 
 
-def test__bool__not_implemented() -> None:
-    with pytest.raises(NotImplementedError):
-        bool(haem.DNABase.ADENINE)
+@pytest.mark.parametrize(
+    "base,result", [(haem.DNABase.ADENINE, True), (haem.DNABase.GAP, False)]
+)
+def test__bool__(base: haem.DNABase, result: bool) -> None:
+    assert bool(base) == result
 
 
 def test__invert__not_implemented() -> None:

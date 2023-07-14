@@ -103,10 +103,8 @@ impl RNABase {
         }
     }
 
-    fn __bool__(&self) -> PyResult<bool> {
-        Err(pyo3::exceptions::PyNotImplementedError::new_err(
-            "not implemented",
-        ))
+    fn __bool__(&self) -> bool {
+        *self != Self::Gap
     }
 
     fn __invert__(&self) -> PyResult<Self> {
