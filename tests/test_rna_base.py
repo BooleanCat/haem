@@ -97,9 +97,30 @@ def test_code(base: haem.RNABase, code: str) -> None:
     assert base.code == code
 
 
-def test_complement_not_implemented() -> None:
-    with pytest.raises(NotImplementedError):
-        haem.RNABase.ADENINE.complement
+@pytest.mark.parametrize(
+    "base,complement",
+    [
+        (haem.RNABase.ADENINE, haem.RNABase.URACIL),
+        (haem.RNABase.CYTOSINE, haem.RNABase.GUANINE),
+        (haem.RNABase.GUANINE, haem.RNABase.CYTOSINE),
+        (haem.RNABase.URACIL, haem.RNABase.ADENINE),
+        (haem.RNABase.ADENINE_CYTOSINE, haem.RNABase.GUANINE_URACIL),
+        (haem.RNABase.ADENINE_GUANINE, haem.RNABase.CYTOSINE_URACIL),
+        (haem.RNABase.ADENINE_URACIL, haem.RNABase.ADENINE_URACIL),
+        (haem.RNABase.CYTOSINE_GUANINE, haem.RNABase.CYTOSINE_GUANINE),
+        (haem.RNABase.CYTOSINE_URACIL, haem.RNABase.ADENINE_GUANINE),
+        (haem.RNABase.GUANINE_URACIL, haem.RNABase.ADENINE_CYTOSINE),
+        (haem.RNABase.ADENINE_CYTOSINE_GUANINE, haem.RNABase.CYTOSINE_GUANINE_URACIL),
+        (haem.RNABase.ADENINE_CYTOSINE_URACIL, haem.RNABase.ADENINE_GUANINE_URACIL),
+        (haem.RNABase.ADENINE_GUANINE_URACIL, haem.RNABase.ADENINE_CYTOSINE_URACIL),
+        (haem.RNABase.CYTOSINE_GUANINE_URACIL, haem.RNABase.ADENINE_CYTOSINE_GUANINE),
+        (haem.RNABase.ANY, haem.RNABase.ANY),
+        (haem.RNABase.GAP, haem.RNABase.GAP),
+    ],
+)
+def test_complement(base: haem.RNABase, complement: haem.RNABase) -> None:
+    assert base.complement == complement
+    assert ~base == complement
 
 
 def test__eq__() -> None:
@@ -123,11 +144,6 @@ def test_unsupported_comparison(
 )
 def test__bool__(base: haem.RNABase, result: bool) -> None:
     assert bool(base) == result
-
-
-def test__invert__not_implemented() -> None:
-    with pytest.raises(NotImplementedError):
-        ~haem.RNABase.ADENINE
 
 
 def test__add__not_implemented() -> None:

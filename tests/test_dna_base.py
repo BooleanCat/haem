@@ -97,9 +97,30 @@ def test_code(base: haem.DNABase, code: str) -> None:
     assert base.code == code
 
 
-def test_complement_not_implemented() -> None:
-    with pytest.raises(NotImplementedError):
-        haem.DNABase.ADENINE.complement
+@pytest.mark.parametrize(
+    "base,complement",
+    [
+        (haem.DNABase.ADENINE, haem.DNABase.THYMINE),
+        (haem.DNABase.CYTOSINE, haem.DNABase.GUANINE),
+        (haem.DNABase.GUANINE, haem.DNABase.CYTOSINE),
+        (haem.DNABase.THYMINE, haem.DNABase.ADENINE),
+        (haem.DNABase.ADENINE_CYTOSINE, haem.DNABase.GUANINE_THYMINE),
+        (haem.DNABase.ADENINE_GUANINE, haem.DNABase.CYTOSINE_THYMINE),
+        (haem.DNABase.ADENINE_THYMINE, haem.DNABase.ADENINE_THYMINE),
+        (haem.DNABase.CYTOSINE_GUANINE, haem.DNABase.CYTOSINE_GUANINE),
+        (haem.DNABase.CYTOSINE_THYMINE, haem.DNABase.ADENINE_GUANINE),
+        (haem.DNABase.GUANINE_THYMINE, haem.DNABase.ADENINE_CYTOSINE),
+        (haem.DNABase.ADENINE_CYTOSINE_GUANINE, haem.DNABase.CYTOSINE_GUANINE_THYMINE),
+        (haem.DNABase.ADENINE_CYTOSINE_THYMINE, haem.DNABase.ADENINE_GUANINE_THYMINE),
+        (haem.DNABase.ADENINE_GUANINE_THYMINE, haem.DNABase.ADENINE_CYTOSINE_THYMINE),
+        (haem.DNABase.CYTOSINE_GUANINE_THYMINE, haem.DNABase.ADENINE_CYTOSINE_GUANINE),
+        (haem.DNABase.ANY, haem.DNABase.ANY),
+        (haem.DNABase.GAP, haem.DNABase.GAP),
+    ],
+)
+def test_complement(base: haem.DNABase, complement: haem.DNABase) -> None:
+    assert base.complement == complement
+    assert ~base == complement
 
 
 @pytest.mark.parametrize(
@@ -148,11 +169,6 @@ def test_unsupported_comparison(
 )
 def test__bool__(base: haem.DNABase, result: bool) -> None:
     assert bool(base) == result
-
-
-def test__invert__not_implemented() -> None:
-    with pytest.raises(NotImplementedError):
-        ~haem.DNABase.ADENINE
 
 
 def test__add__not_implemented() -> None:

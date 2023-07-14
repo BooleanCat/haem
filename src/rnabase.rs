@@ -104,10 +104,25 @@ impl RNABase {
     }
 
     #[getter]
-    fn get_complement(&self) -> PyResult<Self> {
-        Err(pyo3::exceptions::PyNotImplementedError::new_err(
-            "not implemented",
-        ))
+    fn get_complement(&self) -> Self {
+        match self {
+            Self::Adenine => Self::Uracil,
+            Self::Cytosine => Self::Guanine,
+            Self::Guanine => Self::Cytosine,
+            Self::Uracil => Self::Adenine,
+            Self::AdenineCytosine => Self::GuanineUracil,
+            Self::AdenineGuanine => Self::CytosineUracil,
+            Self::AdenineUracil => Self::AdenineUracil,
+            Self::CytosineGuanine => Self::CytosineGuanine,
+            Self::CytosineUracil => Self::AdenineGuanine,
+            Self::GuanineUracil => Self::AdenineCytosine,
+            Self::AdenineCytosineGuanine => Self::CytosineGuanineUracil,
+            Self::AdenineCytosineUracil => Self::AdenineGuanineUracil,
+            Self::AdenineGuanineUracil => Self::AdenineCytosineUracil,
+            Self::CytosineGuanineUracil => Self::AdenineCytosineGuanine,
+            Self::Any => Self::Any,
+            Self::Gap => Self::Gap,
+        }
     }
 
     fn __richcmp__(&self, other: &Self, op: CompareOp, py: Python<'_>) -> PyObject {
@@ -122,7 +137,7 @@ impl RNABase {
         *self != Self::Gap
     }
 
-    fn __invert__(&self) -> PyResult<Self> {
+    fn __invert__(&self) -> Self {
         self.get_complement()
     }
 

@@ -106,10 +106,25 @@ impl DNABase {
     }
 
     #[getter]
-    fn get_complement(&self) -> PyResult<Self> {
-        Err(pyo3::exceptions::PyNotImplementedError::new_err(
-            "not implemented",
-        ))
+    fn get_complement(&self) -> Self {
+        match self {
+            Self::Adenine => Self::Thymine,
+            Self::Cytosine => Self::Guanine,
+            Self::Guanine => Self::Cytosine,
+            Self::Thymine => Self::Adenine,
+            Self::AdenineCytosine => Self::GuanineThymine,
+            Self::AdenineGuanine => Self::CytosineThymine,
+            Self::AdenineThymine => Self::AdenineThymine,
+            Self::CytosineGuanine => Self::CytosineGuanine,
+            Self::CytosineThymine => Self::AdenineGuanine,
+            Self::GuanineThymine => Self::AdenineCytosine,
+            Self::AdenineCytosineGuanine => Self::CytosineGuanineThymine,
+            Self::AdenineCytosineThymine => Self::AdenineGuanineThymine,
+            Self::AdenineGuanineThymine => Self::AdenineCytosineThymine,
+            Self::CytosineGuanineThymine => Self::AdenineCytosineGuanine,
+            Self::Any => Self::Any,
+            Self::Gap => Self::Gap,
+        }
     }
 
     fn transcribe(&self) -> RNABase {
@@ -145,7 +160,7 @@ impl DNABase {
         *self != Self::Gap
     }
 
-    fn __invert__(&self) -> PyResult<Self> {
+    fn __invert__(&self) -> Self {
         self.get_complement()
     }
 
