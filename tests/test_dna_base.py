@@ -102,9 +102,29 @@ def test_complement_not_implemented() -> None:
         haem.DNABase.ADENINE.complement
 
 
-def test_transcribe_not_implemented() -> None:
-    with pytest.raises(NotImplementedError):
-        haem.DNABase.ADENINE.transcribe()
+@pytest.mark.parametrize(
+    "dna_base,rna_base",
+    [
+        (haem.DNABase.ADENINE, haem.RNABase.ADENINE),
+        (haem.DNABase.CYTOSINE, haem.RNABase.CYTOSINE),
+        (haem.DNABase.GUANINE, haem.RNABase.GUANINE),
+        (haem.DNABase.THYMINE, haem.RNABase.URACIL),
+        (haem.DNABase.ADENINE_CYTOSINE, haem.RNABase.ADENINE_CYTOSINE),
+        (haem.DNABase.ADENINE_GUANINE, haem.RNABase.ADENINE_GUANINE),
+        (haem.DNABase.ADENINE_THYMINE, haem.RNABase.ADENINE_URACIL),
+        (haem.DNABase.CYTOSINE_GUANINE, haem.RNABase.CYTOSINE_GUANINE),
+        (haem.DNABase.CYTOSINE_THYMINE, haem.RNABase.CYTOSINE_URACIL),
+        (haem.DNABase.GUANINE_THYMINE, haem.RNABase.GUANINE_URACIL),
+        (haem.DNABase.ADENINE_CYTOSINE_GUANINE, haem.RNABase.ADENINE_CYTOSINE_GUANINE),
+        (haem.DNABase.ADENINE_CYTOSINE_THYMINE, haem.RNABase.ADENINE_CYTOSINE_URACIL),
+        (haem.DNABase.ADENINE_GUANINE_THYMINE, haem.RNABase.ADENINE_GUANINE_URACIL),
+        (haem.DNABase.CYTOSINE_GUANINE_THYMINE, haem.RNABase.CYTOSINE_GUANINE_URACIL),
+        (haem.DNABase.ANY, haem.RNABase.ANY),
+        (haem.DNABase.GAP, haem.RNABase.GAP),
+    ],
+)
+def test_transcribe(dna_base: haem.DNABase, rna_base: haem.RNABase) -> None:
+    assert dna_base.transcribe() == rna_base
 
 
 def test__eq__() -> None:
