@@ -11,49 +11,17 @@ permissions:
   contents: read
 
 jobs:
-  linux:
-    runs-on: ubuntu-latest
+  test:
+    strategy:
+      matrix:
+        python-version: ['3.8', '3.9', '3.10', '3.11']
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
-      - name: Build & install
-        uses: PyO3/maturin-action@v1
-        with:
-          target: x86_64
-          args: --release
-      - uses: abatilo/actions-poetry@v2
-        with: { poetry-version: 1.5 }
-      - run: |
-          poetry install --no-root
-          make test
-  
-  macos:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-      - name: Build & install
-        uses: PyO3/maturin-action@v1
-        with:
-          target: x86_64
-          args: --release
-      - uses: abatilo/actions-poetry@v2
-        with: { poetry-version: 1.5 }
-      - run: |
-          poetry install --no-root
-          make test
-  
-  windows:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
+          python-version: ${{ matrix.python-version }}
       - name: Build & install
         uses: PyO3/maturin-action@v1
         with:
