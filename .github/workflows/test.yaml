@@ -24,7 +24,7 @@ jobs:
           target: x86_64
           args: --release
       - uses: abatilo/actions-poetry@v2
-        with: { poetry-version: 1.4 }
+        with: { poetry-version: 1.5 }
       - run: |
           poetry install --no-root
           make test
@@ -42,7 +42,7 @@ jobs:
           target: x86_64
           args: --release
       - uses: abatilo/actions-poetry@v2
-        with: { poetry-version: 1.4 }
+        with: { poetry-version: 1.5 }
       - run: |
           poetry install --no-root
           make test
@@ -60,7 +60,7 @@ jobs:
           target: x86_64
           args: --release
       - uses: abatilo/actions-poetry@v2
-        with: { poetry-version: 1.4 }
+        with: { poetry-version: 1.5 }
       - run: |
           poetry install --no-root
           make test
