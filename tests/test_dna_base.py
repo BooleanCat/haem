@@ -6,13 +6,41 @@ import pytest
 import haem
 
 
-def test_instantiate() -> None:
-    haem.DNABase.ADENINE
+@pytest.mark.parametrize(
+    "code,base",
+    [
+        ("A", haem.DNABase.ADENINE),
+        ("C", haem.DNABase.CYTOSINE),
+        ("G", haem.DNABase.GUANINE),
+        ("T", haem.DNABase.THYMINE),
+        ("M", haem.DNABase.ADENINE_CYTOSINE),
+        ("R", haem.DNABase.ADENINE_GUANINE),
+        ("W", haem.DNABase.ADENINE_THYMINE),
+        ("S", haem.DNABase.CYTOSINE_GUANINE),
+        ("Y", haem.DNABase.CYTOSINE_THYMINE),
+        ("K", haem.DNABase.GUANINE_THYMINE),
+        ("V", haem.DNABase.ADENINE_CYTOSINE_GUANINE),
+        ("H", haem.DNABase.ADENINE_CYTOSINE_THYMINE),
+        ("D", haem.DNABase.ADENINE_GUANINE_THYMINE),
+        ("B", haem.DNABase.CYTOSINE_GUANINE_THYMINE),
+        ("N", haem.DNABase.ANY),
+        (".", haem.DNABase.GAP),
+        ("-", haem.DNABase.GAP),
+    ],
+)
+def test__new__(code: str, base: haem.DNABase) -> None:
+    assert haem.DNABase(code) == base
 
 
-def test__new__not_implemented() -> None:
-    with pytest.raises(NotImplementedError):
-        haem.DNABase("A")
+@pytest.mark.parametrize(
+    "code,message",
+    [("X", 'invalid IUPAC DNA code "X"'), ("XX", "expected a string of length 1")],
+)
+def test__new__invalid_code(code: str, message: str) -> None:
+    with pytest.raises(ValueError) as excinfo:
+        haem.DNABase(code)
+
+    assert str(excinfo.value) == message
 
 
 def test__repr__not_implemented() -> None:

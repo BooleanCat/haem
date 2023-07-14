@@ -3,6 +3,20 @@ import typing
 class DNABase:
     ADENINE: DNABase
     CYTOSINE: DNABase
+    GUANINE: DNABase
+    THYMINE: DNABase
+    ADENINE_CYTOSINE: DNABase
+    ADENINE_GUANINE: DNABase
+    ADENINE_THYMINE: DNABase
+    CYTOSINE_GUANINE: DNABase
+    CYTOSINE_THYMINE: DNABase
+    GUANINE_THYMINE: DNABase
+    ADENINE_CYTOSINE_GUANINE: DNABase
+    ADENINE_CYTOSINE_THYMINE: DNABase
+    ADENINE_GUANINE_THYMINE: DNABase
+    CYTOSINE_GUANINE_THYMINE: DNABase
+    ANY: DNABase
+    GAP: DNABase
 
     def __new__(self, code: str) -> DNABase:
         """Not implemented."""
