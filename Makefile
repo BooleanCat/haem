@@ -3,5 +3,6 @@ test: check
 	poetry run pytest -v .
 
 check:
+	cargo fmt --check
 	poetry run black --check .
 	poetry run mypy --strict .
