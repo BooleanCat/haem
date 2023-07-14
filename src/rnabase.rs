@@ -82,10 +82,25 @@ impl RNABase {
     }
 
     #[getter]
-    fn get_code(&self) -> PyResult<char> {
-        Err(pyo3::exceptions::PyNotImplementedError::new_err(
-            "not implemented",
-        ))
+    fn get_code(&self) -> char {
+        match self {
+            Self::Adenine => 'A',
+            Self::Cytosine => 'C',
+            Self::Guanine => 'G',
+            Self::Uracil => 'U',
+            Self::AdenineCytosine => 'M',
+            Self::AdenineGuanine => 'R',
+            Self::AdenineUracil => 'W',
+            Self::CytosineGuanine => 'S',
+            Self::CytosineUracil => 'Y',
+            Self::GuanineUracil => 'K',
+            Self::AdenineCytosineGuanine => 'V',
+            Self::AdenineCytosineUracil => 'H',
+            Self::AdenineGuanineUracil => 'D',
+            Self::CytosineGuanineUracil => 'B',
+            Self::Any => 'N',
+            Self::Gap => '-',
+        }
     }
 
     #[getter]

@@ -84,10 +84,25 @@ impl DNABase {
     }
 
     #[getter]
-    fn get_code(&self) -> PyResult<char> {
-        Err(pyo3::exceptions::PyNotImplementedError::new_err(
-            "not implemented",
-        ))
+    fn get_code(&self) -> char {
+        match self {
+            Self::Adenine => 'A',
+            Self::Cytosine => 'C',
+            Self::Guanine => 'G',
+            Self::Thymine => 'T',
+            Self::AdenineCytosine => 'M',
+            Self::AdenineGuanine => 'R',
+            Self::AdenineThymine => 'W',
+            Self::CytosineGuanine => 'S',
+            Self::CytosineThymine => 'Y',
+            Self::GuanineThymine => 'K',
+            Self::AdenineCytosineGuanine => 'V',
+            Self::AdenineCytosineThymine => 'H',
+            Self::AdenineGuanineThymine => 'D',
+            Self::CytosineGuanineThymine => 'B',
+            Self::Any => 'N',
+            Self::Gap => '-',
+        }
     }
 
     #[getter]

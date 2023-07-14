@@ -72,9 +72,29 @@ def test__str__(base: haem.RNABase, text: str) -> None:
     assert str(base) == text
 
 
-def test_code_not_implemented() -> None:
-    with pytest.raises(NotImplementedError):
-        haem.RNABase.ADENINE.code
+@pytest.mark.parametrize(
+    "base,code",
+    [
+        (haem.RNABase.ADENINE, "A"),
+        (haem.RNABase.CYTOSINE, "C"),
+        (haem.RNABase.GUANINE, "G"),
+        (haem.RNABase.URACIL, "U"),
+        (haem.RNABase.ADENINE_CYTOSINE, "M"),
+        (haem.RNABase.ADENINE_GUANINE, "R"),
+        (haem.RNABase.ADENINE_URACIL, "W"),
+        (haem.RNABase.CYTOSINE_GUANINE, "S"),
+        (haem.RNABase.CYTOSINE_URACIL, "Y"),
+        (haem.RNABase.GUANINE_URACIL, "K"),
+        (haem.RNABase.ADENINE_CYTOSINE_GUANINE, "V"),
+        (haem.RNABase.ADENINE_CYTOSINE_URACIL, "H"),
+        (haem.RNABase.ADENINE_GUANINE_URACIL, "D"),
+        (haem.RNABase.CYTOSINE_GUANINE_URACIL, "B"),
+        (haem.RNABase.ANY, "N"),
+        (haem.RNABase.GAP, "-"),
+    ],
+)
+def test_code(base: haem.RNABase, code: str) -> None:
+    assert base.code == code
 
 
 def test_complement_not_implemented() -> None:
