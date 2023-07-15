@@ -104,6 +104,13 @@ impl AminoAcid {
         ))
     }
 
+    #[getter]
+    fn get_short_name(&self) -> PyResult<&'static str> {
+        Err(pyo3::exceptions::PyNotImplementedError::new_err(
+            "not implemented",
+        ))
+    }
+
     fn __str__(&self) -> PyResult<String> {
         Err(pyo3::exceptions::PyNotImplementedError::new_err(
             "not implemented",

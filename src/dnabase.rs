@@ -170,24 +170,24 @@ impl DNABase {
         ))
     }
 
-    fn __str__(&self) -> String {
+    fn __str__(&self) -> &'static str {
         match self {
-            Self::Adenine => "adenine".to_string(),
-            Self::Cytosine => "cytosine".to_string(),
-            Self::Guanine => "guanine".to_string(),
-            Self::Thymine => "thymine".to_string(),
-            Self::AdenineCytosine => "adenine/cytosine".to_string(),
-            Self::AdenineGuanine => "adenine/guanine".to_string(),
-            Self::AdenineThymine => "adenine/thymine".to_string(),
-            Self::CytosineGuanine => "cytosine/guanine".to_string(),
-            Self::CytosineThymine => "cytosine/thymine".to_string(),
-            Self::GuanineThymine => "guanine/thymine".to_string(),
-            Self::AdenineCytosineGuanine => "adenine/cytosine/guanine".to_string(),
-            Self::AdenineCytosineThymine => "adenine/cytosine/thymine".to_string(),
-            Self::AdenineGuanineThymine => "adenine/guanine/thymine".to_string(),
-            Self::CytosineGuanineThymine => "cytosine/guanine/thymine".to_string(),
-            Self::Any => "any".to_string(),
-            Self::Gap => "gap".to_string(),
+            Self::Adenine => "adenine",
+            Self::Cytosine => "cytosine",
+            Self::Guanine => "guanine",
+            Self::Thymine => "thymine",
+            Self::AdenineCytosine => "adenine/cytosine",
+            Self::AdenineGuanine => "adenine/guanine",
+            Self::AdenineThymine => "adenine/thymine",
+            Self::CytosineGuanine => "cytosine/guanine",
+            Self::CytosineThymine => "cytosine/thymine",
+            Self::GuanineThymine => "guanine/thymine",
+            Self::AdenineCytosineGuanine => "adenine/cytosine/guanine",
+            Self::AdenineCytosineThymine => "adenine/cytosine/thymine",
+            Self::AdenineGuanineThymine => "adenine/guanine/thymine",
+            Self::CytosineGuanineThymine => "cytosine/guanine/thymine",
+            Self::Any => "any",
+            Self::Gap => "gap",
         }
     }
 }

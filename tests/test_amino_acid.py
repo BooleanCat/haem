@@ -63,6 +63,11 @@ def test_code_not_implemented() -> None:
         haem.AminoAcid.ALANINE.code
 
 
+def test_short_name_not_implemented() -> None:
+    with pytest.raises(NotImplementedError):
+        haem.AminoAcid.ALANINE.short_name
+
+
 def test__eq__() -> None:
     assert haem.AminoAcid.ALANINE == haem.AminoAcid.ALANINE
 
