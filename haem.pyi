@@ -102,3 +102,24 @@ class RNABase:
     def __add__(self, other: RNABase) -> typing.Any:
         """Not implemented."""
         ...
+
+class AminoAcid:
+    ALANINE: AminoAcid
+    ARGININE: AminoAcid
+
+    def __new__(self, code: str) -> AminoAcid:
+        """Not implemented."""
+        pass
+    def code(self) -> str:
+        """Not implemented."""
+        ...
+    def __repr__(self) -> str: ...
+    def __str__(self) -> str: ...
+    def __eq__(self, other: object) -> bool: ...
+    def __ne__(self, other: object) -> bool: ...
+    def __bool__(self) -> bool:
+        """Always true."""
+        pass
+    def __add__(self, other: AminoAcid) -> typing.Any:
+        """Not implemented."""
+        ...
