@@ -111,10 +111,29 @@ impl AminoAcid {
         ))
     }
 
-    fn __str__(&self) -> PyResult<String> {
-        Err(pyo3::exceptions::PyNotImplementedError::new_err(
-            "not implemented",
-        ))
+    fn __str__(&self) -> &'static str {
+        match self {
+            Self::Alanine => "alanine",
+            Self::Cysteine => "cysteine",
+            Self::AsparticAcid => "aspartic acid",
+            Self::GlutamicAcid => "glutamic acid",
+            Self::Phenylalanine => "phenylalanine",
+            Self::Glycine => "glycine",
+            Self::Histidine => "histidine",
+            Self::Isoleucine => "isoleucine",
+            Self::Lysine => "lysine",
+            Self::Leucine => "leucine",
+            Self::Methionine => "methionine",
+            Self::Asparagine => "asparagine",
+            Self::Proline => "proline",
+            Self::Glutamine => "glutamine",
+            Self::Arginine => "arginine",
+            Self::Serine => "serine",
+            Self::Threonine => "threonine",
+            Self::Valine => "valine",
+            Self::Tryptophan => "tryptophan",
+            Self::Tyrosine => "tyrosine",
+        }
     }
 
     fn __richcmp__(&self, other: &Self, op: CompareOp, py: Python<'_>) -> PyObject {
