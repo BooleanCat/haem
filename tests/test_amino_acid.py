@@ -82,9 +82,33 @@ def test__str__(amino_acid: haem.AminoAcid, text: str) -> None:
     assert str(amino_acid) == text
 
 
-def test_code_not_implemented() -> None:
-    with pytest.raises(NotImplementedError):
-        haem.AminoAcid.ALANINE.code
+@pytest.mark.parametrize(
+    "amino_acid,code",
+    [
+        (haem.AminoAcid.ALANINE, "A"),
+        (haem.AminoAcid.CYSTEINE, "C"),
+        (haem.AminoAcid.ASPARTIC_ACID, "D"),
+        (haem.AminoAcid.GLUTAMIC_ACID, "E"),
+        (haem.AminoAcid.PHENYLALANINE, "F"),
+        (haem.AminoAcid.GLYCINE, "G"),
+        (haem.AminoAcid.HISTIDINE, "H"),
+        (haem.AminoAcid.ISOLEUCINE, "I"),
+        (haem.AminoAcid.LYSINE, "K"),
+        (haem.AminoAcid.LEUCINE, "L"),
+        (haem.AminoAcid.METHIONINE, "M"),
+        (haem.AminoAcid.ASPARAGINE, "N"),
+        (haem.AminoAcid.PROLINE, "P"),
+        (haem.AminoAcid.GLUTAMINE, "Q"),
+        (haem.AminoAcid.ARGININE, "R"),
+        (haem.AminoAcid.SERINE, "S"),
+        (haem.AminoAcid.THREONINE, "T"),
+        (haem.AminoAcid.VALINE, "V"),
+        (haem.AminoAcid.TRYPTOPHAN, "W"),
+        (haem.AminoAcid.TYROSINE, "Y"),
+    ],
+)
+def test_code(amino_acid: haem.AminoAcid, code: str) -> None:
+    assert amino_acid.code == code
 
 
 @pytest.mark.parametrize(

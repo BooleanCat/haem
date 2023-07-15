@@ -147,24 +147,24 @@ impl RNABase {
         ))
     }
 
-    fn __str__(&self) -> String {
+    fn __str__(&self) -> &'static str {
         match self {
-            Self::Adenine => "adenine".to_string(),
-            Self::Cytosine => "cytosine".to_string(),
-            Self::Guanine => "guanine".to_string(),
-            Self::Uracil => "uracil".to_string(),
-            Self::AdenineCytosine => "adenine/cytosine".to_string(),
-            Self::AdenineGuanine => "adenine/guanine".to_string(),
-            Self::AdenineUracil => "adenine/uracil".to_string(),
-            Self::CytosineGuanine => "cytosine/guanine".to_string(),
-            Self::CytosineUracil => "cytosine/uracil".to_string(),
-            Self::GuanineUracil => "guanine/uracil".to_string(),
-            Self::AdenineCytosineGuanine => "adenine/cytosine/guanine".to_string(),
-            Self::AdenineCytosineUracil => "adenine/cytosine/uracil".to_string(),
-            Self::AdenineGuanineUracil => "adenine/guanine/uracil".to_string(),
-            Self::CytosineGuanineUracil => "cytosine/guanine/uracil".to_string(),
-            Self::Any => "any".to_string(),
-            Self::Gap => "gap".to_string(),
+            Self::Adenine => "adenine",
+            Self::Cytosine => "cytosine",
+            Self::Guanine => "guanine",
+            Self::Uracil => "uracil",
+            Self::AdenineCytosine => "adenine/cytosine",
+            Self::AdenineGuanine => "adenine/guanine",
+            Self::AdenineUracil => "adenine/uracil",
+            Self::CytosineGuanine => "cytosine/guanine",
+            Self::CytosineUracil => "cytosine/uracil",
+            Self::GuanineUracil => "guanine/uracil",
+            Self::AdenineCytosineGuanine => "adenine/cytosine/guanine",
+            Self::AdenineCytosineUracil => "adenine/cytosine/uracil",
+            Self::AdenineGuanineUracil => "adenine/guanine/uracil",
+            Self::CytosineGuanineUracil => "cytosine/guanine/uracil",
+            Self::Any => "any",
+            Self::Gap => "gap",
         }
     }
 }

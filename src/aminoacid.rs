@@ -98,10 +98,29 @@ impl AminoAcid {
     }
 
     #[getter]
-    fn get_code(&self) -> PyResult<char> {
-        Err(pyo3::exceptions::PyNotImplementedError::new_err(
-            "not implemented",
-        ))
+    fn get_code(&self) -> char {
+        match self {
+            Self::Alanine => 'A',
+            Self::Cysteine => 'C',
+            Self::AsparticAcid => 'D',
+            Self::GlutamicAcid => 'E',
+            Self::Phenylalanine => 'F',
+            Self::Glycine => 'G',
+            Self::Histidine => 'H',
+            Self::Isoleucine => 'I',
+            Self::Lysine => 'K',
+            Self::Leucine => 'L',
+            Self::Methionine => 'M',
+            Self::Asparagine => 'N',
+            Self::Proline => 'P',
+            Self::Glutamine => 'Q',
+            Self::Arginine => 'R',
+            Self::Serine => 'S',
+            Self::Threonine => 'T',
+            Self::Valine => 'V',
+            Self::Tryptophan => 'W',
+            Self::Tyrosine => 'Y',
+        }
     }
 
     #[getter]

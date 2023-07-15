@@ -128,7 +128,7 @@ class AminoAcid:
     def __new__(self, code: str) -> AminoAcid: ...
     @property
     def code(self) -> str:
-        """Not implemented."""
+        """One-letter IUPAC code of the amino acid."""
         ...
     @property
     def short_name(self) -> str:
