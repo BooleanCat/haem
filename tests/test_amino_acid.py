@@ -87,9 +87,33 @@ def test_code_not_implemented() -> None:
         haem.AminoAcid.ALANINE.code
 
 
-def test_short_name_not_implemented() -> None:
-    with pytest.raises(NotImplementedError):
-        haem.AminoAcid.ALANINE.short_name
+@pytest.mark.parametrize(
+    "amino_acid,short_name",
+    [
+        (haem.AminoAcid.ALANINE, "ala"),
+        (haem.AminoAcid.CYSTEINE, "cys"),
+        (haem.AminoAcid.ASPARTIC_ACID, "asp"),
+        (haem.AminoAcid.GLUTAMIC_ACID, "glu"),
+        (haem.AminoAcid.PHENYLALANINE, "phe"),
+        (haem.AminoAcid.GLYCINE, "gly"),
+        (haem.AminoAcid.HISTIDINE, "his"),
+        (haem.AminoAcid.ISOLEUCINE, "ile"),
+        (haem.AminoAcid.LYSINE, "lys"),
+        (haem.AminoAcid.LEUCINE, "leu"),
+        (haem.AminoAcid.METHIONINE, "met"),
+        (haem.AminoAcid.ASPARAGINE, "asn"),
+        (haem.AminoAcid.PROLINE, "pro"),
+        (haem.AminoAcid.GLUTAMINE, "gln"),
+        (haem.AminoAcid.ARGININE, "arg"),
+        (haem.AminoAcid.SERINE, "ser"),
+        (haem.AminoAcid.THREONINE, "thr"),
+        (haem.AminoAcid.VALINE, "val"),
+        (haem.AminoAcid.TRYPTOPHAN, "trp"),
+        (haem.AminoAcid.TYROSINE, "tyr"),
+    ],
+)
+def test_short_name(amino_acid: haem.AminoAcid, short_name: str) -> None:
+    assert amino_acid.short_name == short_name
 
 
 def test__eq__() -> None:

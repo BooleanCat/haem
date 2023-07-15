@@ -105,10 +105,29 @@ impl AminoAcid {
     }
 
     #[getter]
-    fn get_short_name(&self) -> PyResult<&'static str> {
-        Err(pyo3::exceptions::PyNotImplementedError::new_err(
-            "not implemented",
-        ))
+    fn get_short_name(&self) -> &'static str {
+        match self {
+            Self::Alanine => "ala",
+            Self::Cysteine => "cys",
+            Self::AsparticAcid => "asp",
+            Self::GlutamicAcid => "glu",
+            Self::Phenylalanine => "phe",
+            Self::Glycine => "gly",
+            Self::Histidine => "his",
+            Self::Isoleucine => "ile",
+            Self::Lysine => "lys",
+            Self::Leucine => "leu",
+            Self::Methionine => "met",
+            Self::Asparagine => "asn",
+            Self::Proline => "pro",
+            Self::Glutamine => "gln",
+            Self::Arginine => "arg",
+            Self::Serine => "ser",
+            Self::Threonine => "thr",
+            Self::Valine => "val",
+            Self::Tryptophan => "trp",
+            Self::Tyrosine => "tyr",
+        }
     }
 
     fn __str__(&self) -> &'static str {
