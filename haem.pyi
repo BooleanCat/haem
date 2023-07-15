@@ -105,11 +105,28 @@ class RNABase:
 
 class AminoAcid:
     ALANINE: AminoAcid
+    CYSTEINE: AminoAcid
+    ASPARTIC_ACID: AminoAcid
+    GLUTAMIC_ACID: AminoAcid
+    PHENYLALANINE: AminoAcid
+    GLYCINE: AminoAcid
+    HISTIDINE: AminoAcid
+    ISOLEUCINE: AminoAcid
+    LYSINE: AminoAcid
+    LEUCINE: AminoAcid
+    METHIONINE: AminoAcid
+    ASPARAGINE: AminoAcid
+    PROLINE: AminoAcid
+    GLUTAMINE: AminoAcid
     ARGININE: AminoAcid
+    SERINE: AminoAcid
+    THREONINE: AminoAcid
+    VALINE: AminoAcid
+    TRYPTOPHAN: AminoAcid
+    TYROSINE: AminoAcid
 
-    def __new__(self, code: str) -> AminoAcid:
-        """Not implemented."""
-        pass
+    def __new__(self, code: str) -> AminoAcid: ...
+    @property
     def code(self) -> str:
         """Not implemented."""
         ...
@@ -119,7 +136,7 @@ class AminoAcid:
     def __ne__(self, other: object) -> bool: ...
     def __bool__(self) -> bool:
         """Always true."""
-        pass
+        ...
     def __add__(self, other: AminoAcid) -> typing.Any:
         """Not implemented."""
         ...

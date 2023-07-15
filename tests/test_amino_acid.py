@@ -6,9 +6,47 @@ import pytest
 import haem
 
 
-def test__new__not_implemented() -> None:
-    with pytest.raises(NotImplementedError):
-        haem.AminoAcid("A")
+@pytest.mark.parametrize(
+    "code,amino_acid",
+    [
+        ("A", haem.AminoAcid.ALANINE),
+        ("C", haem.AminoAcid.CYSTEINE),
+        ("D", haem.AminoAcid.ASPARTIC_ACID),
+        ("E", haem.AminoAcid.GLUTAMIC_ACID),
+        ("F", haem.AminoAcid.PHENYLALANINE),
+        ("G", haem.AminoAcid.GLYCINE),
+        ("H", haem.AminoAcid.HISTIDINE),
+        ("I", haem.AminoAcid.ISOLEUCINE),
+        ("K", haem.AminoAcid.LYSINE),
+        ("L", haem.AminoAcid.LEUCINE),
+        ("M", haem.AminoAcid.METHIONINE),
+        ("N", haem.AminoAcid.ASPARAGINE),
+        ("P", haem.AminoAcid.PROLINE),
+        ("Q", haem.AminoAcid.GLUTAMINE),
+        ("R", haem.AminoAcid.ARGININE),
+        ("S", haem.AminoAcid.SERINE),
+        ("T", haem.AminoAcid.THREONINE),
+        ("V", haem.AminoAcid.VALINE),
+        ("W", haem.AminoAcid.TRYPTOPHAN),
+        ("Y", haem.AminoAcid.TYROSINE),
+    ],
+)
+def test__new__(code: str, amino_acid: haem.AminoAcid) -> None:
+    assert haem.AminoAcid(code) == amino_acid
+
+
+@pytest.mark.parametrize(
+    "code,message",
+    [
+        ("X", 'invalid IUPAC amino acid code "X"'),
+        ("XX", "expected a string of length 1"),
+    ],
+)
+def test__new__invalid_code(code: str, message: str) -> None:
+    with pytest.raises(ValueError) as excinfo:
+        haem.AminoAcid(code)
+
+    assert str(excinfo.value) == message
 
 
 def test__repr__() -> None:
