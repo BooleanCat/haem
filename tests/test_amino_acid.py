@@ -153,6 +153,7 @@ def test__new__histidine() -> None:
         ("X", 'invalid IUPAC amino acid code "X"'),
         ("XX", "invalid amino acid codon"),
         ("NNN", "ambiguous codon"),
+        ("---", "codon contains gap"),
     ],
 )
 def test__new__invalid_code(code: str, message: str) -> None:

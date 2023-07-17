@@ -223,6 +223,12 @@ impl AminoAcid {
     #[inline]
     fn from_codon(first: RNABase, second: RNABase, third: RNABase) -> PyResult<Self> {
         Ok(match (first, second, third) {
+            (RNABase::Gap, _, _) | (_, RNABase::Gap, _) | (_, _, RNABase::Gap) => {
+                return Err(pyo3::exceptions::PyValueError::new_err(
+                    "codon contains gap",
+                ))
+            }
+
             // Alanine
             (RNABase::Guanine, RNABase::Cytosine, _) => Self::Alanine,
 
