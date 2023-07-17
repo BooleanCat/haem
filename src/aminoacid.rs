@@ -247,6 +247,23 @@ impl AminoAcid {
                 RNABase::Adenine | RNABase::Guanine | RNABase::AdenineGuanine,
             ) => Self::GlutamicAcid,
 
+            // Phenylalanine
+            (
+                RNABase::Uracil,
+                RNABase::Uracil,
+                RNABase::Cytosine | RNABase::Uracil | RNABase::CytosineUracil,
+            ) => Self::Phenylalanine,
+
+            // Glycine
+            (RNABase::Guanine, RNABase::Guanine, _) => Self::Glycine,
+
+            // Histidine
+            (
+                RNABase::Cytosine,
+                RNABase::Adenine,
+                RNABase::Cytosine | RNABase::Uracil | RNABase::CytosineUracil,
+            ) => Self::Histidine,
+
             _ => return Err(pyo3::exceptions::PyValueError::new_err("ambiguous codon")),
         })
     }
