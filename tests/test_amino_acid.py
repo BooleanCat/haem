@@ -6,12 +6,14 @@ import pytest
 import haem
 
 
+@pytest.fixture
+def rna_bases() -> typing.Iterator[haem.RNABase]:
+    return map(haem.RNABase, "ACGUMRWSYKVHDBN")
+
+
 @pytest.mark.parametrize(
     "code,amino_acid",
     [
-        ("A", haem.AminoAcid.ALANINE),
-        ("C", haem.AminoAcid.CYSTEINE),
-        ("D", haem.AminoAcid.ASPARTIC_ACID),
         ("E", haem.AminoAcid.GLUTAMIC_ACID),
         ("F", haem.AminoAcid.PHENYLALANINE),
         ("G", haem.AminoAcid.GLYCINE),
@@ -35,11 +37,58 @@ def test__new__(code: str, amino_acid: haem.AminoAcid) -> None:
     assert haem.AminoAcid(code) == amino_acid
 
 
+def test__new__alanine(rna_bases: typing.Iterator[haem.RNABase]) -> None:
+    assert haem.AminoAcid("A") == haem.AminoAcid.ALANINE
+
+    for base in rna_bases:
+        assert (
+            haem.AminoAcid((haem.RNABase.GUANINE, haem.RNABase.CYTOSINE, base))
+            == haem.AminoAcid.ALANINE
+        )
+
+        assert haem.AminoAcid("GC" + base.code) == haem.AminoAcid.ALANINE
+
+
+def test__new__cysteine() -> None:
+    assert haem.AminoAcid("C") == haem.AminoAcid.CYSTEINE
+
+    codons = [
+        (haem.RNABase.URACIL, haem.RNABase.GUANINE, haem.RNABase.CYTOSINE),
+        (haem.RNABase.URACIL, haem.RNABase.GUANINE, haem.RNABase.URACIL),
+        (haem.RNABase.URACIL, haem.RNABase.GUANINE, haem.RNABase.CYTOSINE_URACIL),
+    ]
+
+    for codon in codons:
+        assert haem.AminoAcid(codon) == haem.AminoAcid.CYSTEINE
+        assert (
+            haem.AminoAcid("".join(base.code for base in codon))
+            == haem.AminoAcid.CYSTEINE
+        )
+
+
+def test__new__aspartic_acid() -> None:
+    assert haem.AminoAcid("D") == haem.AminoAcid.ASPARTIC_ACID
+
+    codons = [
+        (haem.RNABase.GUANINE, haem.RNABase.ADENINE, haem.RNABase.CYTOSINE),
+        (haem.RNABase.GUANINE, haem.RNABase.ADENINE, haem.RNABase.URACIL),
+        (haem.RNABase.GUANINE, haem.RNABase.ADENINE, haem.RNABase.CYTOSINE_URACIL),
+    ]
+
+    for codon in codons:
+        assert haem.AminoAcid(codon) == haem.AminoAcid.ASPARTIC_ACID
+        assert (
+            haem.AminoAcid("".join(base.code for base in codon))
+            == haem.AminoAcid.ASPARTIC_ACID
+        )
+
+
 @pytest.mark.parametrize(
     "code,message",
     [
         ("X", 'invalid IUPAC amino acid code "X"'),
-        ("XX", "expected a string of length 1"),
+        ("XX", "invalid amino acid codon"),
+        ("NNN", "ambiguous codon"),
     ],
 )
 def test__new__invalid_code(code: str, message: str) -> None:

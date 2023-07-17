@@ -125,7 +125,9 @@ class AminoAcid:
     TRYPTOPHAN: AminoAcid
     TYROSINE: AminoAcid
 
-    def __new__(self, code: str) -> AminoAcid: ...
+    def __new__(
+        self, code_or_codon: typing.Union[str, tuple[RNABase, RNABase, RNABase]]
+    ) -> AminoAcid: ...
     @property
     def code(self) -> str:
         """One-letter IUPAC code of the amino acid."""

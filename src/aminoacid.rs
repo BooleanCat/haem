@@ -1,5 +1,13 @@
+use crate::rnabase::RNABase;
 use pyo3::class::basic::CompareOp;
 use pyo3::prelude::*;
+
+#[derive(FromPyObject)]
+enum CodeOrCodon {
+    Code(char),
+    Codon(RNABase, RNABase, RNABase),
+    CodonStr(String),
+}
 
 #[pyclass(frozen)]
 #[derive(Clone, Copy, PartialEq)]
@@ -68,33 +76,49 @@ pub enum AminoAcid {
 #[pymethods]
 impl AminoAcid {
     #[new]
-    fn __new__(code: char) -> PyResult<Self> {
-        Ok(match code {
-            'A' => Self::Alanine,
-            'C' => Self::Cysteine,
-            'D' => Self::AsparticAcid,
-            'E' => Self::GlutamicAcid,
-            'F' => Self::Phenylalanine,
-            'G' => Self::Glycine,
-            'H' => Self::Histidine,
-            'I' => Self::Isoleucine,
-            'K' => Self::Lysine,
-            'L' => Self::Leucine,
-            'M' => Self::Methionine,
-            'N' => Self::Asparagine,
-            'P' => Self::Proline,
-            'Q' => Self::Glutamine,
-            'R' => Self::Arginine,
-            'S' => Self::Serine,
-            'T' => Self::Threonine,
-            'V' => Self::Valine,
-            'W' => Self::Tryptophan,
-            'Y' => Self::Tyrosine,
+    fn __new__(code_or_codon: CodeOrCodon) -> PyResult<Self> {
+        Ok(match code_or_codon {
+            CodeOrCodon::Code(code) => match code {
+                'A' => Self::Alanine,
+                'C' => Self::Cysteine,
+                'D' => Self::AsparticAcid,
+                'E' => Self::GlutamicAcid,
+                'F' => Self::Phenylalanine,
+                'G' => Self::Glycine,
+                'H' => Self::Histidine,
+                'I' => Self::Isoleucine,
+                'K' => Self::Lysine,
+                'L' => Self::Leucine,
+                'M' => Self::Methionine,
+                'N' => Self::Asparagine,
+                'P' => Self::Proline,
+                'Q' => Self::Glutamine,
+                'R' => Self::Arginine,
+                'S' => Self::Serine,
+                'T' => Self::Threonine,
+                'V' => Self::Valine,
+                'W' => Self::Tryptophan,
+                'Y' => Self::Tyrosine,
+                _ => {
+                    return Err(pyo3::exceptions::PyValueError::new_err(format!(
+                        "invalid IUPAC amino acid code \"{}\"",
+                        code
+                    )))
+                }
+            },
+            CodeOrCodon::Codon(first, second, third) => Self::from_codon(first, second, third)?,
+            CodeOrCodon::CodonStr(codon) if codon.len() == 3 => {
+                let bases = codon
+                    .chars()
+                    .map(RNABase::__new__)
+                    .collect::<PyResult<Vec<_>>>()?;
+
+                Self::from_codon(bases[0], bases[1], bases[2])?
+            }
             _ => {
-                return Err(pyo3::exceptions::PyValueError::new_err(format!(
-                    "invalid IUPAC amino acid code \"{}\"",
-                    code
-                )))
+                return Err(pyo3::exceptions::PyValueError::new_err(
+                    "invalid amino acid codon",
+                ))
             }
         })
     }
@@ -192,5 +216,31 @@ impl AminoAcid {
         Err(pyo3::exceptions::PyNotImplementedError::new_err(
             "not implemented",
         ))
+    }
+}
+
+impl AminoAcid {
+    #[inline]
+    fn from_codon(first: RNABase, second: RNABase, third: RNABase) -> PyResult<Self> {
+        Ok(match (first, second, third) {
+            // Alanine
+            (RNABase::Guanine, RNABase::Cytosine, _) => Self::Alanine,
+
+            // Cysteine
+            (
+                RNABase::Uracil,
+                RNABase::Guanine,
+                RNABase::Cytosine | RNABase::Uracil | RNABase::CytosineUracil,
+            ) => Self::Cysteine,
+
+            // Aspartic acid
+            (
+                RNABase::Guanine,
+                RNABase::Adenine,
+                RNABase::Cytosine | RNABase::Uracil | RNABase::CytosineUracil,
+            ) => Self::AsparticAcid,
+
+            _ => return Err(pyo3::exceptions::PyValueError::new_err("ambiguous codon")),
+        })
     }
 }
