@@ -25,7 +25,6 @@ jobs:
       - name: Build & install
         uses: PyO3/maturin-action@v1
         with:
-          target: x86_64
           args: --release
       - uses: abatilo/actions-poetry@v2
         with: { poetry-version: 1.5 }
