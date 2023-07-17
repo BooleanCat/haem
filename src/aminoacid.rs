@@ -69,32 +69,34 @@ pub enum AminoAcid {
 impl AminoAcid {
     #[new]
     fn __new__(code: char) -> PyResult<Self> {
-        match code {
-            'A' => Ok(Self::Alanine),
-            'C' => Ok(Self::Cysteine),
-            'D' => Ok(Self::AsparticAcid),
-            'E' => Ok(Self::GlutamicAcid),
-            'F' => Ok(Self::Phenylalanine),
-            'G' => Ok(Self::Glycine),
-            'H' => Ok(Self::Histidine),
-            'I' => Ok(Self::Isoleucine),
-            'K' => Ok(Self::Lysine),
-            'L' => Ok(Self::Leucine),
-            'M' => Ok(Self::Methionine),
-            'N' => Ok(Self::Asparagine),
-            'P' => Ok(Self::Proline),
-            'Q' => Ok(Self::Glutamine),
-            'R' => Ok(Self::Arginine),
-            'S' => Ok(Self::Serine),
-            'T' => Ok(Self::Threonine),
-            'V' => Ok(Self::Valine),
-            'W' => Ok(Self::Tryptophan),
-            'Y' => Ok(Self::Tyrosine),
-            _ => Err(pyo3::exceptions::PyValueError::new_err(format!(
-                "invalid IUPAC amino acid code \"{}\"",
-                code
-            ))),
-        }
+        Ok(match code {
+            'A' => Self::Alanine,
+            'C' => Self::Cysteine,
+            'D' => Self::AsparticAcid,
+            'E' => Self::GlutamicAcid,
+            'F' => Self::Phenylalanine,
+            'G' => Self::Glycine,
+            'H' => Self::Histidine,
+            'I' => Self::Isoleucine,
+            'K' => Self::Lysine,
+            'L' => Self::Leucine,
+            'M' => Self::Methionine,
+            'N' => Self::Asparagine,
+            'P' => Self::Proline,
+            'Q' => Self::Glutamine,
+            'R' => Self::Arginine,
+            'S' => Self::Serine,
+            'T' => Self::Threonine,
+            'V' => Self::Valine,
+            'W' => Self::Tryptophan,
+            'Y' => Self::Tyrosine,
+            _ => {
+                return Err(pyo3::exceptions::PyValueError::new_err(format!(
+                    "invalid IUPAC amino acid code \"{}\"",
+                    code
+                )))
+            }
+        })
     }
 
     #[getter]

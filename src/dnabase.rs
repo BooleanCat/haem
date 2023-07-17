@@ -59,28 +59,30 @@ pub enum DNABase {
 impl DNABase {
     #[new]
     fn __new__(code: char) -> PyResult<Self> {
-        match code {
-            'A' => Ok(Self::Adenine),
-            'C' => Ok(Self::Cytosine),
-            'G' => Ok(Self::Guanine),
-            'T' => Ok(Self::Thymine),
-            'M' => Ok(Self::AdenineCytosine),
-            'R' => Ok(Self::AdenineGuanine),
-            'W' => Ok(Self::AdenineThymine),
-            'S' => Ok(Self::CytosineGuanine),
-            'Y' => Ok(Self::CytosineThymine),
-            'K' => Ok(Self::GuanineThymine),
-            'V' => Ok(Self::AdenineCytosineGuanine),
-            'H' => Ok(Self::AdenineCytosineThymine),
-            'D' => Ok(Self::AdenineGuanineThymine),
-            'B' => Ok(Self::CytosineGuanineThymine),
-            'N' => Ok(Self::Any),
-            '.' | '-' => Ok(Self::Gap),
-            _ => Err(pyo3::exceptions::PyValueError::new_err(format!(
-                "invalid IUPAC DNA code \"{}\"",
-                code
-            ))),
-        }
+        Ok(match code {
+            'A' => Self::Adenine,
+            'C' => Self::Cytosine,
+            'G' => Self::Guanine,
+            'T' => Self::Thymine,
+            'M' => Self::AdenineCytosine,
+            'R' => Self::AdenineGuanine,
+            'W' => Self::AdenineThymine,
+            'S' => Self::CytosineGuanine,
+            'Y' => Self::CytosineThymine,
+            'K' => Self::GuanineThymine,
+            'V' => Self::AdenineCytosineGuanine,
+            'H' => Self::AdenineCytosineThymine,
+            'D' => Self::AdenineGuanineThymine,
+            'B' => Self::CytosineGuanineThymine,
+            'N' => Self::Any,
+            '.' | '-' => Self::Gap,
+            _ => {
+                return Err(pyo3::exceptions::PyValueError::new_err(format!(
+                    "invalid IUPAC DNA code \"{}\"",
+                    code
+                )))
+            }
+        })
     }
 
     #[getter]

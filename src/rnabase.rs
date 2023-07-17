@@ -57,28 +57,30 @@ pub enum RNABase {
 impl RNABase {
     #[new]
     fn __new__(code: char) -> PyResult<Self> {
-        match code {
-            'A' => Ok(Self::Adenine),
-            'C' => Ok(Self::Cytosine),
-            'G' => Ok(Self::Guanine),
-            'U' => Ok(Self::Uracil),
-            'M' => Ok(Self::AdenineCytosine),
-            'R' => Ok(Self::AdenineGuanine),
-            'W' => Ok(Self::AdenineUracil),
-            'S' => Ok(Self::CytosineGuanine),
-            'Y' => Ok(Self::CytosineUracil),
-            'K' => Ok(Self::GuanineUracil),
-            'V' => Ok(Self::AdenineCytosineGuanine),
-            'H' => Ok(Self::AdenineCytosineUracil),
-            'D' => Ok(Self::AdenineGuanineUracil),
-            'B' => Ok(Self::CytosineGuanineUracil),
-            'N' => Ok(Self::Any),
-            '.' | '-' => Ok(Self::Gap),
-            _ => Err(pyo3::exceptions::PyValueError::new_err(format!(
-                "invalid IUPAC RNA code \"{}\"",
-                code
-            ))),
-        }
+        Ok(match code {
+            'A' => Self::Adenine,
+            'C' => Self::Cytosine,
+            'G' => Self::Guanine,
+            'U' => Self::Uracil,
+            'M' => Self::AdenineCytosine,
+            'R' => Self::AdenineGuanine,
+            'W' => Self::AdenineUracil,
+            'S' => Self::CytosineGuanine,
+            'Y' => Self::CytosineUracil,
+            'K' => Self::GuanineUracil,
+            'V' => Self::AdenineCytosineGuanine,
+            'H' => Self::AdenineCytosineUracil,
+            'D' => Self::AdenineGuanineUracil,
+            'B' => Self::CytosineGuanineUracil,
+            'N' => Self::Any,
+            '.' | '-' => Self::Gap,
+            _ => {
+                return Err(pyo3::exceptions::PyValueError::new_err(format!(
+                    "invalid IUPAC RNA code \"{}\"",
+                    code
+                )))
+            }
+        })
     }
 
     #[getter]
