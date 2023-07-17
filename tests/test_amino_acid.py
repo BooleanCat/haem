@@ -14,7 +14,6 @@ def rna_bases() -> typing.Iterator[haem.RNABase]:
 @pytest.mark.parametrize(
     "code,amino_acid",
     [
-        ("E", haem.AminoAcid.GLUTAMIC_ACID),
         ("F", haem.AminoAcid.PHENYLALANINE),
         ("G", haem.AminoAcid.GLYCINE),
         ("H", haem.AminoAcid.HISTIDINE),
@@ -63,6 +62,23 @@ def test__new__cysteine() -> None:
         assert (
             haem.AminoAcid("".join(base.code for base in codon))
             == haem.AminoAcid.CYSTEINE
+        )
+
+
+def test__new__glutamic_acid() -> None:
+    assert haem.AminoAcid("E") == haem.AminoAcid.GLUTAMIC_ACID
+
+    codons = [
+        (haem.RNABase.GUANINE, haem.RNABase.ADENINE, haem.RNABase.ADENINE),
+        (haem.RNABase.GUANINE, haem.RNABase.ADENINE, haem.RNABase.GUANINE),
+        (haem.RNABase.GUANINE, haem.RNABase.ADENINE, haem.RNABase.ADENINE_GUANINE),
+    ]
+
+    for codon in codons:
+        assert haem.AminoAcid(codon) == haem.AminoAcid.GLUTAMIC_ACID
+        assert (
+            haem.AminoAcid("".join(base.code for base in codon))
+            == haem.AminoAcid.GLUTAMIC_ACID
         )
 
 
