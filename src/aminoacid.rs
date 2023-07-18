@@ -270,6 +270,54 @@ impl AminoAcid {
                 RNABase::Cytosine | RNABase::Uracil | RNABase::CytosineUracil,
             ) => Self::Histidine,
 
+            // Isoleucine
+            (
+                RNABase::Adenine,
+                RNABase::Uracil,
+                RNABase::Adenine
+                | RNABase::Cytosine
+                | RNABase::Uracil
+                | RNABase::AdenineCytosine
+                | RNABase::AdenineUracil
+                | RNABase::CytosineUracil
+                | RNABase::AdenineCytosineUracil,
+            ) => Self::Isoleucine,
+
+            // Lysine
+            (
+                RNABase::Adenine,
+                RNABase::Adenine,
+                RNABase::Adenine | RNABase::Guanine | RNABase::AdenineGuanine,
+            ) => Self::Lysine,
+
+            // Leucine
+            (RNABase::Cytosine, RNABase::Uracil, _)
+            | (
+                RNABase::Uracil,
+                RNABase::Uracil,
+                RNABase::Adenine | RNABase::Guanine | RNABase::AdenineGuanine,
+            ) => Self::Leucine,
+
+            // Methionine
+            (RNABase::Adenine, RNABase::Uracil, RNABase::Guanine) => Self::Methionine,
+
+            // Asparagine
+            (
+                RNABase::Adenine,
+                RNABase::Adenine,
+                RNABase::Cytosine | RNABase::Uracil | RNABase::CytosineUracil,
+            ) => Self::Asparagine,
+
+            // Proline
+            (RNABase::Cytosine, RNABase::Cytosine, _) => Self::Proline,
+
+            // Glutamine
+            (
+                RNABase::Cytosine,
+                RNABase::Adenine,
+                RNABase::Adenine | RNABase::Guanine | RNABase::AdenineGuanine,
+            ) => Self::Glutamine,
+
             _ => return Err(pyo3::exceptions::PyValueError::new_err("ambiguous codon")),
         })
     }

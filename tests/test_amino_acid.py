@@ -14,13 +14,6 @@ def rna_bases() -> typing.Iterator[haem.RNABase]:
 @pytest.mark.parametrize(
     "code,amino_acid",
     [
-        ("I", haem.AminoAcid.ISOLEUCINE),
-        ("K", haem.AminoAcid.LYSINE),
-        ("L", haem.AminoAcid.LEUCINE),
-        ("M", haem.AminoAcid.METHIONINE),
-        ("N", haem.AminoAcid.ASPARAGINE),
-        ("P", haem.AminoAcid.PROLINE),
-        ("Q", haem.AminoAcid.GLUTAMINE),
         ("R", haem.AminoAcid.ARGININE),
         ("S", haem.AminoAcid.SERINE),
         ("T", haem.AminoAcid.THREONINE),
@@ -144,6 +137,135 @@ def test__new__histidine() -> None:
         assert (
             haem.AminoAcid("".join(base.code for base in codon))
             == haem.AminoAcid.HISTIDINE
+        )
+
+
+def test__new__iso_leucine() -> None:
+    assert haem.AminoAcid("I") == haem.AminoAcid.ISOLEUCINE
+
+    codons = [
+        (haem.RNABase.ADENINE, haem.RNABase.URACIL, haem.RNABase.ADENINE),
+        (haem.RNABase.ADENINE, haem.RNABase.URACIL, haem.RNABase.CYTOSINE),
+        (haem.RNABase.ADENINE, haem.RNABase.URACIL, haem.RNABase.URACIL),
+        (haem.RNABase.ADENINE, haem.RNABase.URACIL, haem.RNABase.ADENINE_CYTOSINE),
+        (haem.RNABase.ADENINE, haem.RNABase.URACIL, haem.RNABase.ADENINE_URACIL),
+        (haem.RNABase.ADENINE, haem.RNABase.URACIL, haem.RNABase.CYTOSINE_URACIL),
+        (
+            haem.RNABase.ADENINE,
+            haem.RNABase.URACIL,
+            haem.RNABase.ADENINE_CYTOSINE_URACIL,
+        ),
+    ]
+
+    for codon in codons:
+        assert haem.AminoAcid(codon) == haem.AminoAcid.ISOLEUCINE
+
+        assert (
+            haem.AminoAcid("".join(base.code for base in codon))
+            == haem.AminoAcid.ISOLEUCINE
+        )
+
+
+def test__new__lysine() -> None:
+    assert haem.AminoAcid("K") == haem.AminoAcid.LYSINE
+
+    codons = [
+        (haem.RNABase.ADENINE, haem.RNABase.ADENINE, haem.RNABase.ADENINE),
+        (haem.RNABase.ADENINE, haem.RNABase.ADENINE, haem.RNABase.GUANINE),
+        (haem.RNABase.ADENINE, haem.RNABase.ADENINE, haem.RNABase.ADENINE_GUANINE),
+    ]
+
+    for codon in codons:
+        assert haem.AminoAcid(codon) == haem.AminoAcid.LYSINE
+
+        assert (
+            haem.AminoAcid("".join(base.code for base in codon))
+            == haem.AminoAcid.LYSINE
+        )
+
+
+def test__new__leucine(rna_bases: typing.Iterator[haem.RNABase]) -> None:
+    assert haem.AminoAcid("L") == haem.AminoAcid.LEUCINE
+
+    for base in rna_bases:
+        assert (
+            haem.AminoAcid((haem.RNABase.CYTOSINE, haem.RNABase.URACIL, base))
+            == haem.AminoAcid.LEUCINE
+        )
+
+        assert haem.AminoAcid("CU" + base.code) == haem.AminoAcid.LEUCINE
+
+    codons = [
+        (haem.RNABase.URACIL, haem.RNABase.URACIL, haem.RNABase.ADENINE),
+        (haem.RNABase.URACIL, haem.RNABase.URACIL, haem.RNABase.GUANINE),
+        (haem.RNABase.URACIL, haem.RNABase.URACIL, haem.RNABase.ADENINE_GUANINE),
+    ]
+
+    for codon in codons:
+        assert haem.AminoAcid(codon) == haem.AminoAcid.LEUCINE
+
+        assert (
+            haem.AminoAcid("".join(base.code for base in codon))
+            == haem.AminoAcid.LEUCINE
+        )
+
+
+def test__new__methionine() -> None:
+    assert haem.AminoAcid("M") == haem.AminoAcid.METHIONINE
+    assert (
+        haem.AminoAcid(
+            (haem.RNABase.ADENINE, haem.RNABase.URACIL, haem.RNABase.GUANINE)
+        )
+        == haem.AminoAcid.METHIONINE
+    )
+    assert haem.AminoAcid("AUG") == haem.AminoAcid.METHIONINE
+
+
+def test__new__asparagine() -> None:
+    assert haem.AminoAcid("N") == haem.AminoAcid.ASPARAGINE
+
+    codons = [
+        (haem.RNABase.ADENINE, haem.RNABase.ADENINE, haem.RNABase.CYTOSINE),
+        (haem.RNABase.ADENINE, haem.RNABase.ADENINE, haem.RNABase.URACIL),
+        (haem.RNABase.ADENINE, haem.RNABase.ADENINE, haem.RNABase.CYTOSINE_URACIL),
+    ]
+
+    for codon in codons:
+        assert haem.AminoAcid(codon) == haem.AminoAcid.ASPARAGINE
+
+        assert (
+            haem.AminoAcid("".join(base.code for base in codon))
+            == haem.AminoAcid.ASPARAGINE
+        )
+
+
+def test__new__proline(rna_bases: typing.Iterator[haem.RNABase]) -> None:
+    assert haem.AminoAcid("P") == haem.AminoAcid.PROLINE
+
+    for base in rna_bases:
+        assert (
+            haem.AminoAcid((haem.RNABase.CYTOSINE, haem.RNABase.CYTOSINE, base))
+            == haem.AminoAcid.PROLINE
+        )
+
+        assert haem.AminoAcid("CC" + base.code) == haem.AminoAcid.PROLINE
+
+
+def test__new__glutamine() -> None:
+    assert haem.AminoAcid("Q") == haem.AminoAcid.GLUTAMINE
+
+    codons = [
+        (haem.RNABase.CYTOSINE, haem.RNABase.ADENINE, haem.RNABase.ADENINE),
+        (haem.RNABase.CYTOSINE, haem.RNABase.ADENINE, haem.RNABase.GUANINE),
+        (haem.RNABase.CYTOSINE, haem.RNABase.ADENINE, haem.RNABase.ADENINE_GUANINE),
+    ]
+
+    for codon in codons:
+        assert haem.AminoAcid(codon) == haem.AminoAcid.GLUTAMINE
+
+        assert (
+            haem.AminoAcid("".join(base.code for base in codon))
+            == haem.AminoAcid.GLUTAMINE
         )
 
 
