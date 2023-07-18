@@ -326,6 +326,30 @@ impl AminoAcid {
                 RNABase::Adenine | RNABase::Guanine | RNABase::AdenineGuanine,
             ) => Self::Arginine,
 
+            // Serine
+            (RNABase::Uracil, RNABase::Cytosine, _)
+            | (
+                RNABase::Adenine,
+                RNABase::Guanine,
+                RNABase::Cytosine | RNABase::Uracil | RNABase::CytosineUracil,
+            ) => Self::Serine,
+
+            // Threonine
+            (RNABase::Adenine, RNABase::Cytosine, _) => Self::Threonine,
+
+            // Valine
+            (RNABase::Guanine, RNABase::Uracil, _) => Self::Valine,
+
+            // Tryptophan
+            (RNABase::Uracil, RNABase::Guanine, RNABase::Guanine) => Self::Tryptophan,
+
+            // Tyrosine
+            (
+                RNABase::Uracil,
+                RNABase::Adenine,
+                RNABase::Cytosine | RNABase::Uracil | RNABase::CytosineUracil,
+            ) => Self::Tyrosine,
+
             _ => return Err(pyo3::exceptions::PyValueError::new_err("ambiguous codon")),
         })
     }
