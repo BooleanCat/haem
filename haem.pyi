@@ -1,10 +1,16 @@
 import typing
 
+class StopTranslation(Exception):
+    """StopTranslation is raised when a stop codon is encountered during
+    translation."""
+
+    pass
+
 class DNABase:
     """An enumeration of DNA bases, as defined by IUPAC.
 
-    DNABases may be instantiated either directly by their variant, or by
-    their IUPAC code. For example:
+    DNABases may be instantiated either directly by their variant or by their
+    IUPAC code. For example:
 
     >>> DNABase.THYMINE
     >>> DNABase('T')
@@ -56,8 +62,8 @@ class DNABase:
 class RNABase:
     """An enumeration of RNA bases, as defined by IUPAC.
 
-    RNABases may be instantiated either directly by their variant, or by
-    their IUPAC code. For example:
+    RNABases may be instantiated either directly by their variant or by their
+    IUPAC code. For example:
 
     >>> RNABase.URACIL
     >>> RNABase('U')
@@ -104,6 +110,27 @@ class RNABase:
         ...
 
 class AminoAcid:
+    """An enumeration of amino acids, as defined by IUPAC.
+
+    AminoAcids may be instantiated either directly by their variant, by their
+    IUPAC code, by a tuple of three RNABases or by a string containing three
+    RNABase IUPAC codes. For example:
+
+    >>> AminoAcid.SERINE
+    >>> AminoAcid('S')
+    >>> AminoAcid((RNABase.ADENINE, RNABase.GUANINE, RNABase.CYTOSINE))
+    >>> AminoAcid('AGC')
+
+    AminoAcids may also be instantiated by ambiguous IUPAC RNA codes where
+    appropriate. For example:
+
+    >>> AminoAcid('AGY')  # Serine
+
+    Invalid inputs or codons that result in ambiguous amino acids will raise a
+    ValueError.
+
+    Stop codons will cause a StopTranslation exception to be raised."""
+
     ALANINE: AminoAcid
     CYSTEINE: AminoAcid
     ASPARTIC_ACID: AminoAcid

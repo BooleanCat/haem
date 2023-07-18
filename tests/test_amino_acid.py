@@ -366,6 +366,22 @@ def test__new__tyrosine() -> None:
         )
 
 
+def test__new__stop() -> None:
+    codons = [
+        (haem.RNABase.URACIL, haem.RNABase.ADENINE, haem.RNABase.ADENINE),
+        (haem.RNABase.URACIL, haem.RNABase.ADENINE, haem.RNABase.GUANINE),
+        (haem.RNABase.URACIL, haem.RNABase.ADENINE, haem.RNABase.ADENINE_GUANINE),
+        (haem.RNABase.URACIL, haem.RNABase.GUANINE, haem.RNABase.ADENINE),
+        (haem.RNABase.URACIL, haem.RNABase.ADENINE_GUANINE, haem.RNABase.ADENINE),
+    ]
+
+    for codon in codons:
+        with pytest.raises(haem.StopTranslation) as excinfo:
+            haem.AminoAcid(codon)
+
+        assert str(excinfo.value) == "stop translation"
+
+
 @pytest.mark.parametrize(
     "code,message",
     [

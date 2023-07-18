@@ -1,6 +1,9 @@
 use crate::rnabase::RNABase;
 use pyo3::class::basic::CompareOp;
+use pyo3::create_exception;
 use pyo3::prelude::*;
+
+create_exception!(haem, StopTranslation, pyo3::exceptions::PyException);
 
 #[derive(FromPyObject)]
 enum CodeOrCodon {
@@ -349,6 +352,16 @@ impl AminoAcid {
                 RNABase::Adenine,
                 RNABase::Cytosine | RNABase::Uracil | RNABase::CytosineUracil,
             ) => Self::Tyrosine,
+
+            // Stop
+            (
+                RNABase::Uracil,
+                RNABase::Adenine,
+                RNABase::Adenine | RNABase::Guanine | RNABase::AdenineGuanine,
+            )
+            | (RNABase::Uracil, RNABase::Guanine | RNABase::AdenineGuanine, RNABase::Adenine) => {
+                return Err(StopTranslation::new_err("stop translation"))
+            }
 
             _ => return Err(pyo3::exceptions::PyValueError::new_err("ambiguous codon")),
         })
