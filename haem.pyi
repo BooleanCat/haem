@@ -34,7 +34,8 @@ class DNABase:
     ANY: DNABase
     GAP: DNABase
 
-    def __new__(self, code: str) -> DNABase: ...
+    @classmethod
+    def __new__(cls, code: str) -> DNABase: ...
     @property
     def code(self) -> str:
         """One-letter IUPAC code of the DNA base."""
@@ -87,7 +88,8 @@ class RNABase:
     ANY: RNABase
     GAP: RNABase
 
-    def __new__(self, code: str) -> RNABase: ...
+    @classmethod
+    def __new__(cls, code: str) -> RNABase: ...
     @property
     def code(self) -> str:
         """One-letter IUPAC code of the RNA base."""
@@ -152,8 +154,9 @@ class AminoAcid:
     TRYPTOPHAN: AminoAcid
     TYROSINE: AminoAcid
 
+    @classmethod
     def __new__(
-        self, code_or_codon: typing.Union[str, tuple[RNABase, RNABase, RNABase]]
+        cls, code_or_codon: typing.Union[str, tuple[RNABase, RNABase, RNABase]]
     ) -> AminoAcid: ...
     @property
     def code(self) -> str:
@@ -171,5 +174,54 @@ class AminoAcid:
         """Always true."""
         ...
     def __add__(self, other: AminoAcid) -> typing.Any:
+        """Not implemented."""
+        ...
+
+class DNASequence:
+    @classmethod
+    def __new__(cls) -> DNASequence:
+        """Not implemented."""
+        ...
+    @property
+    def complement(self) -> DNASequence:
+        """Not implemented."""
+        ...
+    def transcribe(self) -> typing.Any:
+        """Not implemented."""
+        ...
+    def __invert__(self) -> DNASequence:
+        """See `DNASequence.complement`."""
+        ...
+    def __repr__(self) -> str:
+        """Not implemented."""
+        ...
+    def __str__(self) -> str:
+        """Not implemented."""
+        ...
+    def __eq__(self, other: object) -> bool:
+        """Not implemented."""
+        ...
+    def __ne__(self, other: object) -> bool:
+        """Not implemented."""
+        ...
+    def __bool__(self) -> bool:
+        """Not implemented."""
+        ...
+    def __add__(self, other: typing.Union[DNABase, DNASequence]) -> DNASequence:
+        """Not implemented."""
+        ...
+    def __contains__(self, item: typing.Any) -> bool:
+        """Not implemented."""
+        ...
+    def __len__(self) -> int:
+        """Not implemented."""
+        ...
+    def __getitem__(self, key: typing.Any) -> typing.Any:
+        """Not implemented."""
+        ...
+    def __iter__(self) -> typing.Any:
+        """Not implemented."""
+        ...
+    def count(self, item: DNABase) -> int:
         """Not implemented."""
         ...
