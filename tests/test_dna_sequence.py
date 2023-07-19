@@ -95,11 +95,11 @@ def test__str__(bases: list[haem.DNABase], text: str) -> None:
 
 
 @pytest.mark.parametrize("bases", [[], [haem.DNABase.ADENINE, haem.DNABase.GUANINE]])
-def test__eq__not_implemented(bases: list[haem.DNABase]) -> None:
+def test__eq__(bases: list[haem.DNABase]) -> None:
     assert haem.DNASequence(bases) == haem.DNASequence(bases)
 
 
-def test__ne__not_implemented() -> None:
+def test__ne__() -> None:
     assert haem.DNASequence(
         [haem.DNABase.ADENINE, haem.DNABase.GUANINE]
     ) != haem.DNASequence([haem.DNABase.ADENINE, haem.DNABase.THYMINE])
@@ -113,9 +113,9 @@ def test_unsupported_comparison(
         op(haem.DNASequence(), haem.DNASequence())
 
 
-def test__bool__not_implemented() -> None:
-    with pytest.raises(NotImplementedError):
-        bool(haem.DNASequence())
+@pytest.mark.parametrize("bases,result", [([], False), ([haem.DNABase.ADENINE], True)])
+def test__bool__(bases: list[haem.DNABase], result: bool) -> None:
+    assert bool(haem.DNASequence(bases)) is result
 
 
 def test__add__not_implemented() -> None:
@@ -128,9 +128,9 @@ def test__contains__not_implemented() -> None:
         haem.DNASequence() in haem.DNASequence()
 
 
-def test__len__not_implemented() -> None:
-    with pytest.raises(NotImplementedError):
-        len(haem.DNASequence())
+@pytest.mark.parametrize("bases,length", [([], 0), ([haem.DNABase.ADENINE], 1)])
+def test__len__(bases: list[haem.DNABase], length: int) -> None:
+    assert len(haem.DNASequence(bases)) == length
 
 
 def test__getitem__not_implemented() -> None:

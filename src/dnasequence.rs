@@ -94,10 +94,8 @@ impl DNASequence {
         }
     }
 
-    fn __bool__(&self) -> PyResult<bool> {
-        Err(pyo3::exceptions::PyNotImplementedError::new_err(
-            "not implemented",
-        ))
+    fn __bool__(&self) -> bool {
+        self.bases.len() > 0
     }
 
     fn __add__(&self, _other: &Self) -> PyResult<Self> {
@@ -106,10 +104,8 @@ impl DNASequence {
         ))
     }
 
-    fn __len__(&self) -> PyResult<usize> {
-        Err(pyo3::exceptions::PyNotImplementedError::new_err(
-            "not implemented",
-        ))
+    fn __len__(&self) -> usize {
+        self.bases.len()
     }
 
     fn __getitem__(&self, _index: isize) -> PyResult<Self> {
