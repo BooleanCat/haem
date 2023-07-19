@@ -1,13 +1,14 @@
 use crate::dnabase::DNABase;
 use pyo3::class::basic::CompareOp;
 use pyo3::prelude::*;
-use pyo3::types::{PyIterator, PySequence};
+use pyo3::types::PyIterator;
 
 #[derive(FromPyObject)]
 pub enum DNASequenceInput<'a> {
     BasesStr(&'a str),
     BasesIter(&'a PyIterator),
-    BasesSeq(&'a PySequence),
+    BasesSeq(Vec<DNABase>),
+    BasesSeqStr(Vec<char>),
 }
 
 #[pyclass(frozen)]
@@ -29,6 +30,9 @@ impl DNASequence {
             DNASequenceInput::BasesSeq(_) => Err(pyo3::exceptions::PyNotImplementedError::new_err(
                 "not implemented",
             )),
+            DNASequenceInput::BasesSeqStr(_) => Err(
+                pyo3::exceptions::PyNotImplementedError::new_err("not implemented"),
+            ),
         }
     }
 

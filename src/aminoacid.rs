@@ -6,10 +6,10 @@ use pyo3::prelude::*;
 create_exception!(haem, StopTranslation, pyo3::exceptions::PyException);
 
 #[derive(FromPyObject)]
-enum CodeOrCodon {
+enum CodeOrCodon<'a> {
     Code(char),
     Codon(RNABase, RNABase, RNABase),
-    CodonStr(String),
+    CodonStr(&'a str),
 }
 
 #[pyclass(frozen)]
