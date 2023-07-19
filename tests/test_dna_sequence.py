@@ -73,7 +73,7 @@ def test__invert__not_implemented() -> None:
         ([haem.DNABase.ADENINE for _ in range(100)], f"<DNASequence: {'A' * 100}>"),
     ],
 )
-def test__repr__(bases: list[haem.DNABase], text: str) -> None:
+def test__repr__(bases: typing.List[haem.DNABase], text: str) -> None:
     assert repr(haem.DNASequence(bases)) == text
 
 
@@ -90,12 +90,12 @@ def test__repr__(bases: list[haem.DNABase], text: str) -> None:
         ),
     ],
 )
-def test__str__(bases: list[haem.DNABase], text: str) -> None:
+def test__str__(bases: typing.List[haem.DNABase], text: str) -> None:
     assert str(haem.DNASequence(bases)) == text
 
 
 @pytest.mark.parametrize("bases", [[], [haem.DNABase.ADENINE, haem.DNABase.GUANINE]])
-def test__eq__(bases: list[haem.DNABase]) -> None:
+def test__eq__(bases: typing.List[haem.DNABase]) -> None:
     assert haem.DNASequence(bases) == haem.DNASequence(bases)
 
 
@@ -114,7 +114,7 @@ def test_unsupported_comparison(
 
 
 @pytest.mark.parametrize("bases,result", [([], False), ([haem.DNABase.ADENINE], True)])
-def test__bool__(bases: list[haem.DNABase], result: bool) -> None:
+def test__bool__(bases: typing.List[haem.DNABase], result: bool) -> None:
     assert bool(haem.DNASequence(bases)) is result
 
 
@@ -129,7 +129,7 @@ def test__contains__not_implemented() -> None:
 
 
 @pytest.mark.parametrize("bases,length", [([], 0), ([haem.DNABase.ADENINE], 1)])
-def test__len__(bases: list[haem.DNABase], length: int) -> None:
+def test__len__(bases: typing.List[haem.DNABase], length: int) -> None:
     assert len(haem.DNASequence(bases)) == length
 
 
