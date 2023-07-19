@@ -179,7 +179,14 @@ class AminoAcid:
 
 class DNASequence:
     @classmethod
-    def __new__(cls) -> DNASequence:
+    def __new__(
+        cls,
+        bases: typing.Union[
+            str,
+            typing.Iterable[typing.Union[str, DNABase]],
+            typing.Sequence[typing.Union[str, DNABase]],
+        ] = "",
+    ) -> DNASequence:
         """Not implemented."""
         ...
     @property

@@ -6,9 +6,48 @@ import pytest
 import haem
 
 
-def test__new__() -> None:
-    # Temporary in order to allow not implemented tests of other methods.
+def test__new__empty() -> None:
     haem.DNASequence()
+
+
+def test__new__str() -> None:
+    haem.DNASequence("ACGT")
+
+
+def test__new__iterable_base() -> None:
+    with pytest.raises(NotImplementedError):
+        haem.DNASequence(
+            iter(
+                [
+                    haem.DNABase.ADENINE,
+                    haem.DNABase.CYTOSINE,
+                    haem.DNABase.GUANINE,
+                    haem.DNABase.THYMINE,
+                ]
+            )
+        )
+
+
+def test__new__iterable_str() -> None:
+    with pytest.raises(NotImplementedError):
+        haem.DNASequence(iter(["A", "C", "G", "T"]))
+
+
+def test_new__sequence_bases() -> None:
+    with pytest.raises(NotImplementedError):
+        haem.DNASequence(
+            [
+                haem.DNABase.ADENINE,
+                haem.DNABase.CYTOSINE,
+                haem.DNABase.GUANINE,
+                haem.DNABase.THYMINE,
+            ]
+        )
+
+
+def test__new__sequence_str() -> None:
+    with pytest.raises(NotImplementedError):
+        haem.DNASequence(["A", "C", "G", "T"])
 
 
 def test_complement_not_implemented() -> None:

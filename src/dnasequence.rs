@@ -1,17 +1,35 @@
+use crate::dnabase::DNABase;
 use pyo3::class::basic::CompareOp;
 use pyo3::prelude::*;
+use pyo3::types::{PyIterator, PySequence};
 
-use crate::dnabase::DNABase;
+#[derive(FromPyObject)]
+pub enum DNASequenceInput<'a> {
+    BasesStr(&'a str),
+    BasesIter(&'a PyIterator),
+    BasesSeq(&'a PySequence),
+}
 
 #[pyclass(frozen)]
 #[derive(PartialEq)]
-pub struct DNASequence {}
+pub struct DNASequence {
+    bases: Vec<DNABase>,
+}
 
 #[pymethods]
 impl DNASequence {
     #[new]
-    pub fn __new__() -> Self {
-        Self {}
+    #[pyo3(signature = (amino_acids = DNASequenceInput::BasesStr("")))]
+    pub fn __new__(amino_acids: DNASequenceInput) -> PyResult<Self> {
+        match amino_acids {
+            DNASequenceInput::BasesStr(_) => Ok(Self { bases: vec![] }),
+            DNASequenceInput::BasesIter(_) => Err(
+                pyo3::exceptions::PyNotImplementedError::new_err("not implemented"),
+            ),
+            DNASequenceInput::BasesSeq(_) => Err(pyo3::exceptions::PyNotImplementedError::new_err(
+                "not implemented",
+            )),
+        }
     }
 
     #[getter]
