@@ -27,9 +27,7 @@ impl DNASequence {
             DNASequenceInput::BasesIter(_) => Err(
                 pyo3::exceptions::PyNotImplementedError::new_err("not implemented"),
             ),
-            DNASequenceInput::BasesSeq(_) => Err(pyo3::exceptions::PyNotImplementedError::new_err(
-                "not implemented",
-            )),
+            DNASequenceInput::BasesSeq(bases) => Ok(Self { bases }),
             DNASequenceInput::BasesSeqStr(_) => Err(
                 pyo3::exceptions::PyNotImplementedError::new_err("not implemented"),
             ),
@@ -59,16 +57,33 @@ impl DNASequence {
         self.get_complement()
     }
 
-    fn __repr__(&self) -> PyResult<String> {
-        Err(pyo3::exceptions::PyNotImplementedError::new_err(
-            "not implemented",
-        ))
+    fn __repr__(&self) -> String {
+        if self.bases.len() == 0 {
+            "<DNASequence>".to_string()
+        } else {
+            format!(
+                "<DNASequence: {}>",
+                self.bases.iter().map(|b| b.get_code()).collect::<String>()
+            )
+        }
     }
 
-    fn __str__(&self) -> PyResult<String> {
-        Err(pyo3::exceptions::PyNotImplementedError::new_err(
-            "not implemented",
-        ))
+    fn __str__(&self) -> String {
+        if self.bases.len() < 21 {
+            self.bases.iter().map(|b| b.get_code()).collect()
+        } else {
+            format!(
+                "{}...{}",
+                self.bases[0..10]
+                    .iter()
+                    .map(|b| b.get_code())
+                    .collect::<String>(),
+                self.bases[self.bases.len() - 10..self.bases.len()]
+                    .iter()
+                    .map(|b| b.get_code())
+                    .collect::<String>()
+            )
+        }
     }
 
     fn __richcmp__(&self, _other: &Self, op: CompareOp, py: Python<'_>) -> PyResult<PyObject> {

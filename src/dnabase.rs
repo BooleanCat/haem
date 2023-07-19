@@ -86,7 +86,7 @@ impl DNABase {
     }
 
     #[getter]
-    fn get_code(&self) -> char {
+    pub fn get_code(&self) -> char {
         match self {
             Self::Adenine => 'A',
             Self::Cytosine => 'C',

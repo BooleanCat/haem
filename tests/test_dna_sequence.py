@@ -14,7 +14,7 @@ def test__new__str() -> None:
     haem.DNASequence("ACGT")
 
 
-def test__new__iterable_base() -> None:
+def test__new__iterable_base_not_implemented() -> None:
     with pytest.raises(NotImplementedError):
         haem.DNASequence(
             iter(
@@ -28,24 +28,23 @@ def test__new__iterable_base() -> None:
         )
 
 
-def test__new__iterable_str() -> None:
+def test__new__iterable_str_not_implemented() -> None:
     with pytest.raises(NotImplementedError):
         haem.DNASequence(iter(["A", "C", "G", "T"]))
 
 
 def test_new__sequence_bases() -> None:
-    with pytest.raises(NotImplementedError):
-        haem.DNASequence(
-            [
-                haem.DNABase.ADENINE,
-                haem.DNABase.CYTOSINE,
-                haem.DNABase.GUANINE,
-                haem.DNABase.THYMINE,
-            ]
-        )
+    haem.DNASequence(
+        [
+            haem.DNABase.ADENINE,
+            haem.DNABase.CYTOSINE,
+            haem.DNABase.GUANINE,
+            haem.DNABase.THYMINE,
+        ]
+    )
 
 
-def test__new__sequence_str() -> None:
+def test__new__sequence_str_not_implemented() -> None:
     with pytest.raises(NotImplementedError):
         haem.DNASequence(["A", "C", "G", "T"])
 
@@ -65,14 +64,34 @@ def test__invert__not_implemented() -> None:
         ~haem.DNASequence()
 
 
-def test__repr__not_implemented() -> None:
-    with pytest.raises(NotImplementedError):
-        repr(haem.DNASequence())
+@pytest.mark.parametrize(
+    "bases,text",
+    [
+        ([], "<DNASequence>"),
+        ([haem.DNABase.ADENINE], "<DNASequence: A>"),
+        ([haem.DNABase.ADENINE, haem.DNABase.ADENINE_CYTOSINE], "<DNASequence: AM>"),
+        ([haem.DNABase.ADENINE for _ in range(100)], f"<DNASequence: {'A' * 100}>"),
+    ],
+)
+def test__repr__(bases: list[haem.DNABase], text: str) -> None:
+    assert repr(haem.DNASequence(bases)) == text
 
 
-def test__str__not_implemented() -> None:
-    with pytest.raises(NotImplementedError):
-        str(haem.DNASequence())
+@pytest.mark.parametrize(
+    "bases,text",
+    [
+        ([], ""),
+        ([haem.DNABase.ADENINE], "A"),
+        ([haem.DNABase.ADENINE, haem.DNABase.ADENINE_CYTOSINE], "AM"),
+        ([haem.DNABase.ADENINE for _ in range(20)], "A" * 20),
+        (
+            [haem.DNABase.ADENINE for _ in range(21)] + [haem.DNABase.GUANINE],
+            f"{'A' * 10}...{'A' * 9}G",
+        ),
+    ],
+)
+def test__str__(bases: list[haem.DNABase], text: str) -> None:
+    assert str(haem.DNASequence(bases)) == text
 
 
 def test__eq__not_implemented() -> None:
