@@ -86,12 +86,11 @@ impl DNASequence {
         }
     }
 
-    fn __richcmp__(&self, _other: &Self, op: CompareOp, py: Python<'_>) -> PyResult<PyObject> {
+    fn __richcmp__(&self, _other: &Self, op: CompareOp, py: Python<'_>) -> PyObject {
         match op {
-            CompareOp::Eq | CompareOp::Ne => Err(pyo3::exceptions::PyNotImplementedError::new_err(
-                "not implemented",
-            )),
-            _ => Ok(py.NotImplemented()),
+            CompareOp::Eq => (self.bases == _other.bases).into_py(py),
+            CompareOp::Ne => (self.bases != _other.bases).into_py(py),
+            _ => py.NotImplemented(),
         }
     }
 

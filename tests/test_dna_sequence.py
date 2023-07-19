@@ -94,14 +94,15 @@ def test__str__(bases: list[haem.DNABase], text: str) -> None:
     assert str(haem.DNASequence(bases)) == text
 
 
-def test__eq__not_implemented() -> None:
-    with pytest.raises(NotImplementedError):
-        haem.DNASequence() == haem.DNASequence()
+@pytest.mark.parametrize("bases", [[], [haem.DNABase.ADENINE, haem.DNABase.GUANINE]])
+def test__eq__not_implemented(bases: list[haem.DNABase]) -> None:
+    assert haem.DNASequence(bases) == haem.DNASequence(bases)
 
 
 def test__ne__not_implemented() -> None:
-    with pytest.raises(NotImplementedError):
-        haem.DNASequence() != haem.DNASequence()
+    assert haem.DNASequence(
+        [haem.DNABase.ADENINE, haem.DNABase.GUANINE]
+    ) != haem.DNASequence([haem.DNABase.ADENINE, haem.DNABase.THYMINE])
 
 
 @pytest.mark.parametrize("op", [operator.gt, operator.ge, operator.lt, operator.le])
