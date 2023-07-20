@@ -6,10 +6,10 @@ use std::fmt;
 
 #[derive(FromPyObject)]
 pub enum DNASequenceInput<'a> {
-    BasesStr(&'a str),
-    BasesIter(&'a PyIterator),
-    BasesSeq(Vec<DNABase>),
-    BasesSeqStr(Vec<char>),
+    Str(&'a str),
+    Iter(&'a PyIterator),
+    Seq(Vec<DNABase>),
+    SeqStr(Vec<char>),
 }
 
 impl TryFrom<DNASequenceInput<'_>> for Vec<DNABase> {
@@ -17,15 +17,15 @@ impl TryFrom<DNASequenceInput<'_>> for Vec<DNABase> {
 
     fn try_from(bases: DNASequenceInput) -> PyResult<Self> {
         match bases {
-            DNASequenceInput::BasesStr(bases) => bases
+            DNASequenceInput::Str(bases) => bases
                 .chars()
                 .map(DNABase::try_from)
                 .collect::<PyResult<Vec<_>>>(),
-            DNASequenceInput::BasesIter(_bases) => Err(
+            DNASequenceInput::Iter(_bases) => Err(
                 pyo3::exceptions::PyNotImplementedError::new_err("not implemented"),
             ),
-            DNASequenceInput::BasesSeq(bases) => Ok(bases),
-            DNASequenceInput::BasesSeqStr(_bases) => Err(
+            DNASequenceInput::Seq(bases) => Ok(bases),
+            DNASequenceInput::SeqStr(_bases) => Err(
                 pyo3::exceptions::PyNotImplementedError::new_err("not implemented"),
             ),
         }
@@ -58,7 +58,7 @@ pub struct DNASequence {
 #[pymethods]
 impl DNASequence {
     #[new]
-    #[pyo3(signature = (bases = DNASequenceInput::BasesStr("")))]
+    #[pyo3(signature = (bases = DNASequenceInput::Str("")))]
     pub fn __new__(bases: DNASequenceInput) -> PyResult<Self> {
         Ok(Self {
             bases: bases.try_into()?,
@@ -88,7 +88,7 @@ impl DNASequence {
     }
 
     fn __repr__(&self) -> String {
-        if self.bases.len() == 0 {
+        if self.bases.is_empty() {
             "<DNASequence>".to_string()
         } else {
             format!(
@@ -111,7 +111,7 @@ impl DNASequence {
     }
 
     fn __bool__(&self) -> bool {
-        self.bases.len() > 0
+        !self.bases.is_empty()
     }
 
     fn __add__(&self, _other: &Self) -> PyResult<Self> {
