@@ -218,6 +218,6 @@ class DNASequence:
     def __iter__(self) -> typing.Any:
         """Not implemented."""
         ...
-    def count(self, item: DNABase) -> int:
+    def count(self, item: typing.Union[DNABase, str]) -> int:
         """Count the occurances of a DNABase in the sequence."""
         pass

@@ -161,22 +161,14 @@ def test__iter__not_implemented() -> None:
 
 
 @pytest.mark.parametrize(
-    "bases,target,total",
+    "sequence,target,total",
     [
-        ([], haem.DNABase.ADENINE, 0),
-        (
-            [
-                haem.DNABase.ADENINE,
-                haem.DNABase.GUANINE,
-                haem.DNABase.CYTOSINE,
-                haem.DNABase.GUANINE,
-            ],
-            haem.DNABase.GUANINE,
-            2,
-        ),
+        (haem.DNASequence(""), haem.DNABase.ADENINE, 0),
+        (haem.DNASequence("AGCG"), haem.DNABase.GUANINE, 2),
+        (haem.DNASequence("AGCG"), "G", 2),
     ],
 )
 def test_count(
-    bases: typing.List[haem.DNABase], target: haem.DNABase, total: int
+    sequence: haem.DNASequence, target: typing.Union[haem.DNABase, str], total: int
 ) -> None:
-    assert haem.DNASequence(bases).count(target) == total
+    assert sequence.count(target) == total

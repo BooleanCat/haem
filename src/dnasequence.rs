@@ -11,6 +11,12 @@ pub enum DNASequenceInput<'a> {
     BasesSeqStr(Vec<char>),
 }
 
+#[derive(FromPyObject)]
+pub enum DNABaseInput {
+    BaseStr(char),
+    Base(DNABase),
+}
+
 #[pyclass(frozen)]
 #[derive(PartialEq)]
 pub struct DNASequence {
@@ -52,8 +58,12 @@ impl DNASequence {
         ))
     }
 
-    fn count(&self, base: DNABase) -> usize {
-        self.bases.iter().filter(|&b| *b == base).count()
+    fn count(&self, base: DNABaseInput) -> PyResult<usize> {
+        let base = match base {
+            DNABaseInput::BaseStr(base) => DNABase::__new__(base)?,
+            DNABaseInput::Base(base) => base,
+        };
+        Ok(self.bases.iter().filter(|&b| *b == base).count())
     }
 
     fn __invert__(&self) -> Self {
