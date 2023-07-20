@@ -2,6 +2,7 @@ use crate::rnabase::RNABase;
 use pyo3::class::basic::CompareOp;
 use pyo3::create_exception;
 use pyo3::prelude::*;
+use std::fmt;
 
 create_exception!(haem, StopTranslation, pyo3::exceptions::PyException);
 
@@ -10,6 +11,30 @@ enum CodeOrCodon<'a> {
     Code(char),
     Codon(RNABase, RNABase, RNABase),
     CodonStr(&'a str),
+}
+
+impl TryFrom<CodeOrCodon<'_>> for AminoAcid {
+    type Error = PyErr;
+
+    fn try_from(code_or_codon: CodeOrCodon<'_>) -> PyResult<AminoAcid> {
+        Ok(match code_or_codon {
+            CodeOrCodon::Code(code) => code.try_into()?,
+            CodeOrCodon::Codon(first, second, third) => (first, second, third).try_into()?,
+            CodeOrCodon::CodonStr(codon) if codon.len() == 3 => {
+                let bases = codon
+                    .chars()
+                    .map(RNABase::try_from)
+                    .collect::<PyResult<Vec<_>>>()?;
+
+                (bases[0], bases[1], bases[2]).try_into()?
+            }
+            _ => {
+                return Err(pyo3::exceptions::PyValueError::new_err(
+                    "invalid amino acid codon",
+                ))
+            }
+        })
+    }
 }
 
 #[pyclass(frozen)]
@@ -80,76 +105,12 @@ pub enum AminoAcid {
 impl AminoAcid {
     #[new]
     fn __new__(code_or_codon: CodeOrCodon) -> PyResult<Self> {
-        Ok(match code_or_codon {
-            CodeOrCodon::Code(code) => match code {
-                'A' => Self::Alanine,
-                'C' => Self::Cysteine,
-                'D' => Self::AsparticAcid,
-                'E' => Self::GlutamicAcid,
-                'F' => Self::Phenylalanine,
-                'G' => Self::Glycine,
-                'H' => Self::Histidine,
-                'I' => Self::Isoleucine,
-                'K' => Self::Lysine,
-                'L' => Self::Leucine,
-                'M' => Self::Methionine,
-                'N' => Self::Asparagine,
-                'P' => Self::Proline,
-                'Q' => Self::Glutamine,
-                'R' => Self::Arginine,
-                'S' => Self::Serine,
-                'T' => Self::Threonine,
-                'V' => Self::Valine,
-                'W' => Self::Tryptophan,
-                'Y' => Self::Tyrosine,
-                _ => {
-                    return Err(pyo3::exceptions::PyValueError::new_err(format!(
-                        "invalid IUPAC amino acid code \"{}\"",
-                        code
-                    )))
-                }
-            },
-            CodeOrCodon::Codon(first, second, third) => Self::from_codon(first, second, third)?,
-            CodeOrCodon::CodonStr(codon) if codon.len() == 3 => {
-                let bases = codon
-                    .chars()
-                    .map(RNABase::__new__)
-                    .collect::<PyResult<Vec<_>>>()?;
-
-                Self::from_codon(bases[0], bases[1], bases[2])?
-            }
-            _ => {
-                return Err(pyo3::exceptions::PyValueError::new_err(
-                    "invalid amino acid codon",
-                ))
-            }
-        })
+        code_or_codon.try_into()
     }
 
     #[getter]
     fn get_code(&self) -> char {
-        match self {
-            Self::Alanine => 'A',
-            Self::Cysteine => 'C',
-            Self::AsparticAcid => 'D',
-            Self::GlutamicAcid => 'E',
-            Self::Phenylalanine => 'F',
-            Self::Glycine => 'G',
-            Self::Histidine => 'H',
-            Self::Isoleucine => 'I',
-            Self::Lysine => 'K',
-            Self::Leucine => 'L',
-            Self::Methionine => 'M',
-            Self::Asparagine => 'N',
-            Self::Proline => 'P',
-            Self::Glutamine => 'Q',
-            Self::Arginine => 'R',
-            Self::Serine => 'S',
-            Self::Threonine => 'T',
-            Self::Valine => 'V',
-            Self::Tryptophan => 'W',
-            Self::Tyrosine => 'Y',
-        }
+        self.into()
     }
 
     #[getter]
@@ -178,29 +139,8 @@ impl AminoAcid {
         }
     }
 
-    fn __str__(&self) -> &'static str {
-        match self {
-            Self::Alanine => "alanine",
-            Self::Cysteine => "cysteine",
-            Self::AsparticAcid => "aspartic acid",
-            Self::GlutamicAcid => "glutamic acid",
-            Self::Phenylalanine => "phenylalanine",
-            Self::Glycine => "glycine",
-            Self::Histidine => "histidine",
-            Self::Isoleucine => "isoleucine",
-            Self::Lysine => "lysine",
-            Self::Leucine => "leucine",
-            Self::Methionine => "methionine",
-            Self::Asparagine => "asparagine",
-            Self::Proline => "proline",
-            Self::Glutamine => "glutamine",
-            Self::Arginine => "arginine",
-            Self::Serine => "serine",
-            Self::Threonine => "threonine",
-            Self::Valine => "valine",
-            Self::Tryptophan => "tryptophan",
-            Self::Tyrosine => "tyrosine",
-        }
+    fn __str__(&self) -> String {
+        self.to_string()
     }
 
     fn __richcmp__(&self, other: &Self, op: CompareOp, py: Python<'_>) -> PyObject {
@@ -222,10 +162,104 @@ impl AminoAcid {
     }
 }
 
-impl AminoAcid {
-    #[inline]
-    fn from_codon(first: RNABase, second: RNABase, third: RNABase) -> PyResult<Self> {
-        Ok(match (first, second, third) {
+impl From<&AminoAcid> for char {
+    fn from(amino_acid: &AminoAcid) -> Self {
+        match amino_acid {
+            AminoAcid::Alanine => 'A',
+            AminoAcid::Cysteine => 'C',
+            AminoAcid::AsparticAcid => 'D',
+            AminoAcid::GlutamicAcid => 'E',
+            AminoAcid::Phenylalanine => 'F',
+            AminoAcid::Glycine => 'G',
+            AminoAcid::Histidine => 'H',
+            AminoAcid::Isoleucine => 'I',
+            AminoAcid::Lysine => 'K',
+            AminoAcid::Leucine => 'L',
+            AminoAcid::Methionine => 'M',
+            AminoAcid::Asparagine => 'N',
+            AminoAcid::Proline => 'P',
+            AminoAcid::Glutamine => 'Q',
+            AminoAcid::Arginine => 'R',
+            AminoAcid::Serine => 'S',
+            AminoAcid::Threonine => 'T',
+            AminoAcid::Valine => 'V',
+            AminoAcid::Tryptophan => 'W',
+            AminoAcid::Tyrosine => 'Y',
+        }
+    }
+}
+
+impl fmt::Display for AminoAcid {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                Self::Alanine => "alanine",
+                Self::Cysteine => "cysteine",
+                Self::AsparticAcid => "aspartic acid",
+                Self::GlutamicAcid => "glutamic acid",
+                Self::Phenylalanine => "phenylalanine",
+                Self::Glycine => "glycine",
+                Self::Histidine => "histidine",
+                Self::Isoleucine => "isoleucine",
+                Self::Lysine => "lysine",
+                Self::Leucine => "leucine",
+                Self::Methionine => "methionine",
+                Self::Asparagine => "asparagine",
+                Self::Proline => "proline",
+                Self::Glutamine => "glutamine",
+                Self::Arginine => "arginine",
+                Self::Serine => "serine",
+                Self::Threonine => "threonine",
+                Self::Valine => "valine",
+                Self::Tryptophan => "tryptophan",
+                Self::Tyrosine => "tyrosine",
+            }
+        )
+    }
+}
+
+impl TryFrom<char> for AminoAcid {
+    type Error = PyErr;
+
+    fn try_from(code: char) -> PyResult<AminoAcid> {
+        Ok(match code {
+            'A' => Self::Alanine,
+            'C' => Self::Cysteine,
+            'D' => Self::AsparticAcid,
+            'E' => Self::GlutamicAcid,
+            'F' => Self::Phenylalanine,
+            'G' => Self::Glycine,
+            'H' => Self::Histidine,
+            'I' => Self::Isoleucine,
+            'K' => Self::Lysine,
+            'L' => Self::Leucine,
+            'M' => Self::Methionine,
+            'N' => Self::Asparagine,
+            'P' => Self::Proline,
+            'Q' => Self::Glutamine,
+            'R' => Self::Arginine,
+            'S' => Self::Serine,
+            'T' => Self::Threonine,
+            'V' => Self::Valine,
+            'W' => Self::Tryptophan,
+            'Y' => Self::Tyrosine,
+            _ => {
+                return Err(pyo3::exceptions::PyValueError::new_err(format!(
+                    "invalid IUPAC amino acid code \"{}\"",
+                    code
+                )))
+            }
+        })
+    }
+}
+
+impl TryFrom<(RNABase, RNABase, RNABase)> for AminoAcid {
+    type Error = PyErr;
+
+    fn try_from(codon: (RNABase, RNABase, RNABase)) -> PyResult<AminoAcid> {
+        Ok(match (codon.0, codon.1, codon.2) {
             (RNABase::Gap, _, _) | (_, RNABase::Gap, _) | (_, _, RNABase::Gap) => {
                 return Err(pyo3::exceptions::PyValueError::new_err(
                     "codon contains gap",
