@@ -4,6 +4,7 @@ test: check
 
 check:
 	cargo fmt --check
+	cargo clippy
 	poetry run isort . --check
 	poetry run black --check .
 	poetry run mypy --strict .
