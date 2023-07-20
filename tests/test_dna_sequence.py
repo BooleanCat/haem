@@ -6,10 +6,6 @@ import pytest
 import haem
 
 
-def test__new__empty() -> None:
-    haem.DNASequence()
-
-
 def test__new__str() -> None:
     assert haem.DNASequence("ACGT") == haem.DNASequence(
         [
@@ -28,23 +24,28 @@ def test__new__str__invalid() -> None:
     assert str(excinfo.value) == 'invalid IUPAC DNA code "X"'
 
 
-def test__new__iterable_base_not_implemented() -> None:
-    with pytest.raises(NotImplementedError):
-        haem.DNASequence(
-            iter(
-                [
-                    haem.DNABase.ADENINE,
-                    haem.DNABase.CYTOSINE,
-                    haem.DNABase.GUANINE,
-                    haem.DNABase.THYMINE,
-                ]
-            )
+def test__new__iterable_base() -> None:
+    assert haem.DNASequence(
+        iter(
+            [
+                haem.DNABase.ADENINE,
+                haem.DNABase.CYTOSINE,
+                haem.DNABase.GUANINE,
+                haem.DNABase.THYMINE,
+            ]
         )
+    ) == haem.DNASequence("ACGT")
 
 
-def test__new__iterable_str_not_implemented() -> None:
-    with pytest.raises(NotImplementedError):
-        haem.DNASequence(iter(["A", "C", "G", "T"]))
+def test__new__iterable_str() -> None:
+    assert haem.DNASequence(iter(["A", "C", "G", "T"])) == haem.DNASequence("ACGT")
+
+
+def test__new__iterable_invalid() -> None:
+    with pytest.raises(ValueError) as excinfo:
+        haem.DNASequence(iter(["A", "C", "G", "X"]))
+
+    assert str(excinfo.value) == 'invalid IUPAC DNA code "X"'
 
 
 def test_new__sequence_bases() -> None:

@@ -15,6 +15,12 @@ pub enum DNASequenceInput<'a> {
     SeqStr(Vec<char>),
 }
 
+#[derive(FromPyObject)]
+pub enum CharOrDNABase {
+    Char(char),
+    Base(DNABase),
+}
+
 impl TryFrom<DNASequenceInput<'_>> for Vec<DNABase> {
     type Error = PyErr;
 
@@ -24,9 +30,14 @@ impl TryFrom<DNASequenceInput<'_>> for Vec<DNABase> {
                 .chars()
                 .map(DNABase::try_from)
                 .collect::<PyResult<Vec<_>>>(),
-            DNASequenceInput::Iter(_bases) => Err(
-                pyo3::exceptions::PyNotImplementedError::new_err("not implemented"),
-            ),
+            DNASequenceInput::Iter(bases) => bases
+                .iter()?
+                .map(|base| match base?.extract::<CharOrDNABase>() {
+                    Ok(CharOrDNABase::Char(code)) => code.try_into(),
+                    Ok(CharOrDNABase::Base(base)) => Ok(base),
+                    Err(e) => Err(e),
+                })
+                .collect(),
             DNASequenceInput::Seq(bases) => Ok(bases),
             DNASequenceInput::SeqStr(codes) => codes
                 .iter()
