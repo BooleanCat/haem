@@ -58,9 +58,8 @@ def test_new__sequence_bases() -> None:
     )
 
 
-def test__new__sequence_str_not_implemented() -> None:
-    with pytest.raises(NotImplementedError):
-        haem.DNASequence(["A", "C", "G", "T"])
+def test__new__sequence_str() -> None:
+    assert haem.DNASequence(["A", "C", "G", "T"]) == haem.DNASequence("ACGT")
 
 
 @pytest.mark.parametrize(

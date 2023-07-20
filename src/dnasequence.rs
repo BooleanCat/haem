@@ -28,9 +28,10 @@ impl TryFrom<DNASequenceInput<'_>> for Vec<DNABase> {
                 pyo3::exceptions::PyNotImplementedError::new_err("not implemented"),
             ),
             DNASequenceInput::Seq(bases) => Ok(bases),
-            DNASequenceInput::SeqStr(_bases) => Err(
-                pyo3::exceptions::PyNotImplementedError::new_err("not implemented"),
-            ),
+            DNASequenceInput::SeqStr(codes) => codes
+                .iter()
+                .map(|code| DNABase::try_from(*code))
+                .collect::<PyResult<Vec<_>>>(),
         }
     }
 }
