@@ -50,9 +50,9 @@ impl TryFrom<DNABaseInput> for DNABase {
 }
 
 #[pyclass(frozen)]
-#[derive(PartialEq)]
+#[derive(PartialEq, Clone)]
 pub struct DNASequence {
-    bases: Vec<DNABase>,
+    pub bases: Vec<DNABase>,
 }
 
 #[pymethods]

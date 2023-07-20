@@ -1,8 +1,16 @@
+use crate::rnabase::RNABase;
 use pyo3::class::basic::CompareOp;
 use pyo3::prelude::*;
 use std::fmt;
+use std::ops;
 
-use crate::rnabase::RNABase;
+use crate::dnasequence::DNASequence;
+
+#[derive(FromPyObject)]
+pub enum AddInput {
+    Base(DNABase),
+    Seq(DNASequence),
+}
 
 #[pyclass(frozen)]
 #[derive(Clone, Copy, PartialEq)]
@@ -110,10 +118,11 @@ impl DNABase {
         self.get_complement()
     }
 
-    fn __add__(&self, _other: &Self) -> PyResult<()> {
-        Err(pyo3::exceptions::PyNotImplementedError::new_err(
-            "not implemented",
-        ))
+    fn __add__(&self, other: AddInput) -> DNASequence {
+        match other {
+            AddInput::Base(base) => self + &base,
+            AddInput::Seq(seq) => self + &seq,
+        }
     }
 
     fn __str__(&self) -> String {
@@ -199,5 +208,26 @@ impl fmt::Display for DNABase {
                 Self::Gap => "gap",
             }
         )
+    }
+}
+
+impl ops::Add<&DNABase> for &DNABase {
+    type Output = DNASequence;
+
+    fn add(self, rhs: &DNABase) -> DNASequence {
+        DNASequence {
+            bases: vec![*self, *rhs],
+        }
+    }
+}
+
+impl ops::Add<&DNASequence> for &DNABase {
+    type Output = DNASequence;
+
+    fn add(self, rhs: &DNASequence) -> DNASequence {
+        let mut bases = Vec::with_capacity(rhs.bases.len() + 1);
+        bases.push(*self);
+        bases.extend_from_slice(&rhs.bases);
+        DNASequence { bases }
     }
 }
