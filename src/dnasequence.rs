@@ -5,6 +5,7 @@ use pyo3::prelude::*;
 use pyo3::types::PyIterator;
 use std::fmt;
 use std::ops;
+use std::vec;
 
 #[derive(FromPyObject)]
 pub enum DNASequenceInput<'a> {
@@ -133,7 +134,16 @@ impl DNASequence {
         ))
     }
 
-    fn __iter__(&self) -> PyResult<()> {
+    fn __iter__(this: PyRef<'_, Self>) -> PyResult<Py<DNASequenceIterator>> {
+        Py::new(
+            this.py(),
+            DNASequenceIterator {
+                sequence: this.bases.clone().into_iter(),
+            },
+        )
+    }
+
+    fn __contains__(&self, _base: DNABase) -> PyResult<bool> {
         Err(pyo3::exceptions::PyNotImplementedError::new_err(
             "not implemented",
         ))
@@ -179,5 +189,21 @@ impl ops::Add<&DNASequence> for &DNASequence {
         DNASequence {
             bases: [self.bases.as_slice(), rhs.bases.as_slice()].concat(),
         }
+    }
+}
+
+#[pyclass]
+struct DNASequenceIterator {
+    sequence: vec::IntoIter<DNABase>,
+}
+
+#[pymethods]
+impl DNASequenceIterator {
+    fn __iter__(this: PyRef<'_, Self>) -> PyRef<'_, Self> {
+        this
+    }
+
+    fn __next__(mut this: PyRefMut<'_, Self>) -> Option<DNABase> {
+        this.sequence.next()
     }
 }

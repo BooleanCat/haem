@@ -155,7 +155,7 @@ def test__add__(
 
 def test__contains__not_implemented() -> None:
     with pytest.raises(NotImplementedError):
-        haem.DNASequence() in haem.DNASequence()
+        haem.DNABase.ADENINE in haem.DNASequence("")
 
 
 @pytest.mark.parametrize("bases,length", [([], 0), ([haem.DNABase.ADENINE], 1)])
@@ -168,9 +168,17 @@ def test__getitem__not_implemented() -> None:
         haem.DNASequence()[0]
 
 
-def test__iter__not_implemented() -> None:
-    with pytest.raises(NotImplementedError):
-        iter(haem.DNASequence())
+@pytest.mark.parametrize(
+    "bases", [[haem.DNABase("T")], [haem.DNABase("A"), haem.DNABase("C")], []]
+)
+def test__iter__(bases: typing.List[haem.DNABase]) -> None:
+    sequence_iter = iter(haem.DNASequence(bases))
+
+    for base in bases:
+        assert next(sequence_iter) == base
+
+    with pytest.raises(StopIteration):
+        next(sequence_iter)
 
 
 @pytest.mark.parametrize(
