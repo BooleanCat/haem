@@ -1,5 +1,6 @@
 use pyo3::class::basic::CompareOp;
 use pyo3::prelude::*;
+use std::fmt;
 
 use crate::rnabase::RNABase;
 
@@ -59,52 +60,12 @@ pub enum DNABase {
 impl DNABase {
     #[new]
     pub fn __new__(code: char) -> PyResult<Self> {
-        Ok(match code {
-            'A' => Self::Adenine,
-            'C' => Self::Cytosine,
-            'G' => Self::Guanine,
-            'T' => Self::Thymine,
-            'M' => Self::AdenineCytosine,
-            'R' => Self::AdenineGuanine,
-            'W' => Self::AdenineThymine,
-            'S' => Self::CytosineGuanine,
-            'Y' => Self::CytosineThymine,
-            'K' => Self::GuanineThymine,
-            'V' => Self::AdenineCytosineGuanine,
-            'H' => Self::AdenineCytosineThymine,
-            'D' => Self::AdenineGuanineThymine,
-            'B' => Self::CytosineGuanineThymine,
-            'N' => Self::Any,
-            '.' | '-' => Self::Gap,
-            _ => {
-                return Err(pyo3::exceptions::PyValueError::new_err(format!(
-                    "invalid IUPAC DNA code \"{}\"",
-                    code
-                )))
-            }
-        })
+        Self::try_from(code)
     }
 
     #[getter]
     pub fn get_code(&self) -> char {
-        match self {
-            Self::Adenine => 'A',
-            Self::Cytosine => 'C',
-            Self::Guanine => 'G',
-            Self::Thymine => 'T',
-            Self::AdenineCytosine => 'M',
-            Self::AdenineGuanine => 'R',
-            Self::AdenineThymine => 'W',
-            Self::CytosineGuanine => 'S',
-            Self::CytosineThymine => 'Y',
-            Self::GuanineThymine => 'K',
-            Self::AdenineCytosineGuanine => 'V',
-            Self::AdenineCytosineThymine => 'H',
-            Self::AdenineGuanineThymine => 'D',
-            Self::CytosineGuanineThymine => 'B',
-            Self::Any => 'N',
-            Self::Gap => '-',
-        }
+        self.into()
     }
 
     #[getter]
@@ -172,24 +133,88 @@ impl DNABase {
         ))
     }
 
-    fn __str__(&self) -> &'static str {
-        match self {
-            Self::Adenine => "adenine",
-            Self::Cytosine => "cytosine",
-            Self::Guanine => "guanine",
-            Self::Thymine => "thymine",
-            Self::AdenineCytosine => "adenine/cytosine",
-            Self::AdenineGuanine => "adenine/guanine",
-            Self::AdenineThymine => "adenine/thymine",
-            Self::CytosineGuanine => "cytosine/guanine",
-            Self::CytosineThymine => "cytosine/thymine",
-            Self::GuanineThymine => "guanine/thymine",
-            Self::AdenineCytosineGuanine => "adenine/cytosine/guanine",
-            Self::AdenineCytosineThymine => "adenine/cytosine/thymine",
-            Self::AdenineGuanineThymine => "adenine/guanine/thymine",
-            Self::CytosineGuanineThymine => "cytosine/guanine/thymine",
-            Self::Any => "any",
-            Self::Gap => "gap",
+    fn __str__(&self) -> String {
+        format!("{}", self)
+    }
+}
+
+impl From<&DNABase> for char {
+    fn from(base: &DNABase) -> Self {
+        match base {
+            DNABase::Adenine => 'A',
+            DNABase::Cytosine => 'C',
+            DNABase::Guanine => 'G',
+            DNABase::Thymine => 'T',
+            DNABase::AdenineCytosine => 'M',
+            DNABase::AdenineGuanine => 'R',
+            DNABase::AdenineThymine => 'W',
+            DNABase::CytosineGuanine => 'S',
+            DNABase::CytosineThymine => 'Y',
+            DNABase::GuanineThymine => 'K',
+            DNABase::AdenineCytosineGuanine => 'V',
+            DNABase::AdenineCytosineThymine => 'H',
+            DNABase::AdenineGuanineThymine => 'D',
+            DNABase::CytosineGuanineThymine => 'B',
+            DNABase::Any => 'N',
+            DNABase::Gap => '-',
         }
+    }
+}
+
+impl TryFrom<char> for DNABase {
+    type Error = PyErr;
+
+    fn try_from(code: char) -> PyResult<DNABase> {
+        Ok(match code {
+            'A' => Self::Adenine,
+            'C' => Self::Cytosine,
+            'G' => Self::Guanine,
+            'T' => Self::Thymine,
+            'M' => Self::AdenineCytosine,
+            'R' => Self::AdenineGuanine,
+            'W' => Self::AdenineThymine,
+            'S' => Self::CytosineGuanine,
+            'Y' => Self::CytosineThymine,
+            'K' => Self::GuanineThymine,
+            'V' => Self::AdenineCytosineGuanine,
+            'H' => Self::AdenineCytosineThymine,
+            'D' => Self::AdenineGuanineThymine,
+            'B' => Self::CytosineGuanineThymine,
+            'N' => Self::Any,
+            '.' | '-' => Self::Gap,
+            _ => {
+                return Err(pyo3::exceptions::PyValueError::new_err(format!(
+                    "invalid IUPAC DNA code \"{}\"",
+                    code
+                )))
+            }
+        })
+    }
+}
+
+impl fmt::Display for DNABase {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                Self::Adenine => "adenine",
+                Self::Cytosine => "cytosine",
+                Self::Guanine => "guanine",
+                Self::Thymine => "thymine",
+                Self::AdenineCytosine => "adenine/cytosine",
+                Self::AdenineGuanine => "adenine/guanine",
+                Self::AdenineThymine => "adenine/thymine",
+                Self::CytosineGuanine => "cytosine/guanine",
+                Self::CytosineThymine => "cytosine/thymine",
+                Self::GuanineThymine => "guanine/thymine",
+                Self::AdenineCytosineGuanine => "adenine/cytosine/guanine",
+                Self::AdenineCytosineThymine => "adenine/cytosine/thymine",
+                Self::AdenineGuanineThymine => "adenine/guanine/thymine",
+                Self::CytosineGuanineThymine => "cytosine/guanine/thymine",
+                Self::Any => "any",
+                Self::Gap => "gap",
+            }
+        )
     }
 }

@@ -2,6 +2,7 @@ use crate::dnabase::DNABase;
 use pyo3::class::basic::CompareOp;
 use pyo3::prelude::*;
 use pyo3::types::PyIterator;
+use std::fmt;
 
 #[derive(FromPyObject)]
 pub enum DNASequenceInput<'a> {
@@ -11,10 +12,41 @@ pub enum DNASequenceInput<'a> {
     BasesSeqStr(Vec<char>),
 }
 
+impl TryFrom<DNASequenceInput<'_>> for Vec<DNABase> {
+    type Error = PyErr;
+
+    fn try_from(bases: DNASequenceInput) -> PyResult<Self> {
+        match bases {
+            DNASequenceInput::BasesStr(bases) => bases
+                .chars()
+                .map(DNABase::try_from)
+                .collect::<PyResult<Vec<_>>>(),
+            DNASequenceInput::BasesIter(_bases) => Err(
+                pyo3::exceptions::PyNotImplementedError::new_err("not implemented"),
+            ),
+            DNASequenceInput::BasesSeq(bases) => Ok(bases),
+            DNASequenceInput::BasesSeqStr(_bases) => Err(
+                pyo3::exceptions::PyNotImplementedError::new_err("not implemented"),
+            ),
+        }
+    }
+}
+
 #[derive(FromPyObject)]
 pub enum DNABaseInput {
     BaseStr(char),
     Base(DNABase),
+}
+
+impl TryFrom<DNABaseInput> for DNABase {
+    type Error = PyErr;
+
+    fn try_from(base: DNABaseInput) -> PyResult<DNABase> {
+        match base {
+            DNABaseInput::BaseStr(base) => base.try_into(),
+            DNABaseInput::Base(base) => Ok(base),
+        }
+    }
 }
 
 #[pyclass(frozen)]
@@ -28,21 +60,9 @@ impl DNASequence {
     #[new]
     #[pyo3(signature = (bases = DNASequenceInput::BasesStr("")))]
     pub fn __new__(bases: DNASequenceInput) -> PyResult<Self> {
-        match bases {
-            DNASequenceInput::BasesStr(bases) => Ok(Self {
-                bases: bases
-                    .chars()
-                    .map(DNABase::__new__)
-                    .collect::<PyResult<Vec<_>>>()?,
-            }),
-            DNASequenceInput::BasesIter(_) => Err(
-                pyo3::exceptions::PyNotImplementedError::new_err("not implemented"),
-            ),
-            DNASequenceInput::BasesSeq(bases) => Ok(Self { bases }),
-            DNASequenceInput::BasesSeqStr(_) => Err(
-                pyo3::exceptions::PyNotImplementedError::new_err("not implemented"),
-            ),
-        }
+        Ok(Self {
+            bases: bases.try_into()?,
+        })
     }
 
     #[getter]
@@ -59,10 +79,7 @@ impl DNASequence {
     }
 
     fn count(&self, base: DNABaseInput) -> PyResult<usize> {
-        let base = match base {
-            DNABaseInput::BaseStr(base) => DNABase::__new__(base)?,
-            DNABaseInput::Base(base) => base,
-        };
+        let base = base.try_into()?;
         Ok(self.bases.iter().filter(|&b| *b == base).count())
     }
 
@@ -76,27 +93,13 @@ impl DNASequence {
         } else {
             format!(
                 "<DNASequence: {}>",
-                self.bases.iter().map(|b| b.get_code()).collect::<String>()
+                self.bases.iter().map(char::from).collect::<String>()
             )
         }
     }
 
     fn __str__(&self) -> String {
-        if self.bases.len() < 21 {
-            self.bases.iter().map(|b| b.get_code()).collect()
-        } else {
-            format!(
-                "{}...{}",
-                self.bases[0..10]
-                    .iter()
-                    .map(|b| b.get_code())
-                    .collect::<String>(),
-                self.bases[self.bases.len() - 10..self.bases.len()]
-                    .iter()
-                    .map(|b| b.get_code())
-                    .collect::<String>()
-            )
-        }
+        format!("{}", self)
     }
 
     fn __richcmp__(&self, _other: &Self, op: CompareOp, py: Python<'_>) -> PyObject {
@@ -131,5 +134,27 @@ impl DNASequence {
         Err(pyo3::exceptions::PyNotImplementedError::new_err(
             "not implemented",
         ))
+    }
+}
+
+impl fmt::Display for DNASequence {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        if self.bases.len() < 21 {
+            write!(
+                f,
+                "{}",
+                self.bases.iter().map(char::from).collect::<String>()
+            )
+        } else {
+            write!(
+                f,
+                "{}...{}",
+                self.bases[0..10].iter().map(char::from).collect::<String>(),
+                self.bases[self.bases.len() - 10..self.bases.len()]
+                    .iter()
+                    .map(char::from)
+                    .collect::<String>()
+            )
+        }
     }
 }
