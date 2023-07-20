@@ -56,7 +56,7 @@ class DNABase:
         ...
     def __invert__(self) -> DNABase:
         """See `DNABase.complement`."""
-    def __add__(self, other: typing.Union[DNABase, DNASequence]) -> typing.Any:
+    def __add__(self, other: typing.Union[DNABase, DNASequence]) -> DNASequence:
         """Create a DNA sequence from the concatenation of this base and either
         another base or a DNA sequence."""
 
@@ -206,8 +206,8 @@ class DNASequence:
         """Casting to bool is False for empty sequences and True otherwise."""
         ...
     def __add__(self, other: typing.Union[DNABase, DNASequence]) -> DNASequence:
-        """Not implemented."""
-        ...
+        """Create a DNA sequence from the concatenation of this sequence and
+        either a DNABase or another DNASequence."""
     def __contains__(self, item: typing.Any) -> bool:
         """Not implemented."""
         ...

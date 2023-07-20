@@ -135,9 +135,22 @@ def test__bool__(bases: typing.List[haem.DNABase], result: bool) -> None:
     assert bool(haem.DNASequence(bases)) is result
 
 
-def test__add__not_implemented() -> None:
-    with pytest.raises(NotImplementedError):
-        haem.DNASequence() + haem.DNASequence()
+@pytest.mark.parametrize(
+    "left,right,result",
+    [
+        (haem.DNASequence("A-"), haem.DNABase.GUANINE, haem.DNASequence("A-G")),
+        (haem.DNASequence("A-"), haem.DNASequence("CTT"), haem.DNASequence("A-CTT")),
+        (haem.DNASequence("A-"), haem.DNASequence(""), haem.DNASequence("A-")),
+        (haem.DNASequence(""), haem.DNASequence(""), haem.DNASequence("")),
+        (haem.DNASequence(""), haem.DNABase.GUANINE, haem.DNASequence("G")),
+    ],
+)
+def test__add__(
+    left: haem.DNASequence,
+    right: typing.Union[haem.DNABase, haem.DNASequence],
+    result: haem.DNASequence,
+) -> None:
+    assert left + right == result
 
 
 def test__contains__not_implemented() -> None:

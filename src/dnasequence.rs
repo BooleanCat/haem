@@ -1,8 +1,10 @@
+use crate::dnabase::AddInput;
 use crate::dnabase::DNABase;
 use pyo3::class::basic::CompareOp;
 use pyo3::prelude::*;
 use pyo3::types::PyIterator;
 use std::fmt;
+use std::ops;
 
 #[derive(FromPyObject)]
 pub enum DNASequenceInput<'a> {
@@ -114,10 +116,11 @@ impl DNASequence {
         !self.bases.is_empty()
     }
 
-    fn __add__(&self, _other: &Self) -> PyResult<Self> {
-        Err(pyo3::exceptions::PyNotImplementedError::new_err(
-            "not implemented",
-        ))
+    fn __add__(&self, other: AddInput) -> Self {
+        match other {
+            AddInput::Base(base) => self + &base,
+            AddInput::Seq(seq) => self + &seq,
+        }
     }
 
     fn __len__(&self) -> usize {
@@ -155,6 +158,26 @@ impl fmt::Display for DNASequence {
                     .map(char::from)
                     .collect::<String>()
             )
+        }
+    }
+}
+
+impl ops::Add<&DNABase> for &DNASequence {
+    type Output = DNASequence;
+
+    fn add(self, rhs: &DNABase) -> DNASequence {
+        DNASequence {
+            bases: [self.bases.as_slice(), &[*rhs]].concat(),
+        }
+    }
+}
+
+impl ops::Add<&DNASequence> for &DNASequence {
+    type Output = DNASequence;
+
+    fn add(self, rhs: &DNASequence) -> DNASequence {
+        DNASequence {
+            bases: [self.bases.as_slice(), rhs.bases.as_slice()].concat(),
         }
     }
 }
