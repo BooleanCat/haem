@@ -108,7 +108,7 @@ impl DNABase {
     }
 
     #[getter]
-    fn get_complement(&self) -> Self {
+    pub fn get_complement(&self) -> Self {
         match self {
             Self::Adenine => Self::Thymine,
             Self::Cytosine => Self::Guanine,

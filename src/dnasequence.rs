@@ -35,10 +35,10 @@ impl DNASequence {
     }
 
     #[getter]
-    fn get_complement(&self) -> PyResult<Self> {
-        Err(pyo3::exceptions::PyNotImplementedError::new_err(
-            "not implemented",
-        ))
+    fn get_complement(&self) -> Self {
+        Self {
+            bases: self.bases.iter().map(|b| b.get_complement()).collect(),
+        }
     }
 
     fn transcribe(&self) -> PyResult<()> {
@@ -47,13 +47,11 @@ impl DNASequence {
         ))
     }
 
-    fn count(&self, _base: DNABase) -> PyResult<usize> {
-        Err(pyo3::exceptions::PyNotImplementedError::new_err(
-            "not implemented",
-        ))
+    fn count(&self, base: DNABase) -> usize {
+        self.bases.iter().filter(|&b| *b == base).count()
     }
 
-    fn __invert__(&self) -> PyResult<Self> {
+    fn __invert__(&self) -> Self {
         self.get_complement()
     }
 

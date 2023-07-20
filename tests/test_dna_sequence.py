@@ -49,19 +49,37 @@ def test__new__sequence_str_not_implemented() -> None:
         haem.DNASequence(["A", "C", "G", "T"])
 
 
-def test_complement_not_implemented() -> None:
-    with pytest.raises(NotImplementedError):
-        haem.DNASequence().complement
+@pytest.mark.parametrize(
+    "bases,complements",
+    [
+        ([], []),
+        ([haem.DNABase.ADENINE], [haem.DNABase.THYMINE]),
+        (
+            [
+                haem.DNABase.ADENINE,
+                haem.DNABase.CYTOSINE,
+                haem.DNABase.GUANINE,
+                haem.DNABase.THYMINE,
+            ],
+            [
+                haem.DNABase.THYMINE,
+                haem.DNABase.GUANINE,
+                haem.DNABase.CYTOSINE,
+                haem.DNABase.ADENINE,
+            ],
+        ),
+    ],
+)
+def test_complement(
+    bases: typing.List[haem.DNABase], complements: typing.List[haem.DNABase]
+) -> None:
+    assert haem.DNASequence(bases).complement == haem.DNASequence(complements)
+    assert ~haem.DNASequence(bases) == haem.DNASequence(complements)
 
 
 def test_transcribe_not_implemented() -> None:
     with pytest.raises(NotImplementedError):
         haem.DNASequence().transcribe()
-
-
-def test__invert__not_implemented() -> None:
-    with pytest.raises(NotImplementedError):
-        ~haem.DNASequence()
 
 
 @pytest.mark.parametrize(
@@ -143,6 +161,23 @@ def test__iter__not_implemented() -> None:
         iter(haem.DNASequence())
 
 
-def test_count_not_implemented() -> None:
-    with pytest.raises(NotImplementedError):
-        haem.DNASequence().count(haem.DNABase.ADENINE)
+@pytest.mark.parametrize(
+    "bases,target,total",
+    [
+        ([], haem.DNABase.ADENINE, 0),
+        (
+            [
+                haem.DNABase.ADENINE,
+                haem.DNABase.GUANINE,
+                haem.DNABase.CYTOSINE,
+                haem.DNABase.GUANINE,
+            ],
+            haem.DNABase.GUANINE,
+            2,
+        ),
+    ],
+)
+def test_count(
+    bases: typing.List[haem.DNABase], target: haem.DNABase, total: int
+) -> None:
+    assert haem.DNASequence(bases).count(target) == total

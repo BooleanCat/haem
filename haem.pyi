@@ -191,8 +191,7 @@ class DNASequence:
         ...
     @property
     def complement(self) -> DNASequence:
-        """Not implemented."""
-        ...
+        """The complementary DNA sequence."""
     def transcribe(self) -> typing.Any:
         """Not implemented."""
         ...
@@ -220,5 +219,5 @@ class DNASequence:
         """Not implemented."""
         ...
     def count(self, item: DNABase) -> int:
-        """Not implemented."""
-        ...
+        """Count the occurances of a DNABase in the sequence."""
+        pass
