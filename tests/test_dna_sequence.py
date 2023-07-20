@@ -11,7 +11,21 @@ def test__new__empty() -> None:
 
 
 def test__new__str() -> None:
-    haem.DNASequence("ACGT")
+    assert haem.DNASequence("ACGT") == haem.DNASequence(
+        [
+            haem.DNABase.ADENINE,
+            haem.DNABase.CYTOSINE,
+            haem.DNABase.GUANINE,
+            haem.DNABase.THYMINE,
+        ]
+    )
+
+
+def test__new__str__invalid() -> None:
+    with pytest.raises(ValueError) as excinfo:
+        haem.DNASequence("ACGTX")
+
+    assert str(excinfo.value) == 'invalid IUPAC DNA code "X"'
 
 
 def test__new__iterable_base_not_implemented() -> None:
@@ -50,31 +64,16 @@ def test__new__sequence_str_not_implemented() -> None:
 
 
 @pytest.mark.parametrize(
-    "bases,complements",
+    "sequence,complement",
     [
-        ([], []),
-        ([haem.DNABase.ADENINE], [haem.DNABase.THYMINE]),
-        (
-            [
-                haem.DNABase.ADENINE,
-                haem.DNABase.CYTOSINE,
-                haem.DNABase.GUANINE,
-                haem.DNABase.THYMINE,
-            ],
-            [
-                haem.DNABase.THYMINE,
-                haem.DNABase.GUANINE,
-                haem.DNABase.CYTOSINE,
-                haem.DNABase.ADENINE,
-            ],
-        ),
+        (haem.DNASequence(""), haem.DNASequence("")),
+        (haem.DNASequence("A"), haem.DNASequence("T")),
+        (haem.DNASequence("ACGT"), haem.DNASequence("TGCA")),
     ],
 )
-def test_complement(
-    bases: typing.List[haem.DNABase], complements: typing.List[haem.DNABase]
-) -> None:
-    assert haem.DNASequence(bases).complement == haem.DNASequence(complements)
-    assert ~haem.DNASequence(bases) == haem.DNASequence(complements)
+def test_complement(sequence: haem.DNASequence, complement: haem.DNASequence) -> None:
+    assert sequence.complement == complement
+    assert ~sequence == complement
 
 
 def test_transcribe_not_implemented() -> None:

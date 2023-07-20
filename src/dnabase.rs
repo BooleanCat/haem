@@ -58,7 +58,7 @@ pub enum DNABase {
 #[pymethods]
 impl DNABase {
     #[new]
-    fn __new__(code: char) -> PyResult<Self> {
+    pub fn __new__(code: char) -> PyResult<Self> {
         Ok(match code {
             'A' => Self::Adenine,
             'C' => Self::Cytosine,

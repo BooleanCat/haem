@@ -20,10 +20,15 @@ pub struct DNASequence {
 #[pymethods]
 impl DNASequence {
     #[new]
-    #[pyo3(signature = (amino_acids = DNASequenceInput::BasesStr("")))]
-    pub fn __new__(amino_acids: DNASequenceInput) -> PyResult<Self> {
-        match amino_acids {
-            DNASequenceInput::BasesStr(_) => Ok(Self { bases: vec![] }),
+    #[pyo3(signature = (bases = DNASequenceInput::BasesStr("")))]
+    pub fn __new__(bases: DNASequenceInput) -> PyResult<Self> {
+        match bases {
+            DNASequenceInput::BasesStr(bases) => Ok(Self {
+                bases: bases
+                    .chars()
+                    .map(DNABase::__new__)
+                    .collect::<PyResult<Vec<_>>>()?,
+            }),
             DNASequenceInput::BasesIter(_) => Err(
                 pyo3::exceptions::PyNotImplementedError::new_err("not implemented"),
             ),
