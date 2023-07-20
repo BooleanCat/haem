@@ -91,24 +91,7 @@ impl DNABase {
     }
 
     fn transcribe(&self) -> RNABase {
-        match self {
-            Self::Adenine => RNABase::Adenine,
-            Self::Cytosine => RNABase::Cytosine,
-            Self::Guanine => RNABase::Guanine,
-            Self::Thymine => RNABase::Uracil,
-            Self::AdenineCytosine => RNABase::AdenineCytosine,
-            Self::AdenineGuanine => RNABase::AdenineGuanine,
-            Self::AdenineThymine => RNABase::AdenineUracil,
-            Self::CytosineGuanine => RNABase::CytosineGuanine,
-            Self::CytosineThymine => RNABase::CytosineUracil,
-            Self::GuanineThymine => RNABase::GuanineUracil,
-            Self::AdenineCytosineGuanine => RNABase::AdenineCytosineGuanine,
-            Self::AdenineCytosineThymine => RNABase::AdenineCytosineUracil,
-            Self::AdenineGuanineThymine => RNABase::AdenineGuanineUracil,
-            Self::CytosineGuanineThymine => RNABase::CytosineGuanineUracil,
-            Self::Any => RNABase::Any,
-            Self::Gap => RNABase::Gap,
-        }
+        self.into()
     }
 
     fn __richcmp__(&self, other: &Self, op: CompareOp, py: Python<'_>) -> PyObject {
@@ -134,7 +117,7 @@ impl DNABase {
     }
 
     fn __str__(&self) -> String {
-        format!("{}", self)
+        self.to_string()
     }
 }
 

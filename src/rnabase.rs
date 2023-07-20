@@ -1,5 +1,7 @@
+use crate::dnabase::DNABase;
 use pyo3::class::basic::CompareOp;
 use pyo3::prelude::*;
+use std::fmt;
 
 #[pyclass(frozen)]
 #[derive(Clone, Copy, PartialEq)]
@@ -57,52 +59,12 @@ pub enum RNABase {
 impl RNABase {
     #[new]
     pub fn __new__(code: char) -> PyResult<Self> {
-        Ok(match code {
-            'A' => Self::Adenine,
-            'C' => Self::Cytosine,
-            'G' => Self::Guanine,
-            'U' => Self::Uracil,
-            'M' => Self::AdenineCytosine,
-            'R' => Self::AdenineGuanine,
-            'W' => Self::AdenineUracil,
-            'S' => Self::CytosineGuanine,
-            'Y' => Self::CytosineUracil,
-            'K' => Self::GuanineUracil,
-            'V' => Self::AdenineCytosineGuanine,
-            'H' => Self::AdenineCytosineUracil,
-            'D' => Self::AdenineGuanineUracil,
-            'B' => Self::CytosineGuanineUracil,
-            'N' => Self::Any,
-            '.' | '-' => Self::Gap,
-            _ => {
-                return Err(pyo3::exceptions::PyValueError::new_err(format!(
-                    "invalid IUPAC RNA code \"{}\"",
-                    code
-                )))
-            }
-        })
+        Self::try_from(code)
     }
 
     #[getter]
     fn get_code(&self) -> char {
-        match self {
-            Self::Adenine => 'A',
-            Self::Cytosine => 'C',
-            Self::Guanine => 'G',
-            Self::Uracil => 'U',
-            Self::AdenineCytosine => 'M',
-            Self::AdenineGuanine => 'R',
-            Self::AdenineUracil => 'W',
-            Self::CytosineGuanine => 'S',
-            Self::CytosineUracil => 'Y',
-            Self::GuanineUracil => 'K',
-            Self::AdenineCytosineGuanine => 'V',
-            Self::AdenineCytosineUracil => 'H',
-            Self::AdenineGuanineUracil => 'D',
-            Self::CytosineGuanineUracil => 'B',
-            Self::Any => 'N',
-            Self::Gap => '-',
-        }
+        self.into()
     }
 
     #[getter]
@@ -149,24 +111,111 @@ impl RNABase {
         ))
     }
 
-    fn __str__(&self) -> &'static str {
-        match self {
-            Self::Adenine => "adenine",
-            Self::Cytosine => "cytosine",
-            Self::Guanine => "guanine",
-            Self::Uracil => "uracil",
-            Self::AdenineCytosine => "adenine/cytosine",
-            Self::AdenineGuanine => "adenine/guanine",
-            Self::AdenineUracil => "adenine/uracil",
-            Self::CytosineGuanine => "cytosine/guanine",
-            Self::CytosineUracil => "cytosine/uracil",
-            Self::GuanineUracil => "guanine/uracil",
-            Self::AdenineCytosineGuanine => "adenine/cytosine/guanine",
-            Self::AdenineCytosineUracil => "adenine/cytosine/uracil",
-            Self::AdenineGuanineUracil => "adenine/guanine/uracil",
-            Self::CytosineGuanineUracil => "cytosine/guanine/uracil",
-            Self::Any => "any",
-            Self::Gap => "gap",
+    fn __str__(&self) -> String {
+        self.to_string()
+    }
+}
+
+impl From<&RNABase> for char {
+    fn from(base: &RNABase) -> Self {
+        match base {
+            RNABase::Adenine => 'A',
+            RNABase::Cytosine => 'C',
+            RNABase::Guanine => 'G',
+            RNABase::Uracil => 'U',
+            RNABase::AdenineCytosine => 'M',
+            RNABase::AdenineGuanine => 'R',
+            RNABase::AdenineUracil => 'W',
+            RNABase::CytosineGuanine => 'S',
+            RNABase::CytosineUracil => 'Y',
+            RNABase::GuanineUracil => 'K',
+            RNABase::AdenineCytosineGuanine => 'V',
+            RNABase::AdenineCytosineUracil => 'H',
+            RNABase::AdenineGuanineUracil => 'D',
+            RNABase::CytosineGuanineUracil => 'B',
+            RNABase::Any => 'N',
+            RNABase::Gap => '-',
+        }
+    }
+}
+
+impl TryFrom<char> for RNABase {
+    type Error = PyErr;
+
+    fn try_from(code: char) -> PyResult<RNABase> {
+        Ok(match code {
+            'A' => RNABase::Adenine,
+            'C' => RNABase::Cytosine,
+            'G' => RNABase::Guanine,
+            'U' => RNABase::Uracil,
+            'M' => RNABase::AdenineCytosine,
+            'R' => RNABase::AdenineGuanine,
+            'W' => RNABase::AdenineUracil,
+            'S' => RNABase::CytosineGuanine,
+            'Y' => RNABase::CytosineUracil,
+            'K' => RNABase::GuanineUracil,
+            'V' => RNABase::AdenineCytosineGuanine,
+            'H' => RNABase::AdenineCytosineUracil,
+            'D' => RNABase::AdenineGuanineUracil,
+            'B' => RNABase::CytosineGuanineUracil,
+            'N' => RNABase::Any,
+            '.' | '-' => RNABase::Gap,
+            _ => {
+                return Err(pyo3::exceptions::PyValueError::new_err(format!(
+                    "invalid IUPAC RNA code \"{}\"",
+                    code
+                )))
+            }
+        })
+    }
+}
+
+impl fmt::Display for RNABase {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                Self::Adenine => "adenine",
+                Self::Cytosine => "cytosine",
+                Self::Guanine => "guanine",
+                Self::Uracil => "uracil",
+                Self::AdenineCytosine => "adenine/cytosine",
+                Self::AdenineGuanine => "adenine/guanine",
+                Self::AdenineUracil => "adenine/uracil",
+                Self::CytosineGuanine => "cytosine/guanine",
+                Self::CytosineUracil => "cytosine/uracil",
+                Self::GuanineUracil => "guanine/uracil",
+                Self::AdenineCytosineGuanine => "adenine/cytosine/guanine",
+                Self::AdenineCytosineUracil => "adenine/cytosine/uracil",
+                Self::AdenineGuanineUracil => "adenine/guanine/uracil",
+                Self::CytosineGuanineUracil => "cytosine/guanine/uracil",
+                Self::Any => "any",
+                Self::Gap => "gap",
+            }
+        )
+    }
+}
+
+impl From<&DNABase> for RNABase {
+    fn from(base: &DNABase) -> Self {
+        match base {
+            DNABase::Adenine => Self::Adenine,
+            DNABase::Cytosine => Self::Cytosine,
+            DNABase::Guanine => Self::Guanine,
+            DNABase::Thymine => Self::Uracil,
+            DNABase::AdenineCytosine => Self::AdenineCytosine,
+            DNABase::AdenineGuanine => Self::AdenineGuanine,
+            DNABase::AdenineThymine => Self::AdenineUracil,
+            DNABase::CytosineGuanine => Self::CytosineGuanine,
+            DNABase::CytosineThymine => Self::CytosineUracil,
+            DNABase::GuanineThymine => Self::GuanineUracil,
+            DNABase::AdenineCytosineGuanine => Self::AdenineCytosineGuanine,
+            DNABase::AdenineCytosineThymine => Self::AdenineCytosineUracil,
+            DNABase::AdenineGuanineThymine => Self::AdenineGuanineUracil,
+            DNABase::CytosineGuanineThymine => Self::CytosineGuanineUracil,
+            DNABase::Any => Self::Any,
+            DNABase::Gap => Self::Gap,
         }
     }
 }
