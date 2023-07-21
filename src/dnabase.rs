@@ -7,7 +7,7 @@ use std::ops;
 use crate::dnasequence::DNASequence;
 
 #[derive(FromPyObject)]
-pub enum AddInput {
+pub enum DNABaseOrSequence {
     Base(DNABase),
     Seq(DNASequence),
 }
@@ -118,10 +118,10 @@ impl DNABase {
         self.get_complement()
     }
 
-    fn __add__(&self, other: AddInput) -> DNASequence {
+    fn __add__(&self, other: DNABaseOrSequence) -> DNASequence {
         match other {
-            AddInput::Base(base) => self + &base,
-            AddInput::Seq(seq) => self + &seq,
+            DNABaseOrSequence::Base(base) => self + &base,
+            DNABaseOrSequence::Seq(seq) => self + &seq,
         }
     }
 

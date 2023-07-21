@@ -1,5 +1,5 @@
-use crate::dnabase::AddInput;
 use crate::dnabase::DNABase;
+use crate::dnabase::DNABaseOrSequence;
 use pyo3::class::basic::CompareOp;
 use pyo3::prelude::*;
 use pyo3::types::PyIterator;
@@ -129,10 +129,10 @@ impl DNASequence {
         !self.bases.is_empty()
     }
 
-    fn __add__(&self, other: AddInput) -> Self {
+    fn __add__(&self, other: DNABaseOrSequence) -> Self {
         match other {
-            AddInput::Base(base) => self + &base,
-            AddInput::Seq(seq) => self + &seq,
+            DNABaseOrSequence::Base(base) => self + &base,
+            DNABaseOrSequence::Seq(seq) => self + &seq,
         }
     }
 
@@ -155,10 +155,14 @@ impl DNASequence {
         )
     }
 
-    fn __contains__(&self, _base: DNABase) -> PyResult<bool> {
-        Err(pyo3::exceptions::PyNotImplementedError::new_err(
-            "not implemented",
-        ))
+    fn __contains__(&self, base_or_seq: DNABaseOrSequence) -> PyResult<bool> {
+        match base_or_seq {
+            DNABaseOrSequence::Base(base) => Ok(self.bases.contains(&base)),
+            DNABaseOrSequence::Seq(seq) if seq.bases.is_empty() => Ok(true),
+            DNABaseOrSequence::Seq(seq) => {
+                Ok(self.bases.windows(seq.bases.len()).any(|w| w == seq.bases))
+            }
+        }
     }
 }
 

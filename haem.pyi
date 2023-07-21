@@ -4,7 +4,7 @@ class StopTranslation(Exception):
     """StopTranslation is raised when a stop codon is encountered during
     translation."""
 
-    pass
+    ...
 
 class DNABase:
     """An enumeration of DNA bases, as defined by IUPAC.
@@ -187,7 +187,19 @@ class DNASequence:
             typing.Sequence[typing.Union[str, DNABase]],
         ] = "",
     ) -> DNASequence:
-        """Not implemented."""
+        """A sequence of `DNABase`s.
+
+        `DNASequence` may be instantiated by a string of IUPAC DNA codes, or a
+        sequence or iterable of `DNABase`s or IUPAC DNA codes. For example:
+
+        >>> DNASequence("ACGT")
+        >>> DNASequence(["A", "C", "G", "T"])
+        >>> DNASequence(iter(["A", "C", "G", "T"]))
+        >>> DNASequence([DNABase.ADENINE, DNABase.CYTOSINE])
+        >>> DNASequence(iter([DNABase.ADENINE, DNABase.CYTOSINE]))
+
+        A ValueError is raised if any DNA code is not valid."""
+
         ...
     @property
     def complement(self) -> DNASequence:
@@ -208,8 +220,9 @@ class DNASequence:
     def __add__(self, other: typing.Union[DNABase, DNASequence]) -> DNASequence:
         """Create a DNA sequence from the concatenation of this sequence and
         either a DNABase or another DNASequence."""
-    def __contains__(self, item: typing.Any) -> bool:
-        """Not implemented."""
+    def __contains__(self, item: typing.Union[DNABase, DNASequence]) -> bool:
+        """Return true if the given DNABase or DNASequence is contained within
+        this sequence."""
         ...
     def __len__(self) -> int: ...
     def __getitem__(self, key: typing.Any) -> typing.Any:
@@ -220,4 +233,4 @@ class DNASequence:
         ...
     def count(self, item: typing.Union[DNABase, str]) -> int:
         """Count the occurances of a DNABase in the sequence."""
-        pass
+        ...

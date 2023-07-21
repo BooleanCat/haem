@@ -153,9 +153,26 @@ def test__add__(
     assert left + right == result
 
 
-def test__contains__not_implemented() -> None:
-    with pytest.raises(NotImplementedError):
-        haem.DNABase.ADENINE in haem.DNASequence("")
+@pytest.mark.parametrize(
+    "sequence,target,result",
+    [
+        (haem.DNASequence("A"), haem.DNABase.ADENINE, True),
+        (haem.DNASequence(""), haem.DNABase.ADENINE, False),
+        (haem.DNASequence("G"), haem.DNABase.ADENINE, False),
+        (haem.DNASequence("AGCG"), haem.DNABase.GUANINE, True),
+        (haem.DNASequence("AGCG"), haem.DNABase.THYMINE, False),
+        (haem.DNASequence(""), haem.DNASequence(""), True),
+        (haem.DNASequence("AGT"), haem.DNASequence("GT"), True),
+        (haem.DNASequence("AGT"), haem.DNASequence("TG"), False),
+        (haem.DNASequence("A"), haem.DNASequence("AA"), False),
+    ],
+)
+def test__contains__(
+    sequence: haem.DNASequence,
+    target: typing.Union[haem.DNABase, haem.DNASequence],
+    result: bool,
+) -> None:
+    assert (target in sequence) is result
 
 
 @pytest.mark.parametrize("bases,length", [([], 0), ([haem.DNABase.ADENINE], 1)])
