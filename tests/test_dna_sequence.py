@@ -205,9 +205,30 @@ def test__getitem__index_out_of_range(index: int) -> None:
     assert str(excinfo.value) == "DNASequence index out of range"
 
 
-def test__getitem__slice_not_implemented() -> None:
-    with pytest.raises(NotImplementedError):
-        haem.DNASequence("GAT")[0:2]
+@pytest.mark.parametrize(
+    "sequence,slic,result",
+    [
+        (haem.DNASequence(""), slice(0, 0), haem.DNASequence("")),
+        (haem.DNASequence("GAT"), slice(0, 2), haem.DNASequence("GA")),
+        (haem.DNASequence("GAT"), slice(1, 3), haem.DNASequence("AT")),
+        (haem.DNASequence("GAT"), slice(0, 3), haem.DNASequence("GAT")),
+        (haem.DNASequence("GAT"), slice(0, 4), haem.DNASequence("GAT")),
+        (haem.DNASequence("GAT"), slice(0, None), haem.DNASequence("GAT")),
+        (haem.DNASequence("GAT"), slice(1, None), haem.DNASequence("AT")),
+        (haem.DNASequence("GAT"), slice(-1, None), haem.DNASequence("T")),
+        (haem.DNASequence("GAT"), slice(-3, None), haem.DNASequence("GAT")),
+        (haem.DNASequence("GAT"), slice(-4, None), haem.DNASequence("GAT")),
+        (haem.DNASequence("GAT"), slice(0, -1), haem.DNASequence("GA")),
+        (haem.DNASequence("GATCCA"), slice(0, -1, 2), haem.DNASequence("GTC")),
+        (haem.DNASequence("GATCCA"), slice(5, None, -1), haem.DNASequence("ACCTAG")),
+        (haem.DNASequence("GATCCA"), slice(None, None, -1), haem.DNASequence("ACCTAG")),
+        (haem.DNASequence("GATCCA"), slice(10, 2, -2), haem.DNASequence("AC")),
+    ],
+)
+def test__getitem__slice(
+    sequence: haem.DNASequence, slic: slice, result: haem.DNASequence
+) -> None:
+    assert sequence[slic.start : slic.stop : slic.step] == result
 
 
 @pytest.mark.parametrize(

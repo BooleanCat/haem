@@ -5,7 +5,6 @@ use pyo3::prelude::*;
 use pyo3::types::{PyIterator, PySlice};
 use std::fmt;
 use std::ops;
-use std::vec;
 
 #[derive(FromPyObject)]
 pub enum IntOrSlice<'a> {
@@ -146,7 +145,7 @@ impl DNASequence {
         self.bases.len()
     }
 
-    fn __getitem__(&self, index_or_slice: IntOrSlice) -> PyResult<DNABase> {
+    fn __getitem__(&self, py: Python, index_or_slice: IntOrSlice) -> PyResult<Py<PyAny>> {
         match index_or_slice {
             IntOrSlice::Int(index) => {
                 let index: usize = if index < 0 {
@@ -161,21 +160,28 @@ impl DNASequence {
                     ));
                 }
 
-                Ok(self.bases[index])
+                Ok(self.bases[index].into_py(py))
             }
-            IntOrSlice::Slice(_) => Err(pyo3::exceptions::PyNotImplementedError::new_err(
-                "not implemented",
-            )),
-        }
-    }
+            IntOrSlice::Slice(slice) => {
+                let indices = slice.indices(self.bases.len() as i64)?;
 
-    fn __iter__(this: PyRef<'_, Self>) -> PyResult<Py<DNASequenceIterator>> {
-        Py::new(
-            this.py(),
-            DNASequenceIterator {
-                sequence: this.bases.clone().into_iter(),
-            },
-        )
+                let mut bases: Vec<DNABase> = Vec::with_capacity(indices.slicelength as usize);
+
+                match indices.step {
+                    s if s < 0 => (indices.stop + 1..indices.start + 1)
+                        .rev()
+                        .step_by(indices.step.unsigned_abs())
+                        .for_each(|i| {
+                            bases.push(self.bases[i as usize]);
+                        }),
+                    _ => (0..indices.slicelength).for_each(|i| {
+                        bases.push(self.bases[(indices.start + i * indices.step.abs()) as usize]);
+                    }),
+                };
+
+                Ok(Self { bases }.into_py(py))
+            }
+        }
     }
 
     fn __contains__(&self, base_or_seq: DNABaseOrSequence) -> PyResult<bool> {
@@ -228,21 +234,5 @@ impl ops::Add<&DNASequence> for &DNASequence {
         DNASequence {
             bases: [self.bases.as_slice(), rhs.bases.as_slice()].concat(),
         }
-    }
-}
-
-#[pyclass]
-struct DNASequenceIterator {
-    sequence: vec::IntoIter<DNABase>,
-}
-
-#[pymethods]
-impl DNASequenceIterator {
-    fn __iter__(this: PyRef<'_, Self>) -> PyRef<'_, Self> {
-        this
-    }
-
-    fn __next__(mut this: PyRefMut<'_, Self>) -> Option<DNABase> {
-        this.sequence.next()
     }
 }
