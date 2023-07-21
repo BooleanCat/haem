@@ -180,9 +180,34 @@ def test__len__(bases: typing.List[haem.DNABase], length: int) -> None:
     assert len(haem.DNASequence(bases)) == length
 
 
-def test__getitem__not_implemented() -> None:
+@pytest.mark.parametrize(
+    "sequence,index,base",
+    [
+        (haem.DNASequence("GAT"), 0, haem.DNABase.GUANINE),
+        (haem.DNASequence("GAT"), 1, haem.DNABase.ADENINE),
+        (haem.DNASequence("GAT"), 2, haem.DNABase.THYMINE),
+        (haem.DNASequence("GAT"), -1, haem.DNABase.THYMINE),
+        (haem.DNASequence("GAT"), -2, haem.DNABase.ADENINE),
+        (haem.DNASequence("GAT"), -3, haem.DNABase.GUANINE),
+    ],
+)
+def test__getitem__index(
+    sequence: haem.DNASequence, index: int, base: haem.DNABase
+) -> None:
+    assert sequence[index] == base
+
+
+@pytest.mark.parametrize("index", [3, -4])
+def test__getitem__index_out_of_range(index: int) -> None:
+    with pytest.raises(IndexError) as excinfo:
+        haem.DNASequence("GAT")[index]
+
+    assert str(excinfo.value) == "DNASequence index out of range"
+
+
+def test__getitem__slice_not_implemented() -> None:
     with pytest.raises(NotImplementedError):
-        haem.DNASequence()[0]
+        haem.DNASequence("GAT")[0:2]
 
 
 @pytest.mark.parametrize(

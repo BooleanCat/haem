@@ -2,10 +2,16 @@ use crate::dnabase::DNABase;
 use crate::dnabase::DNABaseOrSequence;
 use pyo3::class::basic::CompareOp;
 use pyo3::prelude::*;
-use pyo3::types::PyIterator;
+use pyo3::types::{PyIterator, PySlice};
 use std::fmt;
 use std::ops;
 use std::vec;
+
+#[derive(FromPyObject)]
+pub enum IntOrSlice<'a> {
+    Int(isize),
+    Slice(&'a PySlice),
+}
 
 #[derive(FromPyObject)]
 pub enum DNASequenceInput<'a> {
@@ -140,10 +146,27 @@ impl DNASequence {
         self.bases.len()
     }
 
-    fn __getitem__(&self, _index: isize) -> PyResult<Self> {
-        Err(pyo3::exceptions::PyNotImplementedError::new_err(
-            "not implemented",
-        ))
+    fn __getitem__(&self, index_or_slice: IntOrSlice) -> PyResult<DNABase> {
+        match index_or_slice {
+            IntOrSlice::Int(index) => {
+                let index: usize = if index < 0 {
+                    self.bases.len() - index.unsigned_abs()
+                } else {
+                    index as usize
+                };
+
+                if index >= self.bases.len() {
+                    return Err(pyo3::exceptions::PyIndexError::new_err(
+                        "DNASequence index out of range",
+                    ));
+                }
+
+                Ok(self.bases[index])
+            }
+            IntOrSlice::Slice(_) => Err(pyo3::exceptions::PyNotImplementedError::new_err(
+                "not implemented",
+            )),
+        }
     }
 
     fn __iter__(this: PyRef<'_, Self>) -> PyResult<Py<DNASequenceIterator>> {
