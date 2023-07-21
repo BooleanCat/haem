@@ -5,6 +5,7 @@ use pyo3::prelude::*;
 use pyo3::types::{PyIterator, PySlice};
 use std::fmt;
 use std::ops;
+use std::os::raw::c_long;
 
 #[derive(FromPyObject)]
 pub enum IntOrSlice<'a> {
@@ -148,7 +149,7 @@ impl DNASequence {
     fn __getitem__(&self, py: Python, index_or_slice: IntOrSlice) -> PyResult<Py<PyAny>> {
         match index_or_slice {
             IntOrSlice::Int(index) => {
-                let index: usize = if index < 0 {
+                let index = if index < 0 {
                     self.bases.len() - index.unsigned_abs()
                 } else {
                     index as usize
@@ -163,7 +164,7 @@ impl DNASequence {
                 Ok(self.bases[index].into_py(py))
             }
             IntOrSlice::Slice(slice) => {
-                let indices = slice.indices(self.bases.len() as i64)?;
+                let indices = slice.indices(self.bases.len() as c_long)?;
 
                 Ok(Self {
                     bases: match indices.step {
