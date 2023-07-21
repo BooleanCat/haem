@@ -165,23 +165,20 @@ impl DNASequence {
             IntOrSlice::Slice(slice) => {
                 let indices = slice.indices(self.bases.len() as i64)?;
 
-                let mut bases = Vec::with_capacity(indices.slicelength as usize);
-
-                match indices.step {
-                    s if s < 0 => (indices.stop + 1..indices.start + 1)
-                        .rev()
-                        .step_by(indices.step.unsigned_abs())
-                        .for_each(|i| {
-                            bases.push(self.bases[i as usize]);
-                        }),
-                    _ => (indices.start..indices.stop)
-                        .step_by(indices.step as usize)
-                        .for_each(|i| {
-                            bases.push(self.bases[i as usize]);
-                        }),
-                };
-
-                Ok(Self { bases }.into_py(py))
+                Ok(Self {
+                    bases: match indices.step {
+                        s if s < 0 => (indices.stop + 1..indices.start + 1)
+                            .rev()
+                            .step_by(indices.step.unsigned_abs())
+                            .map(|i| self.bases[i as usize])
+                            .collect(),
+                        _ => (indices.start..indices.stop)
+                            .step_by(indices.step as usize)
+                            .map(|i| self.bases[i as usize])
+                            .collect(),
+                    },
+                }
+                .into_py(py))
             }
         }
     }
