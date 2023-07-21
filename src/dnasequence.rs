@@ -165,7 +165,7 @@ impl DNASequence {
             IntOrSlice::Slice(slice) => {
                 let indices = slice.indices(self.bases.len() as i64)?;
 
-                let mut bases: Vec<DNABase> = Vec::with_capacity(indices.slicelength as usize);
+                let mut bases = Vec::with_capacity(indices.slicelength as usize);
 
                 match indices.step {
                     s if s < 0 => (indices.stop + 1..indices.start + 1)
@@ -174,9 +174,11 @@ impl DNASequence {
                         .for_each(|i| {
                             bases.push(self.bases[i as usize]);
                         }),
-                    _ => (0..indices.slicelength).for_each(|i| {
-                        bases.push(self.bases[(indices.start + i * indices.step.abs()) as usize]);
-                    }),
+                    _ => (indices.start..indices.stop)
+                        .step_by(indices.step as usize)
+                        .for_each(|i| {
+                            bases.push(self.bases[i as usize]);
+                        }),
                 };
 
                 Ok(Self { bases }.into_py(py))
