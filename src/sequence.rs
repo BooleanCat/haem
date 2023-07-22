@@ -7,7 +7,7 @@ use std::os::raw::c_long;
 pub trait Sequence<T>
 where
     for<'a> &'a Vec<T>: PartialEq,
-    T: PartialEq + Clone + TryFrom<char>,
+    T: PartialEq + Clone,
     for<'a> &'a T: Into<char>,
 {
     fn members(&self) -> &Vec<T>;
