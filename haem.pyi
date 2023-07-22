@@ -134,6 +134,7 @@ class AminoAcid:
     Stop codons will cause a StopTranslation exception to be raised."""
 
     ALANINE: AminoAcid
+    ASPARTIC_ACID_ASPARAGINE: AminoAcid
     CYSTEINE: AminoAcid
     ASPARTIC_ACID: AminoAcid
     GLUTAMIC_ACID: AminoAcid
@@ -152,7 +153,9 @@ class AminoAcid:
     THREONINE: AminoAcid
     VALINE: AminoAcid
     TRYPTOPHAN: AminoAcid
+    ANY: AminoAcid
     TYROSINE: AminoAcid
+    GLUTAMINE_GLUTAMIC_ACID: AminoAcid
 
     @classmethod
     def __new__(

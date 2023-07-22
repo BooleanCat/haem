@@ -23,6 +23,28 @@ def test__new__alanine(rna_bases: typing.Iterator[haem.RNABase]) -> None:
         assert haem.AminoAcid("GC" + base.code) == haem.AminoAcid.ALANINE
 
 
+def test__new__aspartic_acid_asparagine() -> None:
+    assert haem.AminoAcid("B") == haem.AminoAcid.ASPARTIC_ACID_ASPARAGINE
+
+    codons = [
+        (haem.RNABase.ADENINE_GUANINE, haem.RNABase.ADENINE, haem.RNABase.CYTOSINE),
+        (haem.RNABase.ADENINE_GUANINE, haem.RNABase.ADENINE, haem.RNABase.URACIL),
+        (
+            haem.RNABase.ADENINE_GUANINE,
+            haem.RNABase.ADENINE,
+            haem.RNABase.CYTOSINE_URACIL,
+        ),
+    ]
+
+    for codon in codons:
+        assert haem.AminoAcid(codon) == haem.AminoAcid.ASPARTIC_ACID_ASPARAGINE
+
+        assert (
+            haem.AminoAcid("".join(base.code for base in codon))
+            == haem.AminoAcid.ASPARTIC_ACID_ASPARAGINE
+        )
+
+
 def test__new__cysteine() -> None:
     assert haem.AminoAcid("C") == haem.AminoAcid.CYSTEINE
 
@@ -348,6 +370,10 @@ def test__new__tryptophan(rna_bases: typing.Iterator[haem.RNABase]) -> None:
     assert haem.AminoAcid("UGG") == haem.AminoAcid.TRYPTOPHAN
 
 
+def test__new__any() -> None:
+    assert haem.AminoAcid("X") == haem.AminoAcid.ANY
+
+
 def test__new__tyrosine() -> None:
     assert haem.AminoAcid("Y") == haem.AminoAcid.TYROSINE
 
@@ -363,6 +389,28 @@ def test__new__tyrosine() -> None:
         assert (
             haem.AminoAcid("".join(base.code for base in codon))
             == haem.AminoAcid.TYROSINE
+        )
+
+
+def test__new__glutamine_glutamic_acid() -> None:
+    assert haem.AminoAcid("Z") == haem.AminoAcid.GLUTAMINE_GLUTAMIC_ACID
+
+    codons = [
+        (haem.RNABase.CYTOSINE_GUANINE, haem.RNABase.ADENINE, haem.RNABase.ADENINE),
+        (haem.RNABase.CYTOSINE_GUANINE, haem.RNABase.ADENINE, haem.RNABase.GUANINE),
+        (
+            haem.RNABase.CYTOSINE_GUANINE,
+            haem.RNABase.ADENINE,
+            haem.RNABase.ADENINE_GUANINE,
+        ),
+    ]
+
+    for codon in codons:
+        assert haem.AminoAcid(codon) == haem.AminoAcid.GLUTAMINE_GLUTAMIC_ACID
+
+        assert (
+            haem.AminoAcid("".join(base.code for base in codon))
+            == haem.AminoAcid.GLUTAMINE_GLUTAMIC_ACID
         )
 
 
@@ -385,8 +433,8 @@ def test__new__stop() -> None:
 @pytest.mark.parametrize(
     "code,message",
     [
-        ("X", 'invalid IUPAC amino acid code "X"'),
-        ("XX", "invalid amino acid codon"),
+        ("J", 'invalid IUPAC amino acid code "J"'),
+        ("JJ", "invalid amino acid codon"),
         ("NNN", "ambiguous codon"),
         ("---", "codon contains gap"),
     ],
@@ -406,6 +454,7 @@ def test__repr__() -> None:
     "amino_acid,text",
     [
         (haem.AminoAcid.ALANINE, "alanine"),
+        (haem.AminoAcid.ASPARTIC_ACID_ASPARAGINE, "aspartic acid/asparagine"),
         (haem.AminoAcid.CYSTEINE, "cysteine"),
         (haem.AminoAcid.ASPARTIC_ACID, "aspartic acid"),
         (haem.AminoAcid.GLUTAMIC_ACID, "glutamic acid"),
@@ -424,7 +473,9 @@ def test__repr__() -> None:
         (haem.AminoAcid.THREONINE, "threonine"),
         (haem.AminoAcid.VALINE, "valine"),
         (haem.AminoAcid.TRYPTOPHAN, "tryptophan"),
+        (haem.AminoAcid.ANY, "any"),
         (haem.AminoAcid.TYROSINE, "tyrosine"),
+        (haem.AminoAcid.GLUTAMINE_GLUTAMIC_ACID, "glutamine/glutamic acid"),
     ],
 )
 def test__str__(amino_acid: haem.AminoAcid, text: str) -> None:
@@ -435,6 +486,7 @@ def test__str__(amino_acid: haem.AminoAcid, text: str) -> None:
     "amino_acid,code",
     [
         (haem.AminoAcid.ALANINE, "A"),
+        (haem.AminoAcid.ASPARTIC_ACID_ASPARAGINE, "B"),
         (haem.AminoAcid.CYSTEINE, "C"),
         (haem.AminoAcid.ASPARTIC_ACID, "D"),
         (haem.AminoAcid.GLUTAMIC_ACID, "E"),
@@ -453,7 +505,9 @@ def test__str__(amino_acid: haem.AminoAcid, text: str) -> None:
         (haem.AminoAcid.THREONINE, "T"),
         (haem.AminoAcid.VALINE, "V"),
         (haem.AminoAcid.TRYPTOPHAN, "W"),
+        (haem.AminoAcid.ANY, "X"),
         (haem.AminoAcid.TYROSINE, "Y"),
+        (haem.AminoAcid.GLUTAMINE_GLUTAMIC_ACID, "Z"),
     ],
 )
 def test_code(amino_acid: haem.AminoAcid, code: str) -> None:
@@ -464,6 +518,7 @@ def test_code(amino_acid: haem.AminoAcid, code: str) -> None:
     "amino_acid,short_name",
     [
         (haem.AminoAcid.ALANINE, "ala"),
+        (haem.AminoAcid.ASPARTIC_ACID_ASPARAGINE, "asx"),
         (haem.AminoAcid.CYSTEINE, "cys"),
         (haem.AminoAcid.ASPARTIC_ACID, "asp"),
         (haem.AminoAcid.GLUTAMIC_ACID, "glu"),
@@ -482,7 +537,9 @@ def test_code(amino_acid: haem.AminoAcid, code: str) -> None:
         (haem.AminoAcid.THREONINE, "thr"),
         (haem.AminoAcid.VALINE, "val"),
         (haem.AminoAcid.TRYPTOPHAN, "trp"),
+        (haem.AminoAcid.ANY, "xaa"),
         (haem.AminoAcid.TYROSINE, "tyr"),
+        (haem.AminoAcid.GLUTAMINE_GLUTAMIC_ACID, "glx"),
     ],
 )
 def test_short_name(amino_acid: haem.AminoAcid, short_name: str) -> None:

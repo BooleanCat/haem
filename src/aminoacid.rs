@@ -43,6 +43,9 @@ pub enum AminoAcid {
     #[pyo3(name = "ALANINE")]
     Alanine,
 
+    #[pyo3(name = "ASPARTIC_ACID_ASPARAGINE")]
+    AsparticAcidAsparagine,
+
     #[pyo3(name = "CYSTEINE")]
     Cysteine,
 
@@ -97,8 +100,14 @@ pub enum AminoAcid {
     #[pyo3(name = "TRYPTOPHAN")]
     Tryptophan,
 
+    #[pyo3(name = "ANY")]
+    Any,
+
     #[pyo3(name = "TYROSINE")]
     Tyrosine,
+
+    #[pyo3(name = "GLUTAMINE_GLUTAMIC_ACID")]
+    GlutamineGlutamicAcid,
 }
 
 #[pymethods]
@@ -117,6 +126,7 @@ impl AminoAcid {
     fn get_short_name(&self) -> &'static str {
         match self {
             Self::Alanine => "ala",
+            Self::AsparticAcidAsparagine => "asx",
             Self::Cysteine => "cys",
             Self::AsparticAcid => "asp",
             Self::GlutamicAcid => "glu",
@@ -135,7 +145,9 @@ impl AminoAcid {
             Self::Threonine => "thr",
             Self::Valine => "val",
             Self::Tryptophan => "trp",
+            Self::Any => "xaa",
             Self::Tyrosine => "tyr",
+            Self::GlutamineGlutamicAcid => "glx",
         }
     }
 
@@ -166,6 +178,7 @@ impl From<&AminoAcid> for char {
     fn from(amino_acid: &AminoAcid) -> Self {
         match amino_acid {
             AminoAcid::Alanine => 'A',
+            AminoAcid::AsparticAcidAsparagine => 'B',
             AminoAcid::Cysteine => 'C',
             AminoAcid::AsparticAcid => 'D',
             AminoAcid::GlutamicAcid => 'E',
@@ -184,7 +197,9 @@ impl From<&AminoAcid> for char {
             AminoAcid::Threonine => 'T',
             AminoAcid::Valine => 'V',
             AminoAcid::Tryptophan => 'W',
+            AminoAcid::Any => 'X',
             AminoAcid::Tyrosine => 'Y',
+            AminoAcid::GlutamineGlutamicAcid => 'Z',
         }
     }
 }
@@ -196,6 +211,7 @@ impl fmt::Display for AminoAcid {
             "{}",
             match self {
                 Self::Alanine => "alanine",
+                Self::AsparticAcidAsparagine => "aspartic acid/asparagine",
                 Self::Cysteine => "cysteine",
                 Self::AsparticAcid => "aspartic acid",
                 Self::GlutamicAcid => "glutamic acid",
@@ -214,7 +230,9 @@ impl fmt::Display for AminoAcid {
                 Self::Threonine => "threonine",
                 Self::Valine => "valine",
                 Self::Tryptophan => "tryptophan",
+                Self::Any => "any",
                 Self::Tyrosine => "tyrosine",
+                Self::GlutamineGlutamicAcid => "glutamine/glutamic acid",
             }
         )
     }
@@ -226,6 +244,7 @@ impl TryFrom<char> for AminoAcid {
     fn try_from(code: char) -> PyResult<AminoAcid> {
         Ok(match code {
             'A' => Self::Alanine,
+            'B' => Self::AsparticAcidAsparagine,
             'C' => Self::Cysteine,
             'D' => Self::AsparticAcid,
             'E' => Self::GlutamicAcid,
@@ -244,7 +263,9 @@ impl TryFrom<char> for AminoAcid {
             'T' => Self::Threonine,
             'V' => Self::Valine,
             'W' => Self::Tryptophan,
+            'X' => Self::Any,
             'Y' => Self::Tyrosine,
+            'Z' => Self::GlutamineGlutamicAcid,
             _ => {
                 return Err(pyo3::exceptions::PyValueError::new_err(format!(
                     "invalid IUPAC amino acid code \"{}\"",
@@ -268,6 +289,13 @@ impl TryFrom<(RNABase, RNABase, RNABase)> for AminoAcid {
 
             // Alanine
             (RNABase::Guanine, RNABase::Cytosine, _) => Self::Alanine,
+
+            // Aspartic acid/Asparagine
+            (
+                RNABase::AdenineGuanine,
+                RNABase::Adenine,
+                RNABase::Cytosine | RNABase::Uracil | RNABase::CytosineUracil,
+            ) => Self::AsparticAcidAsparagine,
 
             // Cysteine
             (
@@ -386,6 +414,12 @@ impl TryFrom<(RNABase, RNABase, RNABase)> for AminoAcid {
                 RNABase::Adenine,
                 RNABase::Cytosine | RNABase::Uracil | RNABase::CytosineUracil,
             ) => Self::Tyrosine,
+
+            (
+                RNABase::CytosineGuanine,
+                RNABase::Adenine,
+                RNABase::Adenine | RNABase::Guanine | RNABase::AdenineGuanine,
+            ) => Self::GlutamineGlutamicAcid,
 
             // Stop
             (
