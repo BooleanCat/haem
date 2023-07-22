@@ -59,6 +59,7 @@ class DNABase:
     def __add__(self, other: typing.Union[DNABase, DNASequence]) -> DNASequence:
         """Create a DNA sequence from the concatenation of this base and either
         another base or a DNA sequence."""
+        ...
 
 class RNABase:
     """An enumeration of RNA bases, as defined by IUPAC.
@@ -107,8 +108,9 @@ class RNABase:
         ...
     def __invert__(self) -> RNABase:
         """See `RNABase.complement`."""
-    def __add__(self, other: RNABase) -> typing.Any:
-        """Not implemented."""
+    def __add__(self, other: typing.Union[RNABase, RNASequence]) -> RNASequence:
+        """Create a RNA sequence from the concatenation of this base and either
+        another base or a RNA sequence."""
         ...
 
 class AminoAcid:

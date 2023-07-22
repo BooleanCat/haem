@@ -1,14 +1,10 @@
 use crate::dnabase::DNABase;
+use crate::member::Member;
 use crate::rnasequence::RNASequence;
+use crate::utils::MemberOrSequence;
 use pyo3::class::basic::CompareOp;
 use pyo3::prelude::*;
 use std::fmt;
-
-#[derive(FromPyObject)]
-pub enum RNABaseOrSequence {
-    Base(RNABase),
-    Seq(RNASequence),
-}
 
 #[pyclass(frozen)]
 #[derive(Clone, Copy, PartialEq)]
@@ -97,11 +93,7 @@ impl RNABase {
     }
 
     fn __richcmp__(&self, other: &Self, op: CompareOp, py: Python<'_>) -> PyObject {
-        match op {
-            CompareOp::Eq => (self == other).into_py(py),
-            CompareOp::Ne => (self != other).into_py(py),
-            _ => py.NotImplemented(),
-        }
+        self.richcmp(other, op, py)
     }
 
     fn __bool__(&self) -> bool {
@@ -112,10 +104,10 @@ impl RNABase {
         self.get_complement()
     }
 
-    fn __add__(&self, _other: &Self) -> PyResult<()> {
-        Err(pyo3::exceptions::PyNotImplementedError::new_err(
-            "not implemented",
-        ))
+    fn __add__(&self, other: MemberOrSequence<Self>) -> RNASequence {
+        RNASequence {
+            bases: self.add(other),
+        }
     }
 
     fn __str__(&self) -> String {

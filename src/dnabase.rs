@@ -1,16 +1,10 @@
+use crate::dnasequence::DNASequence;
+use crate::member::Member;
 use crate::rnabase::RNABase;
+use crate::utils::MemberOrSequence;
 use pyo3::class::basic::CompareOp;
 use pyo3::prelude::*;
 use std::fmt;
-use std::ops;
-
-use crate::dnasequence::DNASequence;
-
-#[derive(FromPyObject)]
-pub enum DNABaseOrSequence {
-    Base(DNABase),
-    Seq(DNASequence),
-}
 
 #[pyclass(frozen)]
 #[derive(Clone, Copy, PartialEq)]
@@ -103,11 +97,7 @@ impl DNABase {
     }
 
     fn __richcmp__(&self, other: &Self, op: CompareOp, py: Python<'_>) -> PyObject {
-        match op {
-            CompareOp::Eq => (self == other).into_py(py),
-            CompareOp::Ne => (self != other).into_py(py),
-            _ => py.NotImplemented(),
-        }
+        self.richcmp(other, op, py)
     }
 
     fn __bool__(&self) -> bool {
@@ -118,10 +108,9 @@ impl DNABase {
         self.get_complement()
     }
 
-    fn __add__(&self, other: DNABaseOrSequence) -> DNASequence {
-        match other {
-            DNABaseOrSequence::Base(base) => self + &base,
-            DNABaseOrSequence::Seq(seq) => self + &seq,
+    fn __add__(&self, other: MemberOrSequence<Self>) -> DNASequence {
+        DNASequence {
+            bases: self.add(other),
         }
     }
 
@@ -208,26 +197,5 @@ impl fmt::Display for DNABase {
                 Self::Gap => "gap",
             }
         )
-    }
-}
-
-impl ops::Add<&DNABase> for &DNABase {
-    type Output = DNASequence;
-
-    fn add(self, rhs: &DNABase) -> DNASequence {
-        DNASequence {
-            bases: vec![*self, *rhs],
-        }
-    }
-}
-
-impl ops::Add<&DNASequence> for &DNABase {
-    type Output = DNASequence;
-
-    fn add(self, rhs: &DNASequence) -> DNASequence {
-        let mut bases = Vec::with_capacity(rhs.bases.len() + 1);
-        bases.push(*self);
-        bases.extend_from_slice(&rhs.bases);
-        DNASequence { bases }
     }
 }

@@ -6,3 +6,42 @@ pub enum IntOrSlice<'a> {
     Int(isize),
     Slice(&'a PySlice),
 }
+
+#[derive(FromPyObject)]
+pub enum MemberOrSequence<T> {
+    Member(T),
+    Sequence(Vec<T>),
+}
+
+#[derive(FromPyObject, Clone)]
+pub enum MemberOrCode<T> {
+    Member(T),
+    Code(char),
+}
+
+pub struct Wrapper<T>(T)
+where
+    T: TryFrom<char, Error = PyErr> + Clone;
+
+impl<T> Wrapper<T>
+where
+    T: TryFrom<char, Error = PyErr> + Clone,
+{
+    pub fn peel(self) -> T {
+        self.0
+    }
+}
+
+impl<T> TryFrom<MemberOrCode<T>> for Wrapper<T>
+where
+    T: TryFrom<char, Error = PyErr> + Clone,
+{
+    type Error = PyErr;
+
+    fn try_from(code: MemberOrCode<T>) -> PyResult<Wrapper<T>> {
+        Ok(match code {
+            MemberOrCode::Member(member) => Wrapper(member),
+            MemberOrCode::Code(code) => Wrapper(code.try_into()?),
+        })
+    }
+}

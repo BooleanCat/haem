@@ -146,6 +146,17 @@ def test__bool__(base: haem.RNABase, result: bool) -> None:
     assert bool(base) == result
 
 
-def test__add__not_implemented() -> None:
-    with pytest.raises(NotImplementedError):
-        haem.RNABase.ADENINE + haem.RNABase.CYTOSINE
+@pytest.mark.parametrize(
+    "left,right,result",
+    [
+        (haem.RNABase.ADENINE, haem.RNABase.GAP, haem.RNASequence("A-")),
+        (haem.RNABase.ADENINE, haem.RNASequence("CUU"), haem.RNASequence("ACUU")),
+        (haem.RNABase.ADENINE, haem.RNASequence(""), haem.RNASequence("A")),
+    ],
+)
+def test__add__(
+    left: haem.RNABase,
+    right: typing.Union[haem.RNABase, haem.RNASequence],
+    result: haem.RNASequence,
+) -> None:
+    assert left + right == result

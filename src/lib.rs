@@ -1,8 +1,10 @@
 mod aminoacid;
 mod dnabase;
 mod dnasequence;
+mod member;
 mod rnabase;
 mod rnasequence;
+mod sequence;
 mod utils;
 
 use aminoacid::{AminoAcid, StopTranslation};
