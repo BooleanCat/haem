@@ -13,7 +13,7 @@ pub enum MemberOrSequence<T> {
     Sequence(Vec<T>),
 }
 
-#[derive(FromPyObject, Clone)]
+#[derive(FromPyObject)]
 pub enum MemberOrCode<T> {
     Member(T),
     Code(char),

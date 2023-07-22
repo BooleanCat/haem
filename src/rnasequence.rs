@@ -5,7 +5,6 @@ use pyo3::class::basic::CompareOp;
 use pyo3::prelude::*;
 
 #[pyclass(frozen)]
-#[derive(PartialEq, Clone)]
 pub struct RNASequence {
     pub bases: Vec<RNABase>,
 }
