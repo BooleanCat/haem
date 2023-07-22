@@ -26,7 +26,7 @@ impl TryFrom<CodeOrCodon<'_>> for AminoAcid {
                     .map(RNABase::try_from)
                     .collect::<PyResult<Vec<_>>>()?;
 
-                (bases[0], bases[1], bases[2]).try_into()?
+                (bases[0].clone(), bases[1].clone(), bases[2].clone()).try_into()?
             }
             _ => {
                 return Err(pyo3::exceptions::PyValueError::new_err(

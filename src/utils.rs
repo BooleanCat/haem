@@ -21,11 +21,11 @@ pub enum MemberOrCode<T> {
 
 pub struct Wrapper<T>(T)
 where
-    T: TryFrom<char, Error = PyErr> + Clone;
+    T: TryFrom<char, Error = PyErr>;
 
 impl<T> Wrapper<T>
 where
-    T: TryFrom<char, Error = PyErr> + Clone,
+    T: TryFrom<char, Error = PyErr>,
 {
     pub fn peel(self) -> T {
         self.0
@@ -34,7 +34,7 @@ where
 
 impl<T> TryFrom<MemberOrCode<T>> for Wrapper<T>
 where
-    T: TryFrom<char, Error = PyErr> + Clone,
+    T: TryFrom<char, Error = PyErr>,
 {
     type Error = PyErr;
 
