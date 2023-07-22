@@ -290,3 +290,53 @@ class RNASequence:
     def count(self, item: typing.Union[RNABase, str]) -> int:
         """Count the occurances of a RNABase in the sequence."""
         ...
+
+class AminoAcidSequence:
+    @classmethod
+    def __new__(
+        cls,
+        bases: typing.Union[
+            str,
+            typing.Iterable[typing.Union[str, AminoAcid]],
+            typing.Sequence[typing.Union[str, AminoAcid]],
+        ] = "",
+    ) -> AminoAcidSequence:
+        """A sequence of `AminoAcid`s.
+
+        `AminoAcidSequence` may be instantiated by a string of IUPAC amino acid
+        codes, or a sequence or iterable of `AminoAcid`s or IUPAC amino acid
+        codes. For example:
+
+        >>> AminoAcidSequence("MVVR")
+        >>> AminoAcidSequence(["M", "V", "V", "R"])
+        >>> AminoAcidSequence(iter(["M", "V", "V", "R"]))
+        >>> AminoAcidSequence([AminoAcid.METHIONINE, AminoAcid.VALINE])
+        >>> AminoAcidSequence(iter([AminoAcid.METHIONINE, AminoAcid.VALINE]))
+
+        A ValueError is raised if any amino acid code is not valid."""
+
+        ...
+    def __repr__(self) -> str: ...
+    def __str__(self) -> str: ...
+    def __eq__(self, other: object) -> bool: ...
+    def __ne__(self, other: object) -> bool: ...
+    def __bool__(self) -> bool:
+        """Casting to bool is False for empty sequences and True otherwise."""
+        ...
+    def __add__(
+        self, other: typing.Union[AminoAcid, AminoAcidSequence]
+    ) -> AminoAcidSequence:
+        """Create an amino acid sequence from the concatenation of this
+        sequence and either an AminoAcid or another AminoAcidSequence."""
+    def __contains__(self, item: typing.Union[AminoAcid, AminoAcidSequence]) -> bool:
+        """Return true if the given AminoAcid or AminoAcidSequence is contained
+        within this sequence."""
+        ...
+    def __len__(self) -> int: ...
+    def __getitem__(
+        self, key: typing.Union[int, slice]
+    ) -> typing.Union[AminoAcid, AminoAcidSequence]: ...
+    def __iter__(self) -> typing.Iterator[AminoAcid]: ...
+    def count(self, item: typing.Union[AminoAcid, str]) -> int:
+        """Count the occurances of an AminoAcid in the sequence."""
+        ...

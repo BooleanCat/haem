@@ -48,7 +48,7 @@ def test__new__iterable_invalid() -> None:
     assert str(excinfo.value) == 'invalid IUPAC RNA code "X"'
 
 
-def test_new__sequence_bases() -> None:
+def test__new__sequence_bases() -> None:
     assert haem.RNASequence(
         [
             haem.RNABase.ADENINE,
