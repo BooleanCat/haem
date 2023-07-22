@@ -151,9 +151,7 @@ where
             }
             SequenceInput::Iter(bases) => bases
                 .iter()?
-                .map(|base| {
-                    Ok(Wrapper::<_>::try_from(base?.extract::<MemberOrCode<_>>()?.clone())?.peel())
-                })
+                .map(|base| Ok(Wrapper::<_>::try_from(base?.extract::<MemberOrCode<_>>()?)?.peel()))
                 .collect(),
             SequenceInput::Seq(bases) => Ok(bases),
             SequenceInput::SeqStr(codes) => codes
