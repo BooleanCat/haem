@@ -1,7 +1,14 @@
 use crate::dnabase::DNABase;
+use crate::rnasequence::RNASequence;
 use pyo3::class::basic::CompareOp;
 use pyo3::prelude::*;
 use std::fmt;
+
+#[derive(FromPyObject)]
+pub enum RNABaseOrSequence {
+    Base(RNABase),
+    Seq(RNASequence),
+}
 
 #[pyclass(frozen)]
 #[derive(Clone, Copy, PartialEq)]
@@ -68,7 +75,7 @@ impl RNABase {
     }
 
     #[getter]
-    fn get_complement(&self) -> Self {
+    pub fn get_complement(&self) -> Self {
         match self {
             Self::Adenine => Self::Uracil,
             Self::Cytosine => Self::Guanine,

@@ -235,3 +235,56 @@ class DNASequence:
     def count(self, item: typing.Union[DNABase, str]) -> int:
         """Count the occurances of a DNABase in the sequence."""
         ...
+
+class RNASequence:
+    @classmethod
+    def __new__(
+        cls,
+        bases: typing.Union[
+            str,
+            typing.Iterable[typing.Union[str, RNABase]],
+            typing.Sequence[typing.Union[str, RNABase]],
+        ] = "",
+    ) -> RNASequence:
+        """A sequence of `RNABase`s.
+
+        `RNASequence` may be instantiated by a string of IUPAC RNA codes, or a
+        sequence or iterable of `RNABase`s or IUPAC RNA codes. For example:
+
+        >>> RNASequence("ACGU")
+        >>> RNASequence(["A", "C", "G", "U"])
+        >>> RNASequence(iter(["A", "C", "G", "U"]))
+        >>> RNASequence([RNABase.ADENINE, RNABase.CYTOSINE])
+        >>> RNASequence(iter([RNABase.ADENINE, RNABase.CYTOSINE]))
+
+        A ValueError is raised if any RNA code is not valid."""
+
+        ...
+    @property
+    def complement(self) -> RNASequence:
+        """The complementary RNA sequence."""
+    def __invert__(self) -> RNASequence:
+        """See `RNASequence.complement`."""
+        ...
+    def __repr__(self) -> str: ...
+    def __str__(self) -> str: ...
+    def __eq__(self, other: object) -> bool: ...
+    def __ne__(self, other: object) -> bool: ...
+    def __bool__(self) -> bool:
+        """Casting to bool is False for empty sequences and True otherwise."""
+        ...
+    def __add__(self, other: typing.Union[RNABase, RNASequence]) -> RNASequence:
+        """Create a RNA sequence from the concatenation of this sequence and
+        either a RNABase or another RNASequence."""
+    def __contains__(self, item: typing.Union[RNABase, RNASequence]) -> bool:
+        """Return true if the given RNABase or RNASequence is contained within
+        this sequence."""
+        ...
+    def __len__(self) -> int: ...
+    def __getitem__(
+        self, key: typing.Union[int, slice]
+    ) -> typing.Union[RNABase, RNASequence]: ...
+    def __iter__(self) -> typing.Iterator[RNABase]: ...
+    def count(self, item: typing.Union[RNABase, str]) -> int:
+        """Count the occurances of a RNABase in the sequence."""
+        ...

@@ -49,14 +49,14 @@ def test__new__iterable_invalid() -> None:
 
 
 def test_new__sequence_bases() -> None:
-    haem.DNASequence(
+    assert haem.DNASequence(
         [
             haem.DNABase.ADENINE,
             haem.DNABase.CYTOSINE,
             haem.DNABase.GUANINE,
             haem.DNABase.THYMINE,
         ]
-    )
+    ) == haem.DNASequence("ACGT")
 
 
 def test__new__sequence_str() -> None:

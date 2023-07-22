@@ -1,81 +1,79 @@
-use crate::dnabase::DNABase;
-use crate::dnabase::DNABaseOrSequence;
+use crate::rnabase::{RNABase, RNABaseOrSequence};
 use crate::utils::IntOrSlice;
 use pyo3::class::basic::CompareOp;
 use pyo3::prelude::*;
 use pyo3::types::PyIterator;
-use std::fmt;
-use std::ops;
 use std::os::raw::c_long;
+use std::{fmt, ops};
 
 #[derive(FromPyObject)]
-pub enum DNASequenceInput<'a> {
+pub enum RNASequenceInput<'a> {
     Str(&'a str),
     Iter(&'a PyIterator),
-    Seq(Vec<DNABase>),
+    Seq(Vec<RNABase>),
     SeqStr(Vec<char>),
 }
 
 #[derive(FromPyObject)]
-pub enum CharOrDNABase {
+pub enum CharOrRNABase {
     Char(char),
-    Base(DNABase),
+    Base(RNABase),
 }
 
-impl TryFrom<DNASequenceInput<'_>> for Vec<DNABase> {
+#[derive(FromPyObject)]
+pub enum RNABaseInput {
+    BaseStr(char),
+    Base(RNABase),
+}
+
+impl TryFrom<RNABaseInput> for RNABase {
     type Error = PyErr;
 
-    fn try_from(bases: DNASequenceInput) -> PyResult<Self> {
-        match bases {
-            DNASequenceInput::Str(bases) => bases
-                .chars()
-                .map(DNABase::try_from)
-                .collect::<PyResult<Vec<_>>>(),
-            DNASequenceInput::Iter(bases) => bases
-                .iter()?
-                .map(|base| match base?.extract::<CharOrDNABase>() {
-                    Ok(CharOrDNABase::Char(code)) => code.try_into(),
-                    Ok(CharOrDNABase::Base(base)) => Ok(base),
-                    Err(e) => Err(e),
-                })
-                .collect(),
-            DNASequenceInput::Seq(bases) => Ok(bases),
-            DNASequenceInput::SeqStr(codes) => codes
-                .iter()
-                .map(|code| DNABase::try_from(*code))
-                .collect::<PyResult<Vec<_>>>(),
+    fn try_from(base: RNABaseInput) -> PyResult<RNABase> {
+        match base {
+            RNABaseInput::BaseStr(base) => base.try_into(),
+            RNABaseInput::Base(base) => Ok(base),
         }
     }
 }
 
-#[derive(FromPyObject)]
-pub enum DNABaseInput {
-    BaseStr(char),
-    Base(DNABase),
-}
-
-impl TryFrom<DNABaseInput> for DNABase {
+impl TryFrom<RNASequenceInput<'_>> for Vec<RNABase> {
     type Error = PyErr;
 
-    fn try_from(base: DNABaseInput) -> PyResult<DNABase> {
-        match base {
-            DNABaseInput::BaseStr(base) => base.try_into(),
-            DNABaseInput::Base(base) => Ok(base),
+    fn try_from(bases: RNASequenceInput) -> PyResult<Self> {
+        match bases {
+            RNASequenceInput::Str(bases) => bases
+                .chars()
+                .map(RNABase::try_from)
+                .collect::<PyResult<Vec<_>>>(),
+            RNASequenceInput::Iter(bases) => bases
+                .iter()?
+                .map(|base| match base?.extract::<CharOrRNABase>() {
+                    Ok(CharOrRNABase::Char(code)) => code.try_into(),
+                    Ok(CharOrRNABase::Base(base)) => Ok(base),
+                    Err(e) => Err(e),
+                })
+                .collect(),
+            RNASequenceInput::Seq(bases) => Ok(bases),
+            RNASequenceInput::SeqStr(codes) => codes
+                .iter()
+                .map(|code| RNABase::try_from(*code))
+                .collect::<PyResult<Vec<_>>>(),
         }
     }
 }
 
 #[pyclass(frozen)]
 #[derive(PartialEq, Clone)]
-pub struct DNASequence {
-    pub bases: Vec<DNABase>,
+pub struct RNASequence {
+    pub bases: Vec<RNABase>,
 }
 
 #[pymethods]
-impl DNASequence {
+impl RNASequence {
     #[new]
-    #[pyo3(signature = (bases = DNASequenceInput::Str("")))]
-    pub fn __new__(bases: DNASequenceInput) -> PyResult<Self> {
+    #[pyo3(signature = (bases = RNASequenceInput::Str("")))]
+    pub fn __new__(bases: RNASequenceInput) -> PyResult<Self> {
         Ok(Self {
             bases: bases.try_into()?,
         })
@@ -88,13 +86,7 @@ impl DNASequence {
         }
     }
 
-    fn transcribe(&self) -> PyResult<()> {
-        Err(pyo3::exceptions::PyNotImplementedError::new_err(
-            "not implemented",
-        ))
-    }
-
-    fn count(&self, base: DNABaseInput) -> PyResult<usize> {
+    fn count(&self, base: RNABaseInput) -> PyResult<usize> {
         let base = base.try_into()?;
         Ok(self.bases.iter().filter(|&b| *b == base).count())
     }
@@ -105,10 +97,10 @@ impl DNASequence {
 
     fn __repr__(&self) -> String {
         if self.bases.is_empty() {
-            "<DNASequence>".to_string()
+            "<RNASequence>".to_string()
         } else {
             format!(
-                "<DNASequence: {}>",
+                "<RNASequence: {}>",
                 self.bases.iter().map(char::from).collect::<String>()
             )
         }
@@ -130,10 +122,10 @@ impl DNASequence {
         !self.bases.is_empty()
     }
 
-    fn __add__(&self, other: DNABaseOrSequence) -> Self {
+    fn __add__(&self, other: RNABaseOrSequence) -> Self {
         match other {
-            DNABaseOrSequence::Base(base) => self + &base,
-            DNABaseOrSequence::Seq(seq) => self + &seq,
+            RNABaseOrSequence::Base(base) => self + &base,
+            RNABaseOrSequence::Seq(seq) => self + &seq,
         }
     }
 
@@ -152,7 +144,7 @@ impl DNASequence {
 
                 if index >= self.bases.len() {
                     return Err(pyo3::exceptions::PyIndexError::new_err(
-                        "DNASequence index out of range",
+                        "RNASequence index out of range",
                     ));
                 }
 
@@ -179,18 +171,18 @@ impl DNASequence {
         }
     }
 
-    fn __contains__(&self, base_or_seq: DNABaseOrSequence) -> PyResult<bool> {
+    fn __contains__(&self, base_or_seq: RNABaseOrSequence) -> PyResult<bool> {
         match base_or_seq {
-            DNABaseOrSequence::Base(base) => Ok(self.bases.contains(&base)),
-            DNABaseOrSequence::Seq(seq) if seq.bases.is_empty() => Ok(true),
-            DNABaseOrSequence::Seq(seq) => {
+            RNABaseOrSequence::Base(base) => Ok(self.bases.contains(&base)),
+            RNABaseOrSequence::Seq(seq) if seq.bases.is_empty() => Ok(true),
+            RNABaseOrSequence::Seq(seq) => {
                 Ok(self.bases.windows(seq.bases.len()).any(|w| w == seq.bases))
             }
         }
     }
 }
 
-impl fmt::Display for DNASequence {
+impl fmt::Display for RNASequence {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         if self.bases.len() < 21 {
             write!(
@@ -212,21 +204,21 @@ impl fmt::Display for DNASequence {
     }
 }
 
-impl ops::Add<&DNABase> for &DNASequence {
-    type Output = DNASequence;
+impl ops::Add<&RNABase> for &RNASequence {
+    type Output = RNASequence;
 
-    fn add(self, rhs: &DNABase) -> DNASequence {
-        DNASequence {
+    fn add(self, rhs: &RNABase) -> RNASequence {
+        RNASequence {
             bases: [self.bases.as_slice(), &[*rhs]].concat(),
         }
     }
 }
 
-impl ops::Add<&DNASequence> for &DNASequence {
-    type Output = DNASequence;
+impl ops::Add<&RNASequence> for &RNASequence {
+    type Output = RNASequence;
 
-    fn add(self, rhs: &DNASequence) -> DNASequence {
-        DNASequence {
+    fn add(self, rhs: &RNASequence) -> RNASequence {
+        RNASequence {
             bases: [self.bases.as_slice(), rhs.bases.as_slice()].concat(),
         }
     }
