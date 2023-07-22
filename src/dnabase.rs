@@ -92,7 +92,7 @@ impl DNABase {
         }
     }
 
-    fn transcribe(&self) -> RNABase {
+    pub fn transcribe(&self) -> RNABase {
         self.into()
     }
 

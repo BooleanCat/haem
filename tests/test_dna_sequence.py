@@ -76,9 +76,17 @@ def test_complement(sequence: haem.DNASequence, complement: haem.DNASequence) ->
     assert ~sequence == complement
 
 
-def test_transcribe_not_implemented() -> None:
-    with pytest.raises(NotImplementedError):
-        haem.DNASequence().transcribe()
+@pytest.mark.parametrize(
+    "dna_sequence,rna_sequence",
+    [
+        (haem.DNASequence(""), haem.RNASequence("")),
+        (haem.DNASequence("ACGT"), haem.RNASequence("ACGU")),
+    ],
+)
+def test_transcribe(
+    dna_sequence: haem.DNASequence, rna_sequence: haem.RNASequence
+) -> None:
+    assert dna_sequence.transcribe() == rna_sequence
 
 
 @pytest.mark.parametrize(

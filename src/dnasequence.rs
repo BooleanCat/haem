@@ -1,8 +1,7 @@
 use crate::dnabase::DNABase;
+use crate::rnasequence::RNASequence;
 use crate::sequence::{Sequence, SequenceInput};
-use crate::utils::IntOrSlice;
-use crate::utils::MemberOrCode;
-use crate::utils::MemberOrSequence;
+use crate::utils::{IntOrSlice, MemberOrCode, MemberOrSequence};
 use pyo3::class::basic::CompareOp;
 use pyo3::prelude::*;
 
@@ -29,10 +28,14 @@ impl DNASequence {
         }
     }
 
-    fn transcribe(&self) -> PyResult<()> {
-        Err(pyo3::exceptions::PyNotImplementedError::new_err(
-            "not implemented",
-        ))
+    fn transcribe(&self) -> RNASequence {
+        RNASequence {
+            bases: self
+                .bases
+                .iter()
+                .map(|b| b.transcribe())
+                .collect::<Vec<_>>(),
+        }
     }
 
     #[pyo3(name = "count")]

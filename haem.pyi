@@ -45,7 +45,7 @@ class DNABase:
         """The complementary DNA base."""
         ...
     def transcribe(self) -> RNABase:
-        """Transcription of the DNA base to an RNA base."""
+        """Transcription of the DNA base to a RNA base."""
         ...
     def __repr__(self) -> str: ...
     def __str__(self) -> str: ...
@@ -209,8 +209,8 @@ class DNASequence:
     @property
     def complement(self) -> DNASequence:
         """The complementary DNA sequence."""
-    def transcribe(self) -> typing.Any:
-        """Not implemented."""
+    def transcribe(self) -> RNASequence:
+        """Transcription of the DNA sequence to a RNA sequence."""
         ...
     def __invert__(self) -> DNASequence:
         """See `DNASequence.complement`."""
