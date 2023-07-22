@@ -178,8 +178,11 @@ class AminoAcid:
     def __bool__(self) -> bool:
         """Always true."""
         ...
-    def __add__(self, other: AminoAcid) -> typing.Any:
-        """Not implemented."""
+    def __add__(
+        self, other: typing.Union[AminoAcid, AminoAcidSequence]
+    ) -> AminoAcidSequence:
+        """Create an amino acid sequence from the concatenation of this amino
+        acid and either another amino acid or an amino acid sequence."""
         ...
 
 class DNASequence:

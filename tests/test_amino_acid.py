@@ -566,6 +566,29 @@ def test__bool__() -> None:
     assert bool(haem.AminoAcid.ALANINE) is True
 
 
-def test__add__not_implemented() -> None:
-    with pytest.raises(NotImplementedError):
-        haem.AminoAcid.ALANINE + haem.AminoAcid.ARGININE
+@pytest.mark.parametrize(
+    "left,right,result",
+    [
+        (
+            haem.AminoAcid.METHIONINE,
+            haem.AminoAcid.VALINE,
+            haem.AminoAcidSequence("MV"),
+        ),
+        (
+            haem.AminoAcid.METHIONINE,
+            haem.AminoAcidSequence("VVR"),
+            haem.AminoAcidSequence("MVVR"),
+        ),
+        (
+            haem.AminoAcid.METHIONINE,
+            haem.AminoAcidSequence(""),
+            haem.AminoAcidSequence("M"),
+        ),
+    ],
+)
+def test__add__(
+    left: haem.AminoAcid,
+    right: typing.Union[haem.AminoAcid, haem.AminoAcidSequence],
+    result: haem.AminoAcidSequence,
+) -> None:
+    assert left + right == result
