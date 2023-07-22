@@ -140,7 +140,7 @@ pub enum SequenceInput<'a, T> {
 
 impl<'a, T> TryFrom<SequenceInput<'a, T>> for Vec<T>
 where
-    T: TryFrom<char, Error = PyErr> + FromPyObject<'a> + Clone,
+    T: TryFrom<char, Error = PyErr> + FromPyObject<'a>,
 {
     type Error = PyErr;
 

@@ -1,3 +1,4 @@
+use crate::member::Member;
 use crate::rnabase::RNABase;
 use pyo3::class::basic::CompareOp;
 use pyo3::create_exception;
@@ -38,7 +39,7 @@ impl TryFrom<CodeOrCodon<'_>> for AminoAcid {
 }
 
 #[pyclass(frozen)]
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, PartialEq)]
 pub enum AminoAcid {
     #[pyo3(name = "ALANINE")]
     Alanine,
@@ -156,11 +157,7 @@ impl AminoAcid {
     }
 
     fn __richcmp__(&self, other: &Self, op: CompareOp, py: Python<'_>) -> PyObject {
-        match op {
-            CompareOp::Eq => (self == other).into_py(py),
-            CompareOp::Ne => (self != other).into_py(py),
-            _ => py.NotImplemented(),
-        }
+        self.richcmp(other, op, py)
     }
 
     fn __bool__(&self) -> bool {
