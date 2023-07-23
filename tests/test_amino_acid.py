@@ -414,6 +414,10 @@ def test__new__glutamine_glutamic_acid() -> None:
         )
 
 
+def test__new__sequence_str() -> None:
+    assert haem.AminoAcid(("U", "A", "C")) == haem.AminoAcid.TYROSINE
+
+
 def test__new__stop() -> None:
     codons = [
         (haem.RNABase.URACIL, haem.RNABase.ADENINE, haem.RNABase.ADENINE),

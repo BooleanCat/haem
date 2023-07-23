@@ -123,6 +123,7 @@ class AminoAcid:
     >>> AminoAcid.SERINE
     >>> AminoAcid('S')
     >>> AminoAcid((RNABase.ADENINE, RNABase.GUANINE, RNABase.CYTOSINE))
+    >>> AminoAcid(('A', 'G', 'C'))
     >>> AminoAcid('AGC')
 
     AminoAcids may also be instantiated by ambiguous IUPAC RNA codes where
@@ -161,7 +162,10 @@ class AminoAcid:
 
     @classmethod
     def __new__(
-        cls, code_or_codon: typing.Union[str, tuple[RNABase, RNABase, RNABase]]
+        cls,
+        code_or_codon: typing.Union[
+            str, typing.Tuple[RNABase, RNABase, RNABase], typing.Tuple[str, str, str]
+        ],
     ) -> AminoAcid: ...
     @property
     def code(self) -> str:

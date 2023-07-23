@@ -8,7 +8,7 @@ use std::os::raw::c_long;
 pub trait Sequence<T>
 where
     for<'a> &'a Vec<T>: PartialEq,
-    T: PartialEq + Clone,
+    T: PartialEq + Clone + Sync,
     for<'a> &'a T: Into<char>,
 {
     fn members(&self) -> &Vec<T>;
@@ -33,7 +33,10 @@ where
             format!(
                 "<{}: {}>",
                 self.name(),
-                self.members().iter().map(|m| m.into()).collect::<String>(),
+                self.members()
+                    .par_iter()
+                    .map(|m| m.into())
+                    .collect::<String>(),
             )
         }
     }
@@ -62,7 +65,7 @@ where
             MemberOrSequence::Sequence(sequence) if sequence.is_empty() => Ok(true),
             MemberOrSequence::Sequence(sequence) => Ok(self
                 .members()
-                .windows(sequence.len())
+                .par_windows(sequence.len())
                 .any(|w| w == sequence)),
         }
     }
@@ -70,12 +73,12 @@ where
     fn add(&self, other: MemberOrSequence<T>) -> Vec<T> {
         match other {
             MemberOrSequence::Member(member) => {
-                let mut members = self.members().clone().to_vec();
+                let mut members = self.members().to_vec();
                 members.push(member);
                 members
             }
             MemberOrSequence::Sequence(sequence) => {
-                let mut members = self.members().clone().to_vec();
+                let mut members = self.members().to_vec();
                 members.extend(sequence);
                 members
             }
@@ -126,8 +129,8 @@ where
     where
         T: TryFrom<char, Error = PyErr>,
     {
-        let base = Wrapper::<T>::try_from(base)?.peel();
-        Ok(self.members().iter().filter(|&b| *b == base).count())
+        let base = Wrapper::try_from(base)?.peel();
+        Ok(self.members().par_iter().filter(|&b| *b == base).count())
     }
 }
 
@@ -154,7 +157,7 @@ where
                 .collect::<PyResult<Vec<_>>>(),
             SequenceInput::Iter(bases) => bases
                 .iter()?
-                .map(|base| Ok(Wrapper::<_>::try_from(base?.extract::<MemberOrCode<_>>()?)?.peel()))
+                .map(|base| Ok(Wrapper::try_from(base?.extract::<MemberOrCode<_>>()?)?.peel()))
                 .collect(),
             SequenceInput::Seq(bases) => Ok(bases),
             SequenceInput::SeqStr(codes) => codes

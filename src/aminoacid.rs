@@ -10,9 +10,39 @@ use std::fmt;
 create_exception!(haem, StopTranslation, pyo3::exceptions::PyException);
 
 #[derive(FromPyObject)]
+enum Codon {
+    Bases(RNABase, RNABase, RNABase),
+    Chars(char, char, char),
+}
+
+impl TryFrom<Codon> for AminoAcid {
+    type Error = PyErr;
+
+    fn try_from(codon: Codon) -> PyResult<AminoAcid> {
+        match codon {
+            Codon::Bases(first, second, third) => (&first, &second, &third).try_into(),
+            Codon::Chars(first, second, third) => (first, second, third).try_into(),
+        }
+    }
+}
+
+impl TryFrom<(char, char, char)> for AminoAcid {
+    type Error = PyErr;
+
+    fn try_from(codon: (char, char, char)) -> PyResult<AminoAcid> {
+        (
+            &RNABase::try_from(codon.0)?,
+            &RNABase::try_from(codon.1)?,
+            &RNABase::try_from(codon.2)?,
+        )
+            .try_into()
+    }
+}
+
+#[derive(FromPyObject)]
 enum CodeOrCodon<'a> {
     Code(char),
-    Codon(RNABase, RNABase, RNABase),
+    Codon(Codon),
     CodonStr(&'a str),
 }
 
@@ -22,14 +52,14 @@ impl TryFrom<CodeOrCodon<'_>> for AminoAcid {
     fn try_from(code_or_codon: CodeOrCodon<'_>) -> PyResult<AminoAcid> {
         Ok(match code_or_codon {
             CodeOrCodon::Code(code) => code.try_into()?,
-            CodeOrCodon::Codon(first, second, third) => (first, second, third).try_into()?,
+            CodeOrCodon::Codon(codon) => codon.try_into()?,
             CodeOrCodon::CodonStr(codon) if codon.len() == 3 => {
                 let bases = codon
                     .chars()
                     .map(RNABase::try_from)
                     .collect::<PyResult<Vec<_>>>()?;
 
-                (bases[0].clone(), bases[1].clone(), bases[2].clone()).try_into()?
+                (&bases[0], &bases[1], &bases[2]).try_into()?
             }
             _ => {
                 return Err(pyo3::exceptions::PyValueError::new_err(
@@ -275,10 +305,10 @@ impl TryFrom<char> for AminoAcid {
     }
 }
 
-impl TryFrom<(RNABase, RNABase, RNABase)> for AminoAcid {
+impl TryFrom<(&RNABase, &RNABase, &RNABase)> for AminoAcid {
     type Error = PyErr;
 
-    fn try_from(codon: (RNABase, RNABase, RNABase)) -> PyResult<AminoAcid> {
+    fn try_from(codon: (&RNABase, &RNABase, &RNABase)) -> PyResult<AminoAcid> {
         Ok(match (codon.0, codon.1, codon.2) {
             (RNABase::Gap, _, _) | (_, RNABase::Gap, _) | (_, _, RNABase::Gap) => {
                 return Err(pyo3::exceptions::PyValueError::new_err(
