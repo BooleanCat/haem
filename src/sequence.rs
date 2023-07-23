@@ -2,6 +2,7 @@ use crate::utils::{IntOrSlice, MemberOrCode, MemberOrSequence, Wrapper};
 use pyo3::class::basic::CompareOp;
 use pyo3::prelude::*;
 use pyo3::types::PyIterator;
+use rayon::prelude::*;
 use std::os::raw::c_long;
 
 pub trait Sequence<T>
@@ -140,22 +141,24 @@ pub enum SequenceInput<'a, T> {
 
 impl<'a, T> TryFrom<SequenceInput<'a, T>> for Vec<T>
 where
-    T: TryFrom<char, Error = PyErr> + FromPyObject<'a>,
+    T: TryFrom<char, Error = PyErr> + FromPyObject<'a> + Send,
 {
     type Error = PyErr;
 
     fn try_from(bases: SequenceInput<'a, T>) -> PyResult<Self> {
         match bases {
-            SequenceInput::Str(bases) => {
-                bases.chars().map(T::try_from).collect::<PyResult<Vec<_>>>()
-            }
+            SequenceInput::Str(bases) => bases
+                .as_parallel_string()
+                .par_chars()
+                .map(T::try_from)
+                .collect::<PyResult<Vec<_>>>(),
             SequenceInput::Iter(bases) => bases
                 .iter()?
                 .map(|base| Ok(Wrapper::<_>::try_from(base?.extract::<MemberOrCode<_>>()?)?.peel()))
                 .collect(),
             SequenceInput::Seq(bases) => Ok(bases),
             SequenceInput::SeqStr(codes) => codes
-                .iter()
+                .par_iter()
                 .map(|code| T::try_from(*code))
                 .collect::<PyResult<Vec<_>>>(),
         }

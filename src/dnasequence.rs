@@ -4,6 +4,7 @@ use crate::sequence::{Sequence, SequenceInput};
 use crate::utils::{IntOrSlice, MemberOrCode, MemberOrSequence};
 use pyo3::class::basic::CompareOp;
 use pyo3::prelude::*;
+use rayon::prelude::*;
 
 #[pyclass(frozen)]
 pub struct DNASequence {
@@ -23,7 +24,7 @@ impl DNASequence {
     #[getter]
     fn get_complement(&self) -> Self {
         Self {
-            bases: self.bases.iter().map(|b| b.get_complement()).collect(),
+            bases: self.bases.par_iter().map(|b| b.get_complement()).collect(),
         }
     }
 
@@ -31,7 +32,7 @@ impl DNASequence {
         RNASequence {
             bases: self
                 .bases
-                .iter()
+                .par_iter()
                 .map(|b| b.transcribe())
                 .collect::<Vec<_>>(),
         }
