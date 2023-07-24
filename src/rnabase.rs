@@ -92,6 +92,10 @@ impl RNABase {
         }
     }
 
+    fn retro_transcribe(&self) -> DNABase {
+        self.into()
+    }
+
     fn __richcmp__(&self, other: &Self, op: CompareOp, py: Python<'_>) -> PyObject {
         self.richcmp(other, op, py)
     }

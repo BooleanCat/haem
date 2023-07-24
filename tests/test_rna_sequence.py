@@ -77,6 +77,19 @@ def test_complement(sequence: haem.RNASequence, complement: haem.RNASequence) ->
 
 
 @pytest.mark.parametrize(
+    "rna_sequence,dna_sequence",
+    [
+        (haem.RNASequence(""), haem.DNASequence("")),
+        (haem.RNASequence("ACGU"), haem.DNASequence("ACGT")),
+    ],
+)
+def test_retro_transcribe(
+    rna_sequence: haem.RNASequence, dna_sequence: haem.DNASequence
+) -> None:
+    assert rna_sequence.retro_transcribe() == dna_sequence
+
+
+@pytest.mark.parametrize(
     "bases,text",
     [
         ([], "<RNASequence>"),

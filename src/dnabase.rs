@@ -199,3 +199,26 @@ impl fmt::Display for DNABase {
         )
     }
 }
+
+impl From<&RNABase> for DNABase {
+    fn from(base: &RNABase) -> Self {
+        match base {
+            RNABase::Adenine => Self::Adenine,
+            RNABase::Cytosine => Self::Cytosine,
+            RNABase::Guanine => Self::Guanine,
+            RNABase::Uracil => Self::Thymine,
+            RNABase::AdenineCytosine => Self::AdenineCytosine,
+            RNABase::AdenineGuanine => Self::AdenineGuanine,
+            RNABase::AdenineUracil => Self::AdenineThymine,
+            RNABase::CytosineGuanine => Self::CytosineGuanine,
+            RNABase::CytosineUracil => Self::CytosineThymine,
+            RNABase::GuanineUracil => Self::GuanineThymine,
+            RNABase::AdenineCytosineGuanine => Self::AdenineCytosineGuanine,
+            RNABase::AdenineCytosineUracil => Self::AdenineCytosineThymine,
+            RNABase::AdenineGuanineUracil => Self::AdenineGuanineThymine,
+            RNABase::CytosineGuanineUracil => Self::CytosineGuanineThymine,
+            RNABase::Any => Self::Any,
+            RNABase::Gap => Self::Gap,
+        }
+    }
+}

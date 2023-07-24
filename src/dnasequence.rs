@@ -1,4 +1,5 @@
 use crate::dnabase::DNABase;
+use crate::rnabase::RNABase;
 use crate::rnasequence::RNASequence;
 use crate::sequence::{Sequence, SequenceInput};
 use crate::utils::{IntOrSlice, MemberOrCode, MemberOrSequence};
@@ -30,11 +31,7 @@ impl DNASequence {
 
     fn transcribe(&self) -> RNASequence {
         RNASequence {
-            bases: self
-                .bases
-                .par_iter()
-                .map(|b| b.transcribe())
-                .collect::<Vec<_>>(),
+            bases: self.bases.par_iter().map(RNABase::from).collect::<Vec<_>>(),
         }
     }
 

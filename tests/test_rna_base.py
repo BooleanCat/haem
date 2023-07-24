@@ -123,6 +123,31 @@ def test_complement(base: haem.RNABase, complement: haem.RNABase) -> None:
     assert ~base == complement
 
 
+@pytest.mark.parametrize(
+    "rna_base,dna_base",
+    [
+        (haem.RNABase.ADENINE, haem.DNABase.ADENINE),
+        (haem.RNABase.CYTOSINE, haem.DNABase.CYTOSINE),
+        (haem.RNABase.GUANINE, haem.DNABase.GUANINE),
+        (haem.RNABase.URACIL, haem.DNABase.THYMINE),
+        (haem.RNABase.ADENINE_CYTOSINE, haem.DNABase.ADENINE_CYTOSINE),
+        (haem.RNABase.ADENINE_GUANINE, haem.DNABase.ADENINE_GUANINE),
+        (haem.RNABase.ADENINE_URACIL, haem.DNABase.ADENINE_THYMINE),
+        (haem.RNABase.CYTOSINE_GUANINE, haem.DNABase.CYTOSINE_GUANINE),
+        (haem.RNABase.CYTOSINE_URACIL, haem.DNABase.CYTOSINE_THYMINE),
+        (haem.RNABase.GUANINE_URACIL, haem.DNABase.GUANINE_THYMINE),
+        (haem.RNABase.ADENINE_CYTOSINE_GUANINE, haem.DNABase.ADENINE_CYTOSINE_GUANINE),
+        (haem.RNABase.ADENINE_CYTOSINE_URACIL, haem.DNABase.ADENINE_CYTOSINE_THYMINE),
+        (haem.RNABase.ADENINE_GUANINE_URACIL, haem.DNABase.ADENINE_GUANINE_THYMINE),
+        (haem.RNABase.CYTOSINE_GUANINE_URACIL, haem.DNABase.CYTOSINE_GUANINE_THYMINE),
+        (haem.RNABase.ANY, haem.DNABase.ANY),
+        (haem.RNABase.GAP, haem.DNABase.GAP),
+    ],
+)
+def test_retro_transcribe(rna_base: haem.RNABase, dna_base: haem.DNABase) -> None:
+    assert rna_base.retro_transcribe() == dna_base
+
+
 def test__eq__() -> None:
     assert haem.RNABase.ADENINE == haem.RNABase.ADENINE
 
