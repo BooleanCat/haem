@@ -162,6 +162,21 @@ def test__add__(
 
 
 @pytest.mark.parametrize(
+    "left,right,result",
+    [
+        (haem.RNABase.GUANINE, haem.RNASequence("A-"), haem.RNASequence("GA-")),
+        (haem.RNABase.GUANINE, haem.RNASequence(""), haem.RNASequence("G")),
+    ],
+)
+def test__radd__(
+    left: haem.RNASequence,
+    right: typing.Union[haem.RNABase, haem.RNASequence],
+    result: haem.RNASequence,
+) -> None:
+    assert left + right == result
+
+
+@pytest.mark.parametrize(
     "sequence,target,result",
     [
         (haem.RNASequence("A"), haem.RNABase.ADENINE, True),

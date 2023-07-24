@@ -185,3 +185,18 @@ def test__add__(
     result: haem.RNASequence,
 ) -> None:
     assert left + right == result
+
+
+@pytest.mark.parametrize(
+    "left,right,result",
+    [
+        (haem.RNASequence("CUU"), haem.RNABase.ADENINE, haem.RNASequence("CUUA")),
+        (haem.RNASequence(""), haem.RNABase.ADENINE, haem.RNASequence("A")),
+    ],
+)
+def test__radd__(
+    left: typing.Union[haem.RNABase, haem.RNASequence],
+    right: haem.RNABase,
+    result: haem.RNASequence,
+) -> None:
+    assert left + right == result
