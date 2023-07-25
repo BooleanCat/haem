@@ -45,7 +45,7 @@ where
                 .as_parallel_string()
                 .par_chars()
                 .map(T::try_from)
-                .collect::<Result<Vec<_>, _>>()?,
+                .collect::<PyResult<_>>()?,
         ))
     }
 }
@@ -61,7 +61,7 @@ where
             codes
                 .par_iter()
                 .map(|c| T::try_from(*c))
-                .collect::<Result<Vec<_>, _>>()?,
+                .collect::<PyResult<_>>()?,
         ))
     }
 }
@@ -90,7 +90,7 @@ where
                         "invalid sequence member",
                     ))
                 })
-                .collect::<PyResult<Vec<_>>>()?,
+                .collect::<PyResult<_>>()?,
         ))
     }
 }
