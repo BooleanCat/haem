@@ -1,7 +1,6 @@
 use crate::aminoacidsequence::AminoAcidSequence;
-use crate::member::Member;
+use crate::member::{Member, MemberOrMembers};
 use crate::rnabase::RNABase;
-use crate::utils::MemberOrSequence;
 use pyo3::class::basic::CompareOp;
 use pyo3::create_exception;
 use pyo3::prelude::*;
@@ -196,7 +195,7 @@ impl AminoAcid {
         true
     }
 
-    fn __add__(&self, other: MemberOrSequence<Self>) -> AminoAcidSequence {
+    fn __add__(&self, other: MemberOrMembers<Self>) -> AminoAcidSequence {
         AminoAcidSequence {
             amino_acids: self.add(other),
         }

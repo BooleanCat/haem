@@ -1,4 +1,5 @@
-use crate::utils::{IntOrSlice, MemberOrCode, MemberOrSequence, Wrapper};
+use crate::member::{MemberOrCode, MemberOrMembers};
+use crate::utils::{IntOrSlice, Wrapper};
 use pyo3::class::basic::CompareOp;
 use pyo3::prelude::*;
 use pyo3::pyclass::PyClass;
@@ -60,25 +61,25 @@ where
         }
     }
 
-    fn contains(&self, base_or_seq: MemberOrSequence<T>) -> PyResult<bool> {
+    fn contains(&self, base_or_seq: MemberOrMembers<T>) -> PyResult<bool> {
         match base_or_seq {
-            MemberOrSequence::Member(member) => Ok(self.members().contains(&member)),
-            MemberOrSequence::Sequence(sequence) if sequence.is_empty() => Ok(true),
-            MemberOrSequence::Sequence(sequence) => Ok(self
+            MemberOrMembers::Member(member) => Ok(self.members().contains(&member)),
+            MemberOrMembers::Sequence(sequence) if sequence.is_empty() => Ok(true),
+            MemberOrMembers::Sequence(sequence) => Ok(self
                 .members()
                 .par_windows(sequence.len())
                 .any(|w| w == sequence)),
         }
     }
 
-    fn add(&self, other: MemberOrSequence<T>) -> Vec<T> {
+    fn add(&self, other: MemberOrMembers<T>) -> Vec<T> {
         match other {
-            MemberOrSequence::Member(member) => {
+            MemberOrMembers::Member(member) => {
                 let mut members = self.members().to_vec();
                 members.push(member);
                 members
             }
-            MemberOrSequence::Sequence(sequence) => {
+            MemberOrMembers::Sequence(sequence) => {
                 let mut members = self.members().to_vec();
                 members.extend(sequence);
                 members
@@ -86,7 +87,7 @@ where
         }
     }
 
-    fn getitem(&self, index_or_slice: IntOrSlice) -> PyResult<MemberOrSequence<T>> {
+    fn getitem(&self, index_or_slice: IntOrSlice) -> PyResult<MemberOrMembers<T>> {
         match index_or_slice {
             IntOrSlice::Int(index) => {
                 let index = if index < 0 {
@@ -102,12 +103,12 @@ where
                     )));
                 }
 
-                Ok(MemberOrSequence::Member(self.members()[index].clone()))
+                Ok(MemberOrMembers::Member(self.members()[index].clone()))
             }
             IntOrSlice::Slice(slice) => {
                 let indices = slice.indices(self.len() as c_long)?;
 
-                Ok(MemberOrSequence::Sequence(match indices.step {
+                Ok(MemberOrMembers::Sequence(match indices.step {
                     s if s < 0 => (indices.stop + 1..indices.start + 1)
                         .rev()
                         .step_by(indices.step.unsigned_abs())
@@ -130,7 +131,7 @@ where
     where
         T: TryFrom<char, Error = PyErr>,
     {
-        let base = Wrapper::try_from(base)?.0;
+        let base = Wrapper::try_from(base)?.into_inner();
         Ok(self.members().par_iter().filter(|&b| *b == base).count())
     }
 }
@@ -150,11 +151,11 @@ where
     type Error = PyErr;
 
     fn try_from(bases: SequenceInput<'a, T>) -> PyResult<Self> {
-        match bases {
-            SequenceInput::Str(bases) => Ok(Wrapper::try_from(bases)?.0),
-            SequenceInput::Iter(bases) => Ok(Wrapper::try_from(bases)?.0),
-            SequenceInput::Seq(bases) => Ok(bases),
-            SequenceInput::SeqStr(codes) => Ok(Wrapper::try_from(codes)?.0),
-        }
+        Ok(match bases {
+            SequenceInput::Str(bases) => Wrapper::try_from(bases)?.into_inner(),
+            SequenceInput::Iter(bases) => Wrapper::try_from(bases)?.into_inner(),
+            SequenceInput::Seq(bases) => bases,
+            SequenceInput::SeqStr(codes) => Wrapper::try_from(codes)?.into_inner(),
+        })
     }
 }

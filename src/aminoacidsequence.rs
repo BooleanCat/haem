@@ -1,6 +1,7 @@
 use crate::aminoacid::AminoAcid;
+use crate::member::{MemberOrCode, MemberOrMembers};
 use crate::sequence::{Sequence, SequenceInput};
-use crate::utils::{IntOrSlice, MemberOrCode, MemberOrSequence};
+use crate::utils::IntOrSlice;
 use pyo3::class::basic::CompareOp;
 use pyo3::prelude::*;
 
@@ -40,13 +41,13 @@ impl AminoAcidSequence {
         self.bool()
     }
 
-    fn __add__(&self, other: MemberOrSequence<AminoAcid>) -> Self {
+    fn __add__(&self, other: MemberOrMembers<AminoAcid>) -> Self {
         Self {
             amino_acids: self.add(other),
         }
     }
 
-    fn __contains__(&self, amino_acid_or_seq: MemberOrSequence<AminoAcid>) -> PyResult<bool> {
+    fn __contains__(&self, amino_acid_or_seq: MemberOrMembers<AminoAcid>) -> PyResult<bool> {
         self.contains(amino_acid_or_seq)
     }
 
@@ -56,8 +57,8 @@ impl AminoAcidSequence {
 
     fn __getitem__(&self, py: Python, index_or_slice: IntOrSlice) -> PyResult<Py<PyAny>> {
         match self.getitem(index_or_slice)? {
-            MemberOrSequence::Member(member) => Ok(member.into_py(py)),
-            MemberOrSequence::Sequence(sequence) => Ok(Self {
+            MemberOrMembers::Member(member) => Ok(member.into_py(py)),
+            MemberOrMembers::Sequence(sequence) => Ok(Self {
                 amino_acids: sequence,
             }
             .into_py(py)),

@@ -1,8 +1,9 @@
 use crate::dnabase::DNABase;
 use crate::dnasequence::DNASequence;
+use crate::member::{MemberOrCode, MemberOrMembers};
 use crate::rnabase::RNABase;
 use crate::sequence::{Sequence, SequenceInput};
-use crate::utils::{IntOrSlice, MemberOrCode, MemberOrSequence};
+use crate::utils::IntOrSlice;
 use pyo3::class::basic::CompareOp;
 use pyo3::prelude::*;
 use rayon::prelude::*;
@@ -60,7 +61,7 @@ impl RNASequence {
         self.bool()
     }
 
-    fn __add__(&self, other: MemberOrSequence<RNABase>) -> Self {
+    fn __add__(&self, other: MemberOrMembers<RNABase>) -> Self {
         Self {
             bases: self.add(other),
         }
@@ -72,12 +73,12 @@ impl RNASequence {
 
     fn __getitem__(&self, py: Python, index_or_slice: IntOrSlice) -> PyResult<Py<PyAny>> {
         match self.getitem(index_or_slice)? {
-            MemberOrSequence::Member(member) => Ok(member.into_py(py)),
-            MemberOrSequence::Sequence(sequence) => Ok(Self { bases: sequence }.into_py(py)),
+            MemberOrMembers::Member(member) => Ok(member.into_py(py)),
+            MemberOrMembers::Sequence(sequence) => Ok(Self { bases: sequence }.into_py(py)),
         }
     }
 
-    fn __contains__(&self, base_or_seq: MemberOrSequence<RNABase>) -> PyResult<bool> {
+    fn __contains__(&self, base_or_seq: MemberOrMembers<RNABase>) -> PyResult<bool> {
         self.contains(base_or_seq)
     }
 }
