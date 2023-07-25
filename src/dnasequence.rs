@@ -3,7 +3,7 @@ use crate::member::{MemberOrCode, MemberOrMembers};
 use crate::rnabase::RNABase;
 use crate::rnasequence::RNASequence;
 use crate::sequence::{Sequence, SequenceInput};
-use crate::utils::IntOrSlice;
+use crate::utils::{AddInput, IntOrSlice};
 use pyo3::class::basic::CompareOp;
 use pyo3::prelude::*;
 use rayon::prelude::*;
@@ -61,10 +61,16 @@ impl DNASequence {
         self.bool()
     }
 
-    fn __add__(&self, other: MemberOrMembers<DNABase>) -> Self {
-        Self {
-            bases: self.add(other),
-        }
+    fn __add__(&self, other: AddInput<DNABase>) -> PyResult<Self> {
+        Ok(Self {
+            bases: self.add(other, false)?,
+        })
+    }
+
+    fn __radd__(&self, other: AddInput<DNABase>) -> PyResult<Self> {
+        Ok(Self {
+            bases: self.add(other, true)?,
+        })
     }
 
     fn __len__(&self) -> usize {

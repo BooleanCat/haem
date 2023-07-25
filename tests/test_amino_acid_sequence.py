@@ -136,7 +136,7 @@ def test__bool__(amino_acids: typing.List[haem.AminoAcid], result: bool) -> None
     [
         (
             haem.AminoAcidSequence("MV"),
-            haem.AminoAcid.ARGININE,
+            haem.AminoAcid("R"),
             haem.AminoAcidSequence("MVR"),
         ),
         (
@@ -146,24 +146,43 @@ def test__bool__(amino_acids: typing.List[haem.AminoAcid], result: bool) -> None
         ),
         (
             haem.AminoAcidSequence("MV"),
-            haem.AminoAcidSequence(""),
+            haem.AminoAcidSequence(),
             haem.AminoAcidSequence("MV"),
         ),
-        (
-            haem.AminoAcidSequence(""),
-            haem.AminoAcidSequence(""),
-            haem.AminoAcidSequence(""),
-        ),
-        (
-            haem.AminoAcidSequence(""),
-            haem.AminoAcid.METHIONINE,
-            haem.AminoAcidSequence("M"),
-        ),
+        (haem.AminoAcidSequence(), haem.AminoAcidSequence(), haem.AminoAcidSequence()),
+        (haem.AminoAcidSequence(), haem.AminoAcid("M"), haem.AminoAcidSequence("M")),
+        (haem.AminoAcidSequence(), "", haem.AminoAcidSequence()),
+        (haem.AminoAcidSequence(), "R", haem.AminoAcidSequence("R")),
+        (haem.AminoAcidSequence("MV"), "R", haem.AminoAcidSequence("MVR")),
+        (haem.AminoAcidSequence("MV"), "", haem.AminoAcidSequence("MV")),
     ],
 )
 def test__add__(
     left: haem.AminoAcidSequence,
-    right: typing.Union[haem.AminoAcid, haem.AminoAcidSequence],
+    right: typing.Union[haem.AminoAcid, haem.AminoAcidSequence, str],
+    result: haem.AminoAcidSequence,
+) -> None:
+    assert left + right == result
+
+
+@pytest.mark.parametrize(
+    "left,right,result",
+    [
+        (
+            haem.AminoAcid("R"),
+            haem.AminoAcidSequence("MV"),
+            haem.AminoAcidSequence("RMV"),
+        ),
+        (haem.AminoAcid("M"), haem.AminoAcidSequence(), haem.AminoAcidSequence("M")),
+        ("", haem.AminoAcidSequence(), haem.AminoAcidSequence()),
+        ("R", haem.AminoAcidSequence(), haem.AminoAcidSequence("R")),
+        ("R", haem.AminoAcidSequence("MV"), haem.AminoAcidSequence("RMV")),
+        ("", haem.AminoAcidSequence("MV"), haem.AminoAcidSequence("MV")),
+    ],
+)
+def test__radd__(
+    left: typing.Union[haem.AminoAcid, str],
+    right: haem.AminoAcidSequence,
     result: haem.AminoAcidSequence,
 ) -> None:
     assert left + right == result
@@ -173,11 +192,11 @@ def test__add__(
     "sequence,target,result",
     [
         (haem.AminoAcidSequence("M"), haem.AminoAcid.METHIONINE, True),
-        (haem.AminoAcidSequence(""), haem.AminoAcid.METHIONINE, False),
+        (haem.AminoAcidSequence(), haem.AminoAcid.METHIONINE, False),
         (haem.AminoAcidSequence("V"), haem.AminoAcid.METHIONINE, False),
         (haem.AminoAcidSequence("MVV"), haem.AminoAcid.VALINE, True),
         (haem.AminoAcidSequence("MVV"), haem.AminoAcid.ARGININE, False),
-        (haem.AminoAcidSequence(""), haem.AminoAcidSequence(""), True),
+        (haem.AminoAcidSequence(), haem.AminoAcidSequence(), True),
         (haem.AminoAcidSequence("MVR"), haem.AminoAcidSequence("VR"), True),
         (haem.AminoAcidSequence("MVR"), haem.AminoAcidSequence("RV"), False),
         (haem.AminoAcidSequence("M"), haem.AminoAcidSequence("MM"), False),
@@ -224,7 +243,7 @@ def test__getitem__index_out_of_range(index: int) -> None:
 @pytest.mark.parametrize(
     "sequence,slic,result",
     [
-        (haem.AminoAcidSequence(""), slice(0, 0), haem.AminoAcidSequence("")),
+        (haem.AminoAcidSequence(), slice(0, 0), haem.AminoAcidSequence()),
         (haem.AminoAcidSequence("MVR"), slice(0, 2), haem.AminoAcidSequence("MV")),
         (haem.AminoAcidSequence("MVR"), slice(1, 3), haem.AminoAcidSequence("VR")),
         (haem.AminoAcidSequence("MVR"), slice(0, 3), haem.AminoAcidSequence("MVR")),
@@ -280,7 +299,7 @@ def test__iter__(amino_acids: typing.List[haem.AminoAcid]) -> None:
 @pytest.mark.parametrize(
     "sequence,target,total",
     [
-        (haem.AminoAcidSequence(""), haem.AminoAcid.VALINE, 0),
+        (haem.AminoAcidSequence(), haem.AminoAcid.VALINE, 0),
         (haem.AminoAcidSequence("MVRV"), haem.AminoAcid.VALINE, 2),
         (haem.AminoAcidSequence("MVRV"), "V", 2),
     ],

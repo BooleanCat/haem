@@ -1,6 +1,6 @@
 test: check
 	poetry run maturin develop --release
-	poetry run pytest -v .
+	poetry run pytest .
 
 check:
 	cargo fmt --check

@@ -174,14 +174,16 @@ def test__bool__(base: haem.RNABase, result: bool) -> None:
 @pytest.mark.parametrize(
     "left,right,result",
     [
-        (haem.RNABase.ADENINE, haem.RNABase.GAP, haem.RNASequence("A-")),
+        (haem.RNABase.ADENINE, haem.RNABase("-"), haem.RNASequence("A-")),
         (haem.RNABase.ADENINE, haem.RNASequence("CUU"), haem.RNASequence("ACUU")),
-        (haem.RNABase.ADENINE, haem.RNASequence(""), haem.RNASequence("A")),
+        (haem.RNABase.ADENINE, haem.RNASequence(), haem.RNASequence("A")),
+        (haem.RNABase.ADENINE, "-", haem.RNASequence("A-")),
+        (haem.RNABase.ADENINE, "", haem.RNASequence("A")),
     ],
 )
 def test__add__(
     left: haem.RNABase,
-    right: typing.Union[haem.RNABase, haem.RNASequence],
+    right: typing.Union[haem.RNABase, haem.RNASequence, str],
     result: haem.RNASequence,
 ) -> None:
     assert left + right == result
@@ -190,12 +192,14 @@ def test__add__(
 @pytest.mark.parametrize(
     "left,right,result",
     [
-        (haem.RNASequence("CUU"), haem.RNABase.ADENINE, haem.RNASequence("CUUA")),
-        (haem.RNASequence(""), haem.RNABase.ADENINE, haem.RNASequence("A")),
+        (haem.RNASequence("CUU"), haem.RNABase("A"), haem.RNASequence("CUUA")),
+        (haem.RNASequence(), haem.RNABase("A"), haem.RNASequence("A")),
+        ("C", haem.RNABase("A"), haem.RNASequence("CA")),
+        ("", haem.RNABase("A"), haem.RNASequence("A")),
     ],
 )
 def test__radd__(
-    left: typing.Union[haem.RNABase, haem.RNASequence],
+    left: typing.Union[haem.RNASequence, str],
     right: haem.RNABase,
     result: haem.RNASequence,
 ) -> None:

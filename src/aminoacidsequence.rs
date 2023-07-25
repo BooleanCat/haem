@@ -1,7 +1,7 @@
 use crate::aminoacid::AminoAcid;
 use crate::member::{MemberOrCode, MemberOrMembers};
 use crate::sequence::{Sequence, SequenceInput};
-use crate::utils::IntOrSlice;
+use crate::utils::{AddInput, IntOrSlice};
 use pyo3::class::basic::CompareOp;
 use pyo3::prelude::*;
 
@@ -41,10 +41,16 @@ impl AminoAcidSequence {
         self.bool()
     }
 
-    fn __add__(&self, other: MemberOrMembers<AminoAcid>) -> Self {
-        Self {
-            amino_acids: self.add(other),
-        }
+    fn __add__(&self, other: AddInput<AminoAcid>) -> PyResult<Self> {
+        Ok(Self {
+            amino_acids: self.add(other, false)?,
+        })
+    }
+
+    fn __radd__(&self, other: AddInput<AminoAcid>) -> PyResult<Self> {
+        Ok(Self {
+            amino_acids: self.add(other, true)?,
+        })
     }
 
     fn __contains__(&self, amino_acid_or_seq: MemberOrMembers<AminoAcid>) -> PyResult<bool> {

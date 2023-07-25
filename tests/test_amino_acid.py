@@ -573,26 +573,41 @@ def test__bool__() -> None:
 @pytest.mark.parametrize(
     "left,right,result",
     [
+        (haem.AminoAcid("M"), haem.AminoAcid("V"), haem.AminoAcidSequence("MV")),
         (
-            haem.AminoAcid.METHIONINE,
-            haem.AminoAcid.VALINE,
-            haem.AminoAcidSequence("MV"),
-        ),
-        (
-            haem.AminoAcid.METHIONINE,
+            haem.AminoAcid("M"),
             haem.AminoAcidSequence("VVR"),
             haem.AminoAcidSequence("MVVR"),
         ),
-        (
-            haem.AminoAcid.METHIONINE,
-            haem.AminoAcidSequence(""),
-            haem.AminoAcidSequence("M"),
-        ),
+        (haem.AminoAcid("M"), haem.AminoAcidSequence(), haem.AminoAcidSequence("M")),
+        (haem.AminoAcid("V"), "M", haem.AminoAcidSequence("VM")),
+        (haem.AminoAcid("V"), "", haem.AminoAcidSequence("V")),
     ],
 )
 def test__add__(
     left: haem.AminoAcid,
-    right: typing.Union[haem.AminoAcid, haem.AminoAcidSequence],
+    right: typing.Union[haem.AminoAcid, haem.AminoAcidSequence, str],
+    result: haem.AminoAcidSequence,
+) -> None:
+    assert left + right == result
+
+
+@pytest.mark.parametrize(
+    "left,right,result",
+    [
+        (
+            haem.AminoAcidSequence("VVR"),
+            haem.AminoAcid("M"),
+            haem.AminoAcidSequence("VVRM"),
+        ),
+        (haem.AminoAcidSequence(), haem.AminoAcid("M"), haem.AminoAcidSequence("M")),
+        ("V", haem.AminoAcid("M"), haem.AminoAcidSequence("VM")),
+        ("", haem.AminoAcid("M"), haem.AminoAcidSequence("M")),
+    ],
+)
+def test__radd__(
+    left: typing.Union[haem.AminoAcidSequence, str],
+    right: haem.AminoAcid,
     result: haem.AminoAcidSequence,
 ) -> None:
     assert left + right == result

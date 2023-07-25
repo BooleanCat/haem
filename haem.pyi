@@ -56,9 +56,13 @@ class DNABase:
         ...
     def __invert__(self) -> DNABase:
         """See `DNABase.complement`."""
-    def __add__(self, other: typing.Union[DNABase, DNASequence]) -> DNASequence:
-        """Create a DNA sequence from the concatenation of this base and either
-        another base or a DNA sequence."""
+    def __add__(self, other: typing.Union[DNABase, DNASequence, str]) -> DNASequence:
+        """Create a new sequence consisting of this base followed by the given
+        sequence member(s)."""
+        ...
+    def __radd__(self, other: typing.Union[DNABase, DNASequence, str]) -> DNASequence:
+        """Create a new sequence consisting of the given sequence member(s)
+        followed by this base."""
         ...
 
 class RNABase:
@@ -111,9 +115,13 @@ class RNABase:
         ...
     def __invert__(self) -> RNABase:
         """See `RNABase.complement`."""
-    def __add__(self, other: typing.Union[RNABase, RNASequence]) -> RNASequence:
-        """Create a RNA sequence from the concatenation of this base and either
-        another base or a RNA sequence."""
+    def __add__(self, other: typing.Union[RNABase, RNASequence, str]) -> RNASequence:
+        """Create a new sequence consisting of this base followed by the given
+        sequence member(s)."""
+        ...
+    def __radd__(self, other: typing.Union[RNABase, RNASequence, str]) -> RNASequence:
+        """Create a new sequence consisting of the given sequence member(s)
+        followed by this base."""
         ...
 
 class AminoAcid:
@@ -186,10 +194,16 @@ class AminoAcid:
         """Always true."""
         ...
     def __add__(
-        self, other: typing.Union[AminoAcid, AminoAcidSequence]
+        self, other: typing.Union[AminoAcid, AminoAcidSequence, str]
     ) -> AminoAcidSequence:
-        """Create an amino acid sequence from the concatenation of this amino
-        acid and either another amino acid or an amino acid sequence."""
+        """Create a new sequence consisting of this amino acid followed by the
+        given sequence member(s)."""
+        ...
+    def __radd__(
+        self, other: typing.Union[AminoAcid, AminoAcidSequence, str]
+    ) -> AminoAcidSequence:
+        """Create a new sequence consisting of the given sequence member(s)
+        followed by this amino acid."""
         ...
 
 class DNASequence:
@@ -232,9 +246,13 @@ class DNASequence:
     def __bool__(self) -> bool:
         """Casting to bool is False for empty sequences and True otherwise."""
         ...
-    def __add__(self, other: typing.Union[DNABase, DNASequence]) -> DNASequence:
-        """Create a DNA sequence from the concatenation of this sequence and
-        either a DNABase or another DNASequence."""
+    def __add__(self, other: typing.Union[DNABase, DNASequence, str]) -> DNASequence:
+        """Create a new sequence consisting of this sequence followed by the
+        given sequence member(s)."""
+    def __radd__(self, other: typing.Union[DNABase, DNASequence, str]) -> DNASequence:
+        """Create a new sequence consisting of the given sequence member(s)
+        followed by this sequence."""
+        ...
     def __contains__(self, item: typing.Union[DNABase, DNASequence]) -> bool:
         """Return true if the given DNABase or DNASequence is contained within
         this sequence."""
@@ -288,9 +306,13 @@ class RNASequence:
     def __bool__(self) -> bool:
         """Casting to bool is False for empty sequences and True otherwise."""
         ...
-    def __add__(self, other: typing.Union[RNABase, RNASequence]) -> RNASequence:
-        """Create a RNA sequence from the concatenation of this sequence and
-        either a RNABase or another RNASequence."""
+    def __add__(self, other: typing.Union[RNABase, RNASequence, str]) -> RNASequence:
+        """Create a new sequence consisting of this sequence followed by the
+        given sequence member(s)."""
+    def __radd__(self, other: typing.Union[RNABase, RNASequence, str]) -> RNASequence:
+        """Create a new sequence consisting of the given sequence member(s)
+        followed by this sequence."""
+        ...
     def __contains__(self, item: typing.Union[RNABase, RNASequence]) -> bool:
         """Return true if the given RNABase or RNASequence is contained within
         this sequence."""
@@ -337,10 +359,16 @@ class AminoAcidSequence:
         """Casting to bool is False for empty sequences and True otherwise."""
         ...
     def __add__(
-        self, other: typing.Union[AminoAcid, AminoAcidSequence]
+        self, other: typing.Union[AminoAcid, AminoAcidSequence, str]
     ) -> AminoAcidSequence:
-        """Create an amino acid sequence from the concatenation of this
-        sequence and either an AminoAcid or another AminoAcidSequence."""
+        """Create a new sequence consisting of this sequence followed by the
+        given sequence member(s)."""
+    def __radd__(
+        self, other: typing.Union[AminoAcidSequence, AminoAcid, str]
+    ) -> AminoAcidSequence:
+        """Create a new sequence consisting of the given sequence member(s)
+        followed by this sequence."""
+        ...
     def __contains__(self, item: typing.Union[AminoAcid, AminoAcidSequence]) -> bool:
         """Return true if the given AminoAcid or AminoAcidSequence is contained
         within this sequence."""

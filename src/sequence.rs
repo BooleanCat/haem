@@ -1,5 +1,5 @@
 use crate::member::{MemberOrCode, MemberOrMembers};
-use crate::utils::{IntOrSlice, Wrapper};
+use crate::utils::{AddInput, IntOrSlice, Wrapper};
 use pyo3::class::basic::CompareOp;
 use pyo3::prelude::*;
 use pyo3::pyclass::PyClass;
@@ -72,19 +72,60 @@ where
         }
     }
 
-    fn add(&self, other: MemberOrMembers<T>) -> Vec<T> {
-        match other {
-            MemberOrMembers::Member(member) => {
-                let mut members = self.members().to_vec();
-                members.push(member);
+    fn add(&self, other: AddInput<T>, swap: bool) -> PyResult<Vec<T>>
+    where
+        T: TryFrom<char, Error = PyErr> + Send + Clone,
+    {
+        Ok(match other {
+            AddInput::Member(member) => {
+                let mut members = Vec::with_capacity(self.len() + 1);
+
+                match swap {
+                    true => {
+                        members.push(member);
+                        members.extend(self.members().to_vec());
+                    }
+                    false => {
+                        members.extend(self.members().to_vec());
+                        members.push(member);
+                    }
+                }
+
                 members
             }
-            MemberOrMembers::Sequence(sequence) => {
-                let mut members = self.members().to_vec();
-                members.extend(sequence);
+            AddInput::Members(others) => {
+                let mut members = Vec::with_capacity(self.len() + others.len());
+
+                match swap {
+                    true => {
+                        members.extend(others);
+                        members.extend(self.members().to_vec());
+                    }
+                    false => {
+                        members.extend(self.members().to_vec());
+                        members.extend(others);
+                    }
+                }
+
                 members
             }
-        }
+            AddInput::Codes(codes) => {
+                let mut members = Vec::with_capacity(self.len() + codes.len());
+
+                match swap {
+                    true => {
+                        members.extend(Wrapper::try_from(codes)?.into_inner());
+                        members.extend(self.members().to_vec());
+                    }
+                    false => {
+                        members.extend(self.members().to_vec());
+                        members.extend(Wrapper::try_from(codes)?.into_inner());
+                    }
+                }
+
+                members
+            }
+        })
     }
 
     fn getitem(&self, index_or_slice: IntOrSlice) -> PyResult<MemberOrMembers<T>> {
