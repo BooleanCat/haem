@@ -1,6 +1,7 @@
 use crate::utils::{IntOrSlice, MemberOrCode, MemberOrSequence, Wrapper};
 use pyo3::class::basic::CompareOp;
 use pyo3::prelude::*;
+use pyo3::pyclass::PyClass;
 use pyo3::types::PyIterator;
 use rayon::prelude::*;
 use std::os::raw::c_long;
@@ -129,7 +130,7 @@ where
     where
         T: TryFrom<char, Error = PyErr>,
     {
-        let base = Wrapper::try_from(base)?.peel();
+        let base = Wrapper::try_from(base)?.0;
         Ok(self.members().par_iter().filter(|&b| *b == base).count())
     }
 }
@@ -144,26 +145,16 @@ pub enum SequenceInput<'a, T> {
 
 impl<'a, T> TryFrom<SequenceInput<'a, T>> for Vec<T>
 where
-    T: TryFrom<char, Error = PyErr> + FromPyObject<'a> + Send,
+    T: TryFrom<char, Error = PyErr> + Send + PyClass + Clone,
 {
     type Error = PyErr;
 
     fn try_from(bases: SequenceInput<'a, T>) -> PyResult<Self> {
         match bases {
-            SequenceInput::Str(bases) => bases
-                .as_parallel_string()
-                .par_chars()
-                .map(T::try_from)
-                .collect::<PyResult<Vec<_>>>(),
-            SequenceInput::Iter(bases) => bases
-                .iter()?
-                .map(|base| Ok(Wrapper::try_from(base?.extract::<MemberOrCode<_>>()?)?.peel()))
-                .collect(),
+            SequenceInput::Str(bases) => Ok(Wrapper::try_from(bases)?.0),
+            SequenceInput::Iter(bases) => Ok(Wrapper::try_from(bases)?.0),
             SequenceInput::Seq(bases) => Ok(bases),
-            SequenceInput::SeqStr(codes) => codes
-                .par_iter()
-                .map(|code| T::try_from(*code))
-                .collect::<PyResult<Vec<_>>>(),
+            SequenceInput::SeqStr(codes) => Ok(Wrapper::try_from(codes)?.0),
         }
     }
 }
