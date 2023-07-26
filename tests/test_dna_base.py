@@ -174,14 +174,16 @@ def test__bool__(base: haem.DNABase, result: bool) -> None:
 @pytest.mark.parametrize(
     "left,right,result",
     [
-        (haem.DNABase.ADENINE, haem.DNABase.GAP, haem.DNASequence("A-")),
-        (haem.DNABase.ADENINE, haem.DNASequence("CTT"), haem.DNASequence("ACTT")),
-        (haem.DNABase.ADENINE, haem.DNASequence(""), haem.DNASequence("A")),
+        (haem.DNABase("A"), haem.DNABase("-"), haem.DNASequence("A-")),
+        (haem.DNABase("A"), haem.DNASequence("CTT"), haem.DNASequence("ACTT")),
+        (haem.DNABase("A"), haem.DNASequence(), haem.DNASequence("A")),
+        (haem.DNABase("A"), "", haem.DNASequence("A")),
+        (haem.DNABase("A"), haem.DNASequence("T"), haem.DNASequence("AT")),
     ],
 )
 def test__add__(
     left: haem.DNABase,
-    right: typing.Union[haem.DNABase, haem.DNASequence],
+    right: typing.Union[haem.DNABase, haem.DNASequence, str],
     result: haem.DNASequence,
 ) -> None:
     assert left + right == result
@@ -190,12 +192,14 @@ def test__add__(
 @pytest.mark.parametrize(
     "left,right,result",
     [
-        (haem.DNASequence("CTT"), haem.DNABase.ADENINE, haem.DNASequence("CTTA")),
-        (haem.DNASequence(""), haem.DNABase.ADENINE, haem.DNASequence("A")),
+        (haem.DNASequence("CTT"), haem.DNABase("A"), haem.DNASequence("CTTA")),
+        (haem.DNASequence(), haem.DNABase("A"), haem.DNASequence("A")),
+        ("", haem.DNABase("A"), haem.DNASequence("A")),
+        ("T", haem.DNABase("A"), haem.DNASequence("TA")),
     ],
 )
 def test__radd__(
-    left: typing.Union[haem.DNABase, haem.DNASequence],
+    left: typing.Union[haem.DNASequence, str],
     right: haem.DNABase,
     result: haem.DNASequence,
 ) -> None:

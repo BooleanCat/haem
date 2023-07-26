@@ -1,4 +1,4 @@
-use crate::utils::Wrapper;
+use crate::utils::{AddInput, Wrapper};
 use pyo3::class::basic::CompareOp;
 use pyo3::prelude::*;
 use pyo3::pyclass::PyClass;
@@ -6,22 +6,49 @@ use pyo3::types::PyIterator;
 use rayon::prelude::*;
 
 pub trait Member<T> {
-    fn add(&self, other: MemberOrMembers<T>) -> Vec<T>;
+    fn add(&self, other: AddInput<T>, swap: bool) -> PyResult<Vec<T>>;
     fn richcmp(&self, other: &Self, op: CompareOp, py: Python<'_>) -> PyObject;
 }
 
-impl<T: Clone + PartialEq> Member<T> for T {
-    fn add(&self, other: MemberOrMembers<T>) -> Vec<T> {
-        match other {
-            MemberOrMembers::Member(member) => {
-                vec![self.clone(), member]
-            }
-            MemberOrMembers::Sequence(sequence) => {
-                let mut sequence = sequence;
-                sequence.insert(0, self.clone());
+impl<T: Clone + PartialEq> Member<T> for T
+where
+    T: TryFrom<char, Error = PyErr> + Send + Clone,
+{
+    fn add(&self, other: AddInput<T>, swap: bool) -> PyResult<Vec<T>> {
+        Ok(match other {
+            AddInput::Member(member) => match swap {
+                true => vec![member, self.clone()],
+                false => vec![self.clone(), member],
+            },
+            AddInput::Members(members) => {
+                let mut sequence = Vec::with_capacity(members.len() + 1);
+                match swap {
+                    false => {
+                        sequence.push(self.clone());
+                        sequence.extend(members);
+                    }
+                    true => {
+                        sequence.extend(members);
+                        sequence.push(self.clone());
+                    }
+                }
                 sequence
             }
-        }
+            AddInput::Codes(codes) => {
+                let mut sequence = Vec::with_capacity(codes.len() + 1);
+                match swap {
+                    false => {
+                        sequence.push(self.clone());
+                        sequence.extend(Wrapper::try_from(codes)?.into_inner());
+                    }
+                    true => {
+                        sequence.extend(Wrapper::try_from(codes)?.into_inner());
+                        sequence.push(self.clone());
+                    }
+                }
+                sequence
+            }
+        })
     }
 
     fn richcmp(&self, other: &Self, op: CompareOp, py: Python<'_>) -> PyObject {
@@ -59,8 +86,8 @@ where
     fn try_from(codes: Vec<char>) -> PyResult<Self> {
         Ok(Wrapper(
             codes
-                .par_iter()
-                .map(|c| T::try_from(*c))
+                .into_par_iter()
+                .map(T::try_from)
                 .collect::<PyResult<_>>()?,
         ))
     }

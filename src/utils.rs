@@ -14,3 +14,10 @@ impl<T> Wrapper<T> {
         self.0
     }
 }
+
+#[derive(FromPyObject)]
+pub enum AddInput<'a, T> {
+    Member(T),
+    Members(Vec<T>),
+    Codes(&'a str),
+}

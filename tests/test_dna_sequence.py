@@ -66,7 +66,7 @@ def test__new__sequence_str() -> None:
 @pytest.mark.parametrize(
     "sequence,complement",
     [
-        (haem.DNASequence(""), haem.DNASequence("")),
+        (haem.DNASequence(), haem.DNASequence()),
         (haem.DNASequence("A"), haem.DNASequence("T")),
         (haem.DNASequence("ACGT"), haem.DNASequence("TGCA")),
     ],
@@ -79,7 +79,7 @@ def test_complement(sequence: haem.DNASequence, complement: haem.DNASequence) ->
 @pytest.mark.parametrize(
     "dna_sequence,rna_sequence",
     [
-        (haem.DNASequence(""), haem.RNASequence("")),
+        (haem.DNASequence(), haem.RNASequence()),
         (haem.DNASequence("ACGT"), haem.RNASequence("ACGU")),
     ],
 )
@@ -148,14 +148,18 @@ def test__bool__(bases: typing.List[haem.DNABase], result: bool) -> None:
     [
         (haem.DNASequence("A-"), haem.DNABase.GUANINE, haem.DNASequence("A-G")),
         (haem.DNASequence("A-"), haem.DNASequence("CTT"), haem.DNASequence("A-CTT")),
-        (haem.DNASequence("A-"), haem.DNASequence(""), haem.DNASequence("A-")),
-        (haem.DNASequence(""), haem.DNASequence(""), haem.DNASequence("")),
-        (haem.DNASequence(""), haem.DNABase.GUANINE, haem.DNASequence("G")),
+        (haem.DNASequence("A-"), haem.DNASequence(), haem.DNASequence("A-")),
+        (haem.DNASequence(), haem.DNASequence(), haem.DNASequence()),
+        (haem.DNASequence(), haem.DNABase.GUANINE, haem.DNASequence("G")),
+        (haem.DNASequence("A-"), "", haem.DNASequence("A-")),
+        (haem.DNASequence("A-"), "GT", haem.DNASequence("A-GT")),
+        (haem.DNASequence(), "", haem.DNASequence()),
+        (haem.DNASequence(), "TG", haem.DNASequence("TG")),
     ],
 )
 def test__add__(
     left: haem.DNASequence,
-    right: typing.Union[haem.DNABase, haem.DNASequence],
+    right: typing.Union[haem.DNABase, haem.DNASequence, str],
     result: haem.DNASequence,
 ) -> None:
     assert left + right == result
@@ -164,13 +168,17 @@ def test__add__(
 @pytest.mark.parametrize(
     "left,right,result",
     [
-        (haem.DNABase.GUANINE, haem.DNASequence("A-"), haem.DNASequence("GA-")),
-        (haem.DNABase.GUANINE, haem.DNASequence(""), haem.DNASequence("G")),
+        (haem.DNABase("G"), haem.DNASequence("A-"), haem.DNASequence("GA-")),
+        (haem.DNABase("G"), haem.DNASequence(), haem.DNASequence("G")),
+        ("", haem.DNASequence("A-"), haem.DNASequence("A-")),
+        ("GT", haem.DNASequence("A-"), haem.DNASequence("GTA-")),
+        ("", haem.DNASequence(), haem.DNASequence()),
+        ("TG", haem.DNASequence(), haem.DNASequence("TG")),
     ],
 )
 def test__radd__(
-    left: haem.DNASequence,
-    right: typing.Union[haem.DNABase, haem.DNASequence],
+    left: typing.Union[haem.DNABase, str],
+    right: haem.DNASequence,
     result: haem.DNASequence,
 ) -> None:
     assert left + right == result
@@ -180,11 +188,11 @@ def test__radd__(
     "sequence,target,result",
     [
         (haem.DNASequence("A"), haem.DNABase.ADENINE, True),
-        (haem.DNASequence(""), haem.DNABase.ADENINE, False),
+        (haem.DNASequence(), haem.DNABase.ADENINE, False),
         (haem.DNASequence("G"), haem.DNABase.ADENINE, False),
         (haem.DNASequence("AGCG"), haem.DNABase.GUANINE, True),
         (haem.DNASequence("AGCG"), haem.DNABase.THYMINE, False),
-        (haem.DNASequence(""), haem.DNASequence(""), True),
+        (haem.DNASequence(), haem.DNASequence(), True),
         (haem.DNASequence("AGT"), haem.DNASequence("GT"), True),
         (haem.DNASequence("AGT"), haem.DNASequence("TG"), False),
         (haem.DNASequence("A"), haem.DNASequence("AA"), False),
@@ -231,7 +239,7 @@ def test__getitem__index_out_of_range(index: int) -> None:
 @pytest.mark.parametrize(
     "sequence,slic,result",
     [
-        (haem.DNASequence(""), slice(0, 0), haem.DNASequence("")),
+        (haem.DNASequence(), slice(0, 0), haem.DNASequence()),
         (haem.DNASequence("GAT"), slice(0, 2), haem.DNASequence("GA")),
         (haem.DNASequence("GAT"), slice(1, 3), haem.DNASequence("AT")),
         (haem.DNASequence("GAT"), slice(0, 3), haem.DNASequence("GAT")),
@@ -270,7 +278,7 @@ def test__iter__(bases: typing.List[haem.DNABase]) -> None:
 @pytest.mark.parametrize(
     "sequence,target,total",
     [
-        (haem.DNASequence(""), haem.DNABase.ADENINE, 0),
+        (haem.DNASequence(), haem.DNABase.ADENINE, 0),
         (haem.DNASequence("AGCG"), haem.DNABase.GUANINE, 2),
         (haem.DNASequence("AGCG"), "G", 2),
     ],
