@@ -9,7 +9,6 @@ use std::os::raw::c_long;
 
 pub trait Sequence<T>
 where
-    for<'a> &'a Vec<T>: PartialEq,
     T: PartialEq + Clone + Sync,
     for<'a> char: From<&'a T>,
 {

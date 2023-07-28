@@ -10,9 +10,9 @@ pub trait Member<T> {
     fn richcmp(&self, other: &Self, op: CompareOp, py: Python<'_>) -> PyObject;
 }
 
-impl<T: Clone + PartialEq> Member<T> for T
+impl<T> Member<T> for T
 where
-    T: TryFrom<char, Error = PyErr> + Send + Clone,
+    T: TryFrom<char, Error = PyErr> + Send + Clone + PartialEq,
 {
     fn add(&self, other: AddInput<T>, swap: bool) -> PyResult<Vec<T>> {
         Ok(match other {
