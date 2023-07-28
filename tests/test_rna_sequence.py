@@ -287,3 +287,43 @@ def test_count(
     sequence: haem.RNASequence, target: typing.Union[haem.RNABase, str], total: int
 ) -> None:
     assert sequence.count(target) == total
+
+
+@pytest.mark.skip
+@pytest.mark.parametrize(
+    "sequence,target,total",
+    [
+        (haem.RNASequence(), haem.RNASequence("GA"), 0),
+        (haem.RNASequence("GAUC"), haem.RNASequence("AU"), 1),
+        (haem.RNASequence("GAGA"), haem.RNASequence("GA"), 2),
+        (haem.RNASequence(), "GA", 0),
+        (haem.RNASequence("GAUC"), "AU", 1),
+        (haem.RNASequence("AUAU"), "AU", 2),
+        (haem.RNASequence(), haem.RNASequence(), 0),
+        (haem.RNASequence("GUC"), haem.RNASequence(), 0),
+        (haem.RNASequence(), "", 0),
+        (haem.RNASequence("GAUC"), "", 0),
+    ],
+)
+def test_count_sequence(
+    sequence: haem.RNASequence,
+    target: typing.Union[haem.RNASequence, str],
+    total: int,
+) -> None:
+    assert sequence.count(target) == total
+
+
+@pytest.mark.skip
+@pytest.mark.parametrize(
+    "sequence,target,total",
+    [
+        (haem.RNASequence("GAAA"), haem.RNASequence("AA"), 2),
+        (haem.RNASequence("GAAG"), haem.RNASequence("AA"), 1),
+    ],
+)
+def test_count_overlap(
+    sequence: haem.RNASequence,
+    target: typing.Union[haem.RNASequence, str],
+    total: int,
+) -> None:
+    assert sequence.count(target, overlap=True) == total

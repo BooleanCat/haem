@@ -11,7 +11,7 @@ pub trait Sequence<T>
 where
     for<'a> &'a Vec<T>: PartialEq,
     T: PartialEq + Clone + Sync,
-    for<'a> &'a T: Into<char>,
+    for<'a> char: From<&'a T>,
 {
     fn members(&self) -> &Vec<T>;
     fn name(&self) -> &str;
@@ -37,7 +37,7 @@ where
                 self.name(),
                 self.members()
                     .par_iter()
-                    .map(|m| m.into())
+                    .map(char::from)
                     .collect::<String>(),
             )
         }
@@ -45,17 +45,17 @@ where
 
     fn str(&self) -> String {
         if self.len() < 21 {
-            self.members().iter().map(|m| m.into()).collect::<String>()
+            self.members().iter().map(char::from).collect::<String>()
         } else {
             format!(
                 "{}...{}",
                 self.members()[0..10]
                     .iter()
-                    .map(|m| m.into())
+                    .map(char::from)
                     .collect::<String>(),
                 self.members()[self.len() - 10..self.len()]
                     .iter()
-                    .map(|m| m.into())
+                    .map(char::from)
                     .collect::<String>()
             )
         }
@@ -83,10 +83,10 @@ where
                 match swap {
                     true => {
                         members.push(member);
-                        members.extend(self.members().to_vec());
+                        members.par_extend(self.members().to_vec());
                     }
                     false => {
-                        members.extend(self.members().to_vec());
+                        members.par_extend(self.members().to_vec());
                         members.push(member);
                     }
                 }
@@ -98,12 +98,12 @@ where
 
                 match swap {
                     true => {
-                        members.extend(others);
-                        members.extend(self.members().to_vec());
+                        members.par_extend(others);
+                        members.par_extend(self.members().to_vec());
                     }
                     false => {
-                        members.extend(self.members().to_vec());
-                        members.extend(others);
+                        members.par_extend(self.members().to_vec());
+                        members.par_extend(others);
                     }
                 }
 
@@ -114,12 +114,12 @@ where
 
                 match swap {
                     true => {
-                        members.extend(Wrapper::try_from(codes)?.into_inner());
-                        members.extend(self.members().to_vec());
+                        members.par_extend(Wrapper::try_from(codes)?.into_inner());
+                        members.par_extend(self.members().to_vec());
                     }
                     false => {
-                        members.extend(self.members().to_vec());
-                        members.extend(Wrapper::try_from(codes)?.into_inner());
+                        members.par_extend(self.members().to_vec());
+                        members.par_extend(Wrapper::try_from(codes)?.into_inner());
                     }
                 }
 

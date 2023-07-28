@@ -262,7 +262,9 @@ class DNASequence:
         self, key: typing.Union[int, slice]
     ) -> typing.Union[DNABase, DNASequence]: ...
     def __iter__(self) -> typing.Iterator[DNABase]: ...
-    def count(self, item: typing.Union[DNABase, str]) -> int:
+    def count(
+        self, item: typing.Union[DNABase, DNASequence, str], overlap: bool = True
+    ) -> int:
         """Count the occurances of a DNABase in the sequence."""
         ...
 
@@ -322,7 +324,9 @@ class RNASequence:
         self, key: typing.Union[int, slice]
     ) -> typing.Union[RNABase, RNASequence]: ...
     def __iter__(self) -> typing.Iterator[RNABase]: ...
-    def count(self, item: typing.Union[RNABase, str]) -> int:
+    def count(
+        self, item: typing.Union[RNABase, RNASequence, str], overlap: bool = True
+    ) -> int:
         """Count the occurances of a RNABase in the sequence."""
         ...
 
@@ -378,6 +382,10 @@ class AminoAcidSequence:
         self, key: typing.Union[int, slice]
     ) -> typing.Union[AminoAcid, AminoAcidSequence]: ...
     def __iter__(self) -> typing.Iterator[AminoAcid]: ...
-    def count(self, item: typing.Union[AminoAcid, str]) -> int:
+    def count(
+        self,
+        item: typing.Union[AminoAcid, str, AminoAcidSequence],
+        overlap: bool = False,
+    ) -> int:
         """Count the occurances of an AminoAcid in the sequence."""
         ...

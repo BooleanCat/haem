@@ -310,3 +310,43 @@ def test_count(
     total: int,
 ) -> None:
     assert sequence.count(target) == total
+
+
+@pytest.mark.skip
+@pytest.mark.parametrize(
+    "sequence,target,total",
+    [
+        (haem.AminoAcidSequence(), haem.AminoAcidSequence("VR"), 0),
+        (haem.AminoAcidSequence("MVRV"), haem.AminoAcidSequence("VR"), 1),
+        (haem.AminoAcidSequence("MVMV"), haem.AminoAcidSequence("MV"), 2),
+        (haem.AminoAcidSequence(), "VR", 0),
+        (haem.AminoAcidSequence("MVRV"), "VR", 1),
+        (haem.AminoAcidSequence("MVMV"), "MV", 2),
+        (haem.AminoAcidSequence(), haem.AminoAcidSequence(), 0),
+        (haem.AminoAcidSequence("MVRV"), haem.AminoAcidSequence(), 0),
+        (haem.AminoAcidSequence(), "", 0),
+        (haem.AminoAcidSequence("MVRV"), "", 0),
+    ],
+)
+def test_count_sequence(
+    sequence: haem.AminoAcidSequence,
+    target: typing.Union[haem.AminoAcidSequence, str],
+    total: int,
+) -> None:
+    assert sequence.count(target) == total
+
+
+@pytest.mark.skip
+@pytest.mark.parametrize(
+    "sequence,target,total",
+    [
+        (haem.AminoAcidSequence("MRRR"), haem.AminoAcidSequence("RR"), 2),
+        (haem.AminoAcidSequence("MRRA"), haem.AminoAcidSequence("RR"), 1),
+    ],
+)
+def test_count_overlap(
+    sequence: haem.AminoAcidSequence,
+    target: typing.Union[haem.AminoAcidSequence, str],
+    total: int,
+) -> None:
+    assert sequence.count(target, overlap=True) == total

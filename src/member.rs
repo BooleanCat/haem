@@ -25,10 +25,10 @@ where
                 match swap {
                     false => {
                         sequence.push(self.clone());
-                        sequence.extend(members);
+                        sequence.par_extend(members);
                     }
                     true => {
-                        sequence.extend(members);
+                        sequence.par_extend(members);
                         sequence.push(self.clone());
                     }
                 }
@@ -39,10 +39,10 @@ where
                 match swap {
                     false => {
                         sequence.push(self.clone());
-                        sequence.extend(Wrapper::try_from(codes)?.into_inner());
+                        sequence.par_extend(Wrapper::try_from(codes)?.into_inner());
                     }
                     true => {
-                        sequence.extend(Wrapper::try_from(codes)?.into_inner());
+                        sequence.par_extend(Wrapper::try_from(codes)?.into_inner());
                         sequence.push(self.clone());
                     }
                 }
