@@ -1,4 +1,4 @@
-use crate::utils::{AddInput, Wrapper};
+use crate::utils::{SequenceLikeInput, Wrapper};
 use pyo3::class::basic::CompareOp;
 use pyo3::prelude::*;
 use pyo3::pyclass::PyClass;
@@ -6,7 +6,7 @@ use pyo3::types::PyIterator;
 use rayon::prelude::*;
 
 pub trait Member<T> {
-    fn add(&self, other: AddInput<T>, swap: bool) -> PyResult<Vec<T>>;
+    fn add(&self, other: SequenceLikeInput<T>, swap: bool) -> PyResult<Vec<T>>;
     fn richcmp(&self, other: &Self, op: CompareOp, py: Python<'_>) -> PyObject;
 }
 
@@ -14,13 +14,13 @@ impl<T> Member<T> for T
 where
     T: TryFrom<char, Error = PyErr> + Send + Clone + PartialEq,
 {
-    fn add(&self, other: AddInput<T>, swap: bool) -> PyResult<Vec<T>> {
+    fn add(&self, other: SequenceLikeInput<T>, swap: bool) -> PyResult<Vec<T>> {
         Ok(match other {
-            AddInput::Member(member) => match swap {
+            SequenceLikeInput::Member(member) => match swap {
                 true => vec![member, self.clone()],
                 false => vec![self.clone(), member],
             },
-            AddInput::Members(members) => {
+            SequenceLikeInput::Members(members) => {
                 let mut sequence = Vec::with_capacity(members.len() + 1);
                 match swap {
                     false => {
@@ -34,7 +34,7 @@ where
                 }
                 sequence
             }
-            AddInput::Codes(codes) => {
+            SequenceLikeInput::Codes(codes) => {
                 let mut sequence = Vec::with_capacity(codes.len() + 1);
                 match swap {
                     false => {

@@ -1,5 +1,5 @@
-use crate::member::{MemberOrCode, MemberOrMembers};
-use crate::utils::{AddInput, IntOrSlice, Wrapper};
+use crate::member::MemberOrMembers;
+use crate::utils::{IntOrSlice, SequenceLikeInput, Wrapper};
 use pyo3::class::basic::CompareOp;
 use pyo3::prelude::*;
 use pyo3::pyclass::PyClass;
@@ -71,12 +71,12 @@ where
         }
     }
 
-    fn add(&self, other: AddInput<T>, swap: bool) -> PyResult<Vec<T>>
+    fn add(&self, other: SequenceLikeInput<T>, swap: bool) -> PyResult<Vec<T>>
     where
         T: TryFrom<char, Error = PyErr> + Send + Clone,
     {
         Ok(match other {
-            AddInput::Member(member) => {
+            SequenceLikeInput::Member(member) => {
                 let mut members = Vec::with_capacity(self.len() + 1);
 
                 match swap {
@@ -92,7 +92,7 @@ where
 
                 members
             }
-            AddInput::Members(others) => {
+            SequenceLikeInput::Members(others) => {
                 let mut members = Vec::with_capacity(self.len() + others.len());
 
                 match swap {
@@ -108,7 +108,7 @@ where
 
                 members
             }
-            AddInput::Codes(codes) => {
+            SequenceLikeInput::Codes(codes) => {
                 let mut members = Vec::with_capacity(self.len() + codes.len());
 
                 match swap {
@@ -167,12 +167,17 @@ where
         self.members().len()
     }
 
-    fn count(&self, base: MemberOrCode<T>) -> PyResult<usize>
+    fn count(&self, bases: SequenceLikeInput<T>) -> PyResult<usize>
     where
         T: TryFrom<char, Error = PyErr>,
+        for<'a> Wrapper<Vec<T>>: TryFrom<SequenceLikeInput<'a, T>, Error = PyErr>,
     {
-        let base = Wrapper::try_from(base)?.into_inner();
-        Ok(self.members().par_iter().filter(|&b| *b == base).count())
+        let sequence: Vec<T> = Wrapper::<Vec<T>>::try_from(bases)?.into_inner();
+        Ok(self
+            .members()
+            .par_windows(sequence.len())
+            .filter(|w| *w == sequence)
+            .count())
     }
 }
 

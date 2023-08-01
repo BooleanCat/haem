@@ -1,7 +1,7 @@
 use crate::dnabase::DNABase;
 use crate::member::Member;
 use crate::rnasequence::RNASequence;
-use crate::utils::AddInput;
+use crate::utils::SequenceLikeInput;
 use pyo3::class::basic::CompareOp;
 use pyo3::prelude::*;
 use std::fmt;
@@ -108,13 +108,13 @@ impl RNABase {
         self.get_complement()
     }
 
-    fn __add__(&self, other: AddInput<Self>) -> PyResult<RNASequence> {
+    fn __add__(&self, other: SequenceLikeInput<Self>) -> PyResult<RNASequence> {
         Ok(RNASequence {
             bases: self.add(other, false)?,
         })
     }
 
-    fn __radd__(&self, other: AddInput<Self>) -> PyResult<RNASequence> {
+    fn __radd__(&self, other: SequenceLikeInput<Self>) -> PyResult<RNASequence> {
         Ok(RNASequence {
             bases: self.add(other, true)?,
         })

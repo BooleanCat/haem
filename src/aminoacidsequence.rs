@@ -1,7 +1,7 @@
 use crate::aminoacid::AminoAcid;
-use crate::member::{MemberOrCode, MemberOrMembers};
+use crate::member::MemberOrMembers;
 use crate::sequence::{Sequence, SequenceInput};
-use crate::utils::{AddInput, IntOrSlice};
+use crate::utils::{IntOrSlice, SequenceLikeInput};
 use pyo3::class::basic::CompareOp;
 use pyo3::prelude::*;
 
@@ -21,7 +21,9 @@ impl AminoAcidSequence {
     }
 
     #[pyo3(name = "count")]
-    fn py_count(&self, base: MemberOrCode<AminoAcid>) -> PyResult<usize> {
+    #[pyo3(signature = (base, overlap = false))]
+    fn py_count(&self, base: SequenceLikeInput<AminoAcid>, overlap: bool) -> PyResult<usize> {
+        if overlap {}
         self.count(base)
     }
 
@@ -41,13 +43,13 @@ impl AminoAcidSequence {
         self.bool()
     }
 
-    fn __add__(&self, other: AddInput<AminoAcid>) -> PyResult<Self> {
+    fn __add__(&self, other: SequenceLikeInput<AminoAcid>) -> PyResult<Self> {
         Ok(Self {
             amino_acids: self.add(other, false)?,
         })
     }
 
-    fn __radd__(&self, other: AddInput<AminoAcid>) -> PyResult<Self> {
+    fn __radd__(&self, other: SequenceLikeInput<AminoAcid>) -> PyResult<Self> {
         Ok(Self {
             amino_acids: self.add(other, true)?,
         })

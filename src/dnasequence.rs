@@ -1,9 +1,9 @@
 use crate::dnabase::DNABase;
-use crate::member::{MemberOrCode, MemberOrMembers};
+use crate::member::MemberOrMembers;
 use crate::rnabase::RNABase;
 use crate::rnasequence::RNASequence;
 use crate::sequence::{Sequence, SequenceInput};
-use crate::utils::{AddInput, IntOrSlice};
+use crate::utils::{IntOrSlice, SequenceLikeInput};
 use pyo3::class::basic::CompareOp;
 use pyo3::prelude::*;
 use rayon::prelude::*;
@@ -37,7 +37,9 @@ impl DNASequence {
     }
 
     #[pyo3(name = "count")]
-    fn py_count(&self, base: MemberOrCode<DNABase>) -> PyResult<usize> {
+    #[pyo3(signature = (base, overlap = false))]
+    fn py_count(&self, base: SequenceLikeInput<DNABase>, overlap: bool) -> PyResult<usize> {
+        if overlap {}
         self.count(base)
     }
 
@@ -61,13 +63,13 @@ impl DNASequence {
         self.bool()
     }
 
-    fn __add__(&self, other: AddInput<DNABase>) -> PyResult<Self> {
+    fn __add__(&self, other: SequenceLikeInput<DNABase>) -> PyResult<Self> {
         Ok(Self {
             bases: self.add(other, false)?,
         })
     }
 
-    fn __radd__(&self, other: AddInput<DNABase>) -> PyResult<Self> {
+    fn __radd__(&self, other: SequenceLikeInput<DNABase>) -> PyResult<Self> {
         Ok(Self {
             bases: self.add(other, true)?,
         })
