@@ -185,10 +185,8 @@ where
         while let Some(item) = iter.next() {
             if item == sequence {
                 count += 1;
-                if !overlap {
-                    for _ in 0..sequence_len - 1 {
-                        iter.next();
-                    }
+                if !overlap && sequence_len > 1 {
+                    iter.nth(sequence_len - 2);
                 }
             }
         }
