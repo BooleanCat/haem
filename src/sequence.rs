@@ -60,15 +60,21 @@ where
         }
     }
 
-    fn contains(&self, base_or_seq: MemberOrMembers<T>) -> PyResult<bool> {
-        match base_or_seq {
-            MemberOrMembers::Member(member) => Ok(self.members().contains(&member)),
-            MemberOrMembers::Sequence(sequence) if sequence.is_empty() => Ok(true),
-            MemberOrMembers::Sequence(sequence) => Ok(self
-                .members()
-                .par_windows(sequence.len())
-                .any(|w| w == sequence)),
+    fn contains(&self, sequence: SequenceLikeInput<T>) -> PyResult<bool>
+    where
+        T: TryFrom<char, Error = PyErr> + Clone + Copy,
+        for<'a> Wrapper<Vec<T>>: TryFrom<SequenceLikeInput<'a, T>, Error = PyErr>,
+    {
+        let sequence = Wrapper::try_from(sequence)?.into_inner();
+
+        if sequence.is_empty() {
+            return Ok(true);
         }
+
+        Ok(self
+            .members()
+            .par_windows(sequence.len())
+            .any(|w| w == sequence))
     }
 
     fn add(&self, other: SequenceLikeInput<T>, swap: bool) -> PyResult<Vec<T>>

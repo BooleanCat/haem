@@ -196,6 +196,10 @@ def test__radd__(
         (haem.DNASequence("AGT"), haem.DNASequence("GT"), True),
         (haem.DNASequence("AGT"), haem.DNASequence("TG"), False),
         (haem.DNASequence("A"), haem.DNASequence("AA"), False),
+        (haem.DNASequence(), "", True),
+        (haem.DNASequence("AGT"), "GT", True),
+        (haem.DNASequence("AGT"), "TG", False),
+        (haem.DNASequence("A"), "AA", False),
     ],
 )
 def test__contains__(

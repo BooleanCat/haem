@@ -196,6 +196,10 @@ def test__radd__(
         (haem.RNASequence("AGU"), haem.RNASequence("GU"), True),
         (haem.RNASequence("AGU"), haem.RNASequence("UG"), False),
         (haem.RNASequence("A"), haem.RNASequence("AA"), False),
+        (haem.RNASequence(), "", True),
+        (haem.RNASequence("AGU"), "GU", True),
+        (haem.RNASequence("AGU"), "UG", False),
+        (haem.RNASequence("A"), "AA", False),
     ],
 )
 def test__contains__(

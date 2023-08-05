@@ -200,6 +200,10 @@ def test__radd__(
         (haem.AminoAcidSequence("MVR"), haem.AminoAcidSequence("VR"), True),
         (haem.AminoAcidSequence("MVR"), haem.AminoAcidSequence("RV"), False),
         (haem.AminoAcidSequence("M"), haem.AminoAcidSequence("MM"), False),
+        (haem.AminoAcidSequence(), "", True),
+        (haem.AminoAcidSequence("MVR"), "VR", True),
+        (haem.AminoAcidSequence("MVR"), "RV", False),
+        (haem.AminoAcidSequence("M"), "MM", False),
     ],
 )
 def test__contains__(

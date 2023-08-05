@@ -59,8 +59,8 @@ impl AminoAcidSequence {
         })
     }
 
-    fn __contains__(&self, amino_acid_or_seq: MemberOrMembers<AminoAcid>) -> PyResult<bool> {
-        self.contains(amino_acid_or_seq)
+    fn __contains__(&self, sequence: SequenceLikeInput<AminoAcid>) -> PyResult<bool> {
+        self.contains(sequence)
     }
 
     fn __len__(&self) -> usize {

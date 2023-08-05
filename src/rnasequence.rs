@@ -90,8 +90,8 @@ impl RNASequence {
         }
     }
 
-    fn __contains__(&self, base_or_seq: MemberOrMembers<RNABase>) -> PyResult<bool> {
-        self.contains(base_or_seq)
+    fn __contains__(&self, sequence: SequenceLikeInput<RNABase>) -> PyResult<bool> {
+        self.contains(sequence)
     }
 }
 

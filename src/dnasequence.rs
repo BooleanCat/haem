@@ -90,8 +90,8 @@ impl DNASequence {
         }
     }
 
-    fn __contains__(&self, base_or_seq: MemberOrMembers<DNABase>) -> PyResult<bool> {
-        self.contains(base_or_seq)
+    fn __contains__(&self, sequence: SequenceLikeInput<DNABase>) -> PyResult<bool> {
+        self.contains(sequence)
     }
 }
 
