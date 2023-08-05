@@ -172,7 +172,7 @@ where
         T: TryFrom<char, Error = PyErr> + Clone + Copy,
         for<'a> Wrapper<Vec<T>>: TryFrom<SequenceLikeInput<'a, T>, Error = PyErr>,
     {
-        let sequence: Vec<T> = Wrapper::<Vec<T>>::try_from(bases)?.into_inner();
+        let sequence = Wrapper::try_from(bases)?.into_inner();
         let sequence_len = sequence.len();
 
         if sequence_len == 0 {
@@ -181,26 +181,14 @@ where
 
         let mut count = 0;
 
-        let mut iter = self.members().iter().peekable();
-        while let Some(&item) = iter.next() {
-            if item == sequence[0] {
-                let mut match_found = true;
-                for item in sequence.iter().take(sequence_len).skip(1) {
-                    if let Some(&next_item) = iter.peek() {
-                        if next_item != item {
-                            match_found = false;
-                            break;
-                        }
-                    } else {
-                        match_found = false;
-                        break;
-                    }
-                    if !overlap {
+        let mut iter = self.members().windows(sequence.len());
+        while let Some(item) = iter.next() {
+            if item == sequence {
+                count += 1;
+                if !overlap {
+                    for _ in 0..sequence_len - 1 {
                         iter.next();
                     }
-                }
-                if match_found {
-                    count += 1;
                 }
             }
         }
