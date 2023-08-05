@@ -173,25 +173,30 @@ where
         for<'a> Wrapper<Vec<T>>: TryFrom<SequenceLikeInput<'a, T>, Error = PyErr>,
     {
         let sequence = Wrapper::try_from(bases)?.into_inner();
-        let sequence_len = sequence.len();
 
-        if sequence_len == 0 {
-            return Ok(0);
-        }
+        Ok(match (sequence.len(), overlap) {
+            // Special case, empty sequences always return 0.
+            (0, _) => 0,
+            // With a sequence lenth of 1 or when overlap is allowed, optimisation is possible.
+            (1, _) | (_, true) => self
+                .members()
+                .par_windows(sequence.len())
+                .filter(|w| *w == sequence)
+                .count(),
+            _ => {
+                let mut count = 0;
 
-        let mut count = 0;
-
-        let mut iter = self.members().windows(sequence.len());
-        while let Some(item) = iter.next() {
-            if item == sequence {
-                count += 1;
-                if !overlap && sequence_len > 1 {
-                    iter.nth(sequence_len - 2);
+                let mut iter = self.members().windows(sequence.len());
+                while let Some(item) = iter.next() {
+                    if item == sequence {
+                        count += 1;
+                        iter.nth(sequence.len() - 2);
+                    }
                 }
-            }
-        }
 
-        Ok(count)
+                count
+            }
+        })
     }
 }
 
