@@ -325,3 +325,27 @@ def test_count_overlap(
     total: int,
 ) -> None:
     assert sequence.count(target, overlap=True) == total
+
+
+@pytest.mark.parametrize(
+    "sequence,target,result",
+    [
+        (haem.RNASequence(), haem.RNASequence(), None),
+        (haem.RNASequence(), haem.RNABase("A"), None),
+        (haem.RNASequence(), "", None),
+        (haem.RNASequence(), "AU", None),
+        (haem.RNASequence("AUG"), haem.RNASequence(), None),
+        (haem.RNASequence("AUG"), haem.RNABase("C"), None),
+        (haem.RNASequence("AUG"), "", None),
+        (haem.RNASequence("AUG"), "GU", None),
+        (haem.RNASequence("AUG"), haem.RNASequence("UG"), 1),
+        (haem.RNASequence("AUG"), haem.RNABase("G"), 2),
+        (haem.RNASequence("AUG"), "UG", 1),
+    ],
+)
+def test_find(
+    sequence: haem.RNASequence,
+    target: typing.Union[haem.RNASequence, haem.RNABase, str],
+    result: typing.Optional[int],
+) -> None:
+    assert sequence.find(target) == result

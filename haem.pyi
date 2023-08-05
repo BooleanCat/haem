@@ -267,6 +267,12 @@ class DNASequence:
     ) -> int:
         """Count the occurances of a DNABase in the sequence."""
         ...
+    def find(
+        self, target: typing.Union[DNASequence, DNABase, str]
+    ) -> typing.Optional[int]:
+        """Find the index of the first occurance of the given DNABase or
+        DNASequence."""
+        ...
 
 class RNASequence:
     @classmethod
@@ -329,6 +335,12 @@ class RNASequence:
     ) -> int:
         """Count the occurances of a RNABase in the sequence."""
         ...
+    def find(
+        self, target: typing.Union[RNASequence, RNABase, str]
+    ) -> typing.Optional[int]:
+        """Find the index of the first occurance of the given RNABase or
+        RNASequence."""
+        ...
 
 class AminoAcidSequence:
     @classmethod
@@ -388,4 +400,10 @@ class AminoAcidSequence:
         overlap: bool = False,
     ) -> int:
         """Count the occurances of an AminoAcid in the sequence."""
+        ...
+    def find(
+        self, target: typing.Union[AminoAcidSequence, AminoAcid, str]
+    ) -> typing.Optional[int]:
+        """Find the index of the first occurance of the given AminoAcid or
+        AminoAcidSequence."""
         ...

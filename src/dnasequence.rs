@@ -42,6 +42,11 @@ impl DNASequence {
         self.count(base, overlap)
     }
 
+    #[pyo3(name = "find")]
+    fn py_find(&self, base: SequenceLikeInput<DNABase>) -> PyResult<Option<usize>> {
+        self.find(base)
+    }
+
     fn __invert__(&self) -> Self {
         self.get_complement()
     }

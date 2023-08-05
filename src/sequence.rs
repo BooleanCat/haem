@@ -163,6 +163,23 @@ where
             }
         })
     }
+
+    fn find(&self, bases: SequenceLikeInput<T>) -> PyResult<Option<usize>>
+    where
+        T: TryFrom<char, Error = PyErr> + Clone + Copy,
+        for<'a> Wrapper<Vec<T>>: TryFrom<SequenceLikeInput<'a, T>, Error = PyErr>,
+    {
+        let sequence = Wrapper::try_from(bases)?.into_inner();
+
+        if self.members().is_empty() || sequence.is_empty() {
+            return Ok(None);
+        }
+
+        Ok(self
+            .members()
+            .par_windows(sequence.len())
+            .position_first(|w| w == sequence))
+    }
 }
 
 #[derive(FromPyObject)]

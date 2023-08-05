@@ -26,6 +26,11 @@ impl AminoAcidSequence {
         self.count(base, overlap)
     }
 
+    #[pyo3(name = "find")]
+    fn py_find(&self, base: SequenceLikeInput<AminoAcid>) -> PyResult<Option<usize>> {
+        self.find(base)
+    }
+
     fn __repr__(&self) -> String {
         self.repr()
     }
