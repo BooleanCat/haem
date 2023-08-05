@@ -23,8 +23,7 @@ impl AminoAcidSequence {
     #[pyo3(name = "count")]
     #[pyo3(signature = (base, overlap = false))]
     fn py_count(&self, base: SequenceLikeInput<AminoAcid>, overlap: bool) -> PyResult<usize> {
-        if overlap {}
-        self.count(base)
+        self.count(base, overlap)
     }
 
     fn __repr__(&self) -> String {

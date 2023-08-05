@@ -312,7 +312,6 @@ def test_count(
     assert sequence.count(target) == total
 
 
-@pytest.mark.skip
 @pytest.mark.parametrize(
     "sequence,target,total",
     [

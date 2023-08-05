@@ -167,17 +167,45 @@ where
         self.members().len()
     }
 
-    fn count(&self, bases: SequenceLikeInput<T>) -> PyResult<usize>
+    fn count(&self, bases: SequenceLikeInput<T>, overlap: bool) -> PyResult<usize>
     where
-        T: TryFrom<char, Error = PyErr>,
+        T: TryFrom<char, Error = PyErr> + Clone + Copy,
         for<'a> Wrapper<Vec<T>>: TryFrom<SequenceLikeInput<'a, T>, Error = PyErr>,
     {
         let sequence: Vec<T> = Wrapper::<Vec<T>>::try_from(bases)?.into_inner();
-        Ok(self
-            .members()
-            .par_windows(sequence.len())
-            .filter(|w| *w == sequence)
-            .count())
+        let sequence_len = sequence.len();
+
+        if sequence_len == 0 {
+            return Ok(0);
+        }
+
+        let mut count = 0;
+
+        let mut iter = self.members().iter().peekable();
+        while let Some(&item) = iter.next() {
+            if item == sequence[0] {
+                let mut match_found = true;
+                for item in sequence.iter().take(sequence_len).skip(1) {
+                    if let Some(&next_item) = iter.peek() {
+                        if next_item != item {
+                            match_found = false;
+                            break;
+                        }
+                    } else {
+                        match_found = false;
+                        break;
+                    }
+                    if !overlap {
+                        iter.next();
+                    }
+                }
+                if match_found {
+                    count += 1;
+                }
+            }
+        }
+
+        Ok(count)
     }
 }
 

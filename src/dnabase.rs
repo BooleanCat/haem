@@ -7,7 +7,7 @@ use pyo3::prelude::*;
 use std::fmt;
 
 #[pyclass(frozen)]
-#[derive(Clone, PartialEq)]
+#[derive(Clone, Copy, PartialEq)]
 pub enum DNABase {
     #[pyo3(name = "ADENINE")]
     Adenine,

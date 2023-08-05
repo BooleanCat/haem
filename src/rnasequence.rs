@@ -39,8 +39,7 @@ impl RNASequence {
     #[pyo3(name = "count")]
     #[pyo3(signature = (base, overlap = false))]
     fn py_count(&self, base: SequenceLikeInput<RNABase>, overlap: bool) -> PyResult<usize> {
-        if overlap {}
-        self.count(base)
+        self.count(base, overlap)
     }
 
     fn __invert__(&self) -> Self {
