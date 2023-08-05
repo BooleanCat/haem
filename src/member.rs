@@ -15,40 +15,21 @@ where
     T: TryFrom<char, Error = PyErr> + Send + Clone + PartialEq,
 {
     fn add(&self, other: SequenceLikeInput<T>, swap: bool) -> PyResult<Vec<T>> {
-        Ok(match other {
-            SequenceLikeInput::Member(member) => match swap {
-                true => vec![member, self.clone()],
-                false => vec![self.clone(), member],
-            },
-            SequenceLikeInput::Members(members) => {
-                let mut sequence = Vec::with_capacity(members.len() + 1);
-                match swap {
-                    false => {
-                        sequence.push(self.clone());
-                        sequence.par_extend(members);
-                    }
-                    true => {
-                        sequence.par_extend(members);
-                        sequence.push(self.clone());
-                    }
-                }
-                sequence
+        let sequence = Wrapper::try_from(other)?.into_inner();
+        let mut members = Vec::with_capacity(1 + sequence.len());
+
+        match swap {
+            true => {
+                members.par_extend(sequence);
+                members.push(self.clone());
             }
-            SequenceLikeInput::Codes(codes) => {
-                let mut sequence = Vec::with_capacity(codes.len() + 1);
-                match swap {
-                    false => {
-                        sequence.push(self.clone());
-                        sequence.par_extend(Wrapper::try_from(codes)?.into_inner());
-                    }
-                    true => {
-                        sequence.par_extend(Wrapper::try_from(codes)?.into_inner());
-                        sequence.push(self.clone());
-                    }
-                }
-                sequence
+            false => {
+                members.push(self.clone());
+                members.par_extend(sequence);
             }
-        })
+        }
+
+        Ok(members)
     }
 
     fn richcmp(&self, other: &Self, op: CompareOp, py: Python<'_>) -> PyObject {

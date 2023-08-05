@@ -75,56 +75,21 @@ where
     where
         T: TryFrom<char, Error = PyErr> + Send + Clone,
     {
-        Ok(match other {
-            SequenceLikeInput::Member(member) => {
-                let mut members = Vec::with_capacity(self.len() + 1);
+        let sequence = Wrapper::try_from(other)?.into_inner();
+        let mut members = Vec::with_capacity(self.len() + sequence.len());
 
-                match swap {
-                    true => {
-                        members.push(member);
-                        members.par_extend(self.members().to_vec());
-                    }
-                    false => {
-                        members.par_extend(self.members().to_vec());
-                        members.push(member);
-                    }
-                }
-
-                members
+        match swap {
+            true => {
+                members.par_extend(sequence);
+                members.par_extend(self.members().to_vec());
             }
-            SequenceLikeInput::Members(others) => {
-                let mut members = Vec::with_capacity(self.len() + others.len());
-
-                match swap {
-                    true => {
-                        members.par_extend(others);
-                        members.par_extend(self.members().to_vec());
-                    }
-                    false => {
-                        members.par_extend(self.members().to_vec());
-                        members.par_extend(others);
-                    }
-                }
-
-                members
+            false => {
+                members.par_extend(self.members().to_vec());
+                members.par_extend(sequence);
             }
-            SequenceLikeInput::Codes(codes) => {
-                let mut members = Vec::with_capacity(self.len() + codes.len());
+        }
 
-                match swap {
-                    true => {
-                        members.par_extend(Wrapper::try_from(codes)?.into_inner());
-                        members.par_extend(self.members().to_vec());
-                    }
-                    false => {
-                        members.par_extend(self.members().to_vec());
-                        members.par_extend(Wrapper::try_from(codes)?.into_inner());
-                    }
-                }
-
-                members
-            }
-        })
+        Ok(members)
     }
 
     fn getitem(&self, index_or_slice: IntOrSlice) -> PyResult<MemberOrMembers<T>> {
@@ -178,15 +143,15 @@ where
             // Special case, empty sequences always return 0.
             (0, _) => 0,
             // With a sequence lenth of 1 or when overlap is allowed, optimisation is possible.
-            (1, _) | (_, true) => self
+            (len @ 1, _) | (len, true) => self
                 .members()
-                .par_windows(sequence.len())
+                .par_windows(len)
                 .filter(|w| *w == sequence)
                 .count(),
-            _ => {
+            (len, _) => {
                 let mut count = 0;
 
-                let mut iter = self.members().windows(sequence.len());
+                let mut iter = self.members().windows(len);
                 while let Some(item) = iter.next() {
                     if item == sequence {
                         count += 1;
