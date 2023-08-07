@@ -13,7 +13,7 @@ use aminoacidsequence::AminoAcidSequence;
 use dnabase::DNABase;
 use dnasequence::DNASequence;
 use rnabase::RNABase;
-use rnasequence::RNASequence;
+use rnasequence::{NoStartCodon, NoStopCodon, RNASequence};
 
 use pyo3::prelude::*;
 
@@ -26,6 +26,8 @@ fn haem(py: Python, m: &PyModule) -> PyResult<()> {
     m.add_class::<DNASequence>()?;
     m.add_class::<RNASequence>()?;
     m.add_class::<AminoAcidSequence>()?;
+    m.add("NoStopCodon", py.get_type::<NoStopCodon>())?;
+    m.add("NoStartCodon", py.get_type::<NoStartCodon>())?;
 
     Ok(())
 }

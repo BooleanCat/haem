@@ -6,6 +6,16 @@ class StopTranslation(Exception):
 
     ...
 
+class NoStartCodon(Exception):
+    """NoStartCodon is raised during translation if no start codon is found."""
+
+    ...
+
+class NoStopCodon(Exception):
+    """NoStopCodon is raised during translation if no stop codon is found."""
+
+    ...
+
 class DNABase:
     """An enumeration of DNA bases, as defined by IUPAC.
 
@@ -303,6 +313,17 @@ class RNASequence:
         """The complementary RNA sequence."""
     def retro_transcribe(self) -> DNASequence:
         """Reverse transcription of the RNA sequence to a DNA sequence."""
+        ...
+    def translate(self) -> AminoAcidSequence:
+        """Translation of the RNA sequence to an AminoAcid sequence.
+
+        Amino acids prior to the first methionine are discarded. Translation
+        includes the the first methionone and continues until a stop codon is
+        encountered.
+
+        If no methionine is found, a NoStartCodon exception is raised. If no
+        stop codon is found following a methionine, a NoStopCodon exception
+        is raised."""
         ...
     def __invert__(self) -> RNASequence:
         """See `RNASequence.complement`."""
