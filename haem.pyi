@@ -314,7 +314,7 @@ class RNASequence:
     def retro_transcribe(self) -> DNASequence:
         """Reverse transcription of the RNA sequence to a DNA sequence."""
         ...
-    def translate(self) -> AminoAcidSequence:
+    def translate(self, reverse: bool = False) -> AminoAcidSequence:
         """Translation of the RNA sequence to an AminoAcid sequence.
 
         Amino acids prior to the first methionine are discarded. Translation
@@ -323,7 +323,10 @@ class RNASequence:
 
         If no methionine is found, a NoStartCodon exception is raised. If no
         stop codon is found following a methionine, a NoStopCodon exception
-        is raised."""
+        is raised.
+
+        Providing reverse=True will translate from the reverse complement of
+        the RNA sequence."""
         ...
     def __invert__(self) -> RNASequence:
         """See `RNASequence.complement`."""

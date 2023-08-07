@@ -100,11 +100,26 @@ impl RNASequence {
         self.contains(sequence)
     }
 
-    fn translate(&self, py: Python<'_>) -> PyResult<AminoAcidSequence> {
-        let mut sequence = self
-            .members()
-            .chunks_exact(3)
-            .map(|chunk| AminoAcid::try_from((&chunk[0], &chunk[1], &chunk[2])));
+    #[pyo3(signature = (reverse = false))]
+    fn translate(&self, py: Python<'_>, reverse: bool) -> PyResult<AminoAcidSequence> {
+        let mut sequence = match reverse {
+            true => self
+                .members()
+                .iter()
+                .rev()
+                .map(|base| base.get_complement())
+                .collect::<Vec<_>>()
+                .chunks_exact(3)
+                .map(|chunk| AminoAcid::try_from((&chunk[0], &chunk[1], &chunk[2])))
+                .collect::<Vec<_>>(),
+
+            false => self
+                .members()
+                .chunks_exact(3)
+                .map(|chunk| AminoAcid::try_from((&chunk[0], &chunk[1], &chunk[2])))
+                .collect::<Vec<_>>(),
+        }
+        .into_iter();
 
         if !sequence.any(|amino_acid| {
             amino_acid.is_ok() && *amino_acid.as_ref().unwrap() == AminoAcid::Methionine
