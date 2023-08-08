@@ -1,5 +1,3 @@
-use crate::aminoacid::{AminoAcid, StopTranslation};
-use crate::aminoacidsequence::AminoAcidSequence;
 use crate::dnabase::DNABase;
 use crate::dnasequence::DNASequence;
 use crate::member::MemberOrMembers;
@@ -7,12 +5,8 @@ use crate::rnabase::RNABase;
 use crate::sequence::{Sequence, SequenceInput};
 use crate::utils::{IntOrSlice, SequenceLikeInput};
 use pyo3::class::basic::CompareOp;
-use pyo3::create_exception;
 use pyo3::prelude::*;
 use rayon::prelude::*;
-
-create_exception!(haem, NoStopCodon, pyo3::exceptions::PyException);
-create_exception!(haem, NoStartCodon, pyo3::exceptions::PyException);
 
 #[pyclass(frozen)]
 pub struct RNASequence {
@@ -98,34 +92,6 @@ impl RNASequence {
 
     fn __contains__(&self, sequence: SequenceLikeInput<RNABase>) -> PyResult<bool> {
         self.contains(sequence)
-    }
-
-    fn translate(&self, py: Python<'_>) -> PyResult<AminoAcidSequence> {
-        let mut sequence = self
-            .members()
-            .chunks_exact(3)
-            .map(|chunk| AminoAcid::try_from((&chunk[0], &chunk[1], &chunk[2])));
-
-        if !sequence.any(|amino_acid| {
-            amino_acid.is_ok() && *amino_acid.as_ref().unwrap() == AminoAcid::Methionine
-        }) {
-            // No start codon found
-            return Err(NoStartCodon::new_err("no start codon"));
-        }
-
-        let mut amino_acids = vec![AminoAcid::Methionine];
-
-        for amino_acid in sequence {
-            match amino_acid {
-                Ok(amino_acid) => amino_acids.push(amino_acid),
-                Err(err) if err.is_instance_of::<StopTranslation>(py) => {
-                    return Ok(AminoAcidSequence { amino_acids })
-                }
-                Err(err) => return Err(err),
-            }
-        }
-
-        Err(NoStopCodon::new_err("no stop codon"))
     }
 }
 

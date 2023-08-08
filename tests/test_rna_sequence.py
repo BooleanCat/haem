@@ -353,37 +353,3 @@ def test_find(
     result: typing.Optional[int],
 ) -> None:
     assert sequence.find(target) == result
-
-
-@pytest.mark.parametrize(
-    "rna_sequence,amino_acid_sequence",
-    [
-        (haem.RNASequence("AUGUAA"), haem.AminoAcidSequence("M")),
-        (haem.RNASequence("AUGGAUUAA"), haem.AminoAcidSequence("MD")),
-        (haem.RNASequence("AUGGAUUAAA"), haem.AminoAcidSequence("MD")),
-        (haem.RNASequence("AUGGAUGGAUAA"), haem.AminoAcidSequence("MDG")),
-        (haem.RNASequence("AUGGAUUAAGGA"), haem.AminoAcidSequence("MD")),
-        (haem.RNASequence("GAUAUGGAUUAAGGA"), haem.AminoAcidSequence("MD")),
-        (haem.RNASequence("UAAGAUAUGGAUUAAGGA"), haem.AminoAcidSequence("MD")),
-    ],
-)
-def test_translate(
-    rna_sequence: haem.RNASequence,
-    amino_acid_sequence: haem.AminoAcidSequence,
-) -> None:
-    assert rna_sequence.translate() == amino_acid_sequence
-
-
-def test_translate_no_stop_codon() -> None:
-    with pytest.raises(haem.NoStopCodon) as excinfo:
-        haem.RNASequence("AUGGAU").translate()
-
-    assert str(excinfo.value) == "no stop codon"
-
-
-@pytest.mark.parametrize("sequence", [haem.RNASequence(), haem.RNASequence("UAA")])
-def test_translate_no_start_codon(sequence: haem.RNASequence) -> None:
-    with pytest.raises(haem.NoStartCodon) as excinfo:
-        sequence.translate()
-
-    assert str(excinfo.value) == "no start codon"
