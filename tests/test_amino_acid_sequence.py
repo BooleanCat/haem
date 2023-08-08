@@ -21,7 +21,7 @@ def test__new__str__invalid() -> None:
     with pytest.raises(ValueError) as excinfo:
         haem.AminoAcidSequence("JJ")
 
-    assert str(excinfo.value) == 'invalid IUPAC amino acid code "J"'
+    assert str(excinfo.value) == 'invalid amino acid code "J"'
 
 
 def test__new__iterable_amino_acid() -> None:
@@ -47,7 +47,7 @@ def test__new__iterable_invalid() -> None:
     with pytest.raises(ValueError) as excinfo:
         haem.AminoAcidSequence(iter(["J"]))
 
-    assert str(excinfo.value) == 'invalid IUPAC amino acid code "J"'
+    assert str(excinfo.value) == 'invalid amino acid code "J"'
 
 
 def test__new__sequence_amino_acids() -> None:

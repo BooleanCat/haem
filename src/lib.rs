@@ -8,7 +8,7 @@ mod rnasequence;
 mod sequence;
 mod utils;
 
-use aminoacid::{AminoAcid, StopTranslation};
+use aminoacid::AminoAcid;
 use aminoacidsequence::AminoAcidSequence;
 use dnabase::DNABase;
 use dnasequence::DNASequence;
@@ -18,11 +18,10 @@ use rnasequence::RNASequence;
 use pyo3::prelude::*;
 
 #[pymodule]
-fn haem(py: Python, m: &PyModule) -> PyResult<()> {
+fn haem(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_class::<RNABase>()?;
     m.add_class::<DNABase>()?;
     m.add_class::<AminoAcid>()?;
-    m.add("StopTranslation", py.get_type::<StopTranslation>())?;
     m.add_class::<DNASequence>()?;
     m.add_class::<RNASequence>()?;
     m.add_class::<AminoAcidSequence>()?;

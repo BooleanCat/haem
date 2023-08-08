@@ -419,6 +419,8 @@ def test__new__sequence_str() -> None:
 
 
 def test__new__stop() -> None:
+    assert haem.AminoAcid("*") == haem.AminoAcid.STOP
+
     codons = [
         (haem.RNABase.URACIL, haem.RNABase.ADENINE, haem.RNABase.ADENINE),
         (haem.RNABase.URACIL, haem.RNABase.ADENINE, haem.RNABase.GUANINE),
@@ -428,16 +430,17 @@ def test__new__stop() -> None:
     ]
 
     for codon in codons:
-        with pytest.raises(haem.StopTranslation) as excinfo:
-            haem.AminoAcid(codon)
+        assert haem.AminoAcid(codon) == haem.AminoAcid.STOP
 
-        assert str(excinfo.value) == "stop translation"
+        assert (
+            haem.AminoAcid("".join(base.code for base in codon)) == haem.AminoAcid.STOP
+        )
 
 
 @pytest.mark.parametrize(
     "code,message",
     [
-        ("J", 'invalid IUPAC amino acid code "J"'),
+        ("J", 'invalid amino acid code "J"'),
         ("JJ", "invalid amino acid codon"),
         ("NNN", "ambiguous codon"),
         ("---", "codon contains gap"),
@@ -480,6 +483,7 @@ def test__repr__() -> None:
         (haem.AminoAcid.ANY, "any"),
         (haem.AminoAcid.TYROSINE, "tyrosine"),
         (haem.AminoAcid.GLUTAMINE_GLUTAMIC_ACID, "glutamine/glutamic acid"),
+        (haem.AminoAcid.STOP, "stop"),
     ],
 )
 def test__str__(amino_acid: haem.AminoAcid, text: str) -> None:
@@ -512,6 +516,7 @@ def test__str__(amino_acid: haem.AminoAcid, text: str) -> None:
         (haem.AminoAcid.ANY, "X"),
         (haem.AminoAcid.TYROSINE, "Y"),
         (haem.AminoAcid.GLUTAMINE_GLUTAMIC_ACID, "Z"),
+        (haem.AminoAcid.STOP, "*"),
     ],
 )
 def test_code(amino_acid: haem.AminoAcid, code: str) -> None:
@@ -544,6 +549,7 @@ def test_code(amino_acid: haem.AminoAcid, code: str) -> None:
         (haem.AminoAcid.ANY, "xaa"),
         (haem.AminoAcid.TYROSINE, "tyr"),
         (haem.AminoAcid.GLUTAMINE_GLUTAMIC_ACID, "glx"),
+        (haem.AminoAcid.STOP, "stop"),
     ],
 )
 def test_short_name(amino_acid: haem.AminoAcid, short_name: str) -> None:

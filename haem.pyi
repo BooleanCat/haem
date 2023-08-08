@@ -1,11 +1,5 @@
 import typing
 
-class StopTranslation(Exception):
-    """StopTranslation is raised when a stop codon is encountered during
-    translation."""
-
-    ...
-
 class DNABase:
     """An enumeration of DNA bases, as defined by IUPAC.
 
@@ -170,6 +164,7 @@ class AminoAcid:
     ANY: AminoAcid
     TYROSINE: AminoAcid
     GLUTAMINE_GLUTAMIC_ACID: AminoAcid
+    STOP: AminoAcid
 
     @classmethod
     def __new__(
