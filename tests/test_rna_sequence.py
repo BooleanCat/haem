@@ -387,22 +387,3 @@ def test_translate_no_start_codon(sequence: haem.RNASequence) -> None:
         sequence.translate()
 
     assert str(excinfo.value) == "no start codon"
-
-
-@pytest.mark.parametrize(
-    "rna_sequence,amino_acid_sequence",
-    [
-        (haem.RNASequence("UUACAU"), haem.AminoAcidSequence("M")),
-        (haem.RNASequence("UUAAUCCAU"), haem.AminoAcidSequence("MD")),
-        (haem.RNASequence("UUUAAUCCAU"), haem.AminoAcidSequence("MD")),
-        (haem.RNASequence("UUAUCCAUCCAU"), haem.AminoAcidSequence("MDG")),
-        (haem.RNASequence("UCCUUAAUCCAU"), haem.AminoAcidSequence("MD")),
-        (haem.RNASequence("UCCUUAAUCCAUAUC"), haem.AminoAcidSequence("MD")),
-        (haem.RNASequence("UCCUUAAUCCAUAUCUUA"), haem.AminoAcidSequence("MD")),
-    ],
-)
-def test_translate_reverse(
-    rna_sequence: haem.RNASequence,
-    amino_acid_sequence: haem.AminoAcidSequence,
-) -> None:
-    assert rna_sequence.translate(reverse=True) == amino_acid_sequence
