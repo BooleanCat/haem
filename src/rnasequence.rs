@@ -103,7 +103,11 @@ impl RNASequence {
     #[pyo3(signature = (reverse = false))]
     fn translate(&self, py: Python<'_>, reverse: bool) -> PyResult<AminoAcidSequence> {
         let mut sequence = match reverse {
-            true => RNASequenceReverseComplementTranslate::new(self.members()).collect::<Vec<_>>(),
+            true => RNASequenceReverseComplement::new(self.members())
+                .collect::<Vec<_>>()
+                .chunks_exact(3)
+                .map(|chunk| AminoAcid::try_from((&chunk[0], &chunk[1], &chunk[2])))
+                .collect::<Vec<_>>(),
 
             false => self
                 .members()
@@ -148,12 +152,12 @@ impl Sequence<RNABase> for RNASequence {
     }
 }
 
-struct RNASequenceReverseComplementTranslate<'a> {
+struct RNASequenceReverseComplement<'a> {
     bases: &'a Vec<RNABase>,
     index: usize,
 }
 
-impl<'a> RNASequenceReverseComplementTranslate<'a> {
+impl<'a> RNASequenceReverseComplement<'a> {
     fn new(bases: &'a Vec<RNABase>) -> Self {
         Self {
             bases,
@@ -162,20 +166,16 @@ impl<'a> RNASequenceReverseComplementTranslate<'a> {
     }
 }
 
-impl<'a> Iterator for RNASequenceReverseComplementTranslate<'a> {
-    type Item = PyResult<AminoAcid>;
+impl<'a> Iterator for RNASequenceReverseComplement<'a> {
+    type Item = RNABase;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if self.index < 3 {
+        if self.index == 0 {
             return None;
         }
 
-        self.index -= 3;
+        self.index -= 1;
 
-        Some(AminoAcid::try_from((
-            &self.bases[self.index + 2].get_complement(),
-            &self.bases[self.index + 1].get_complement(),
-            &self.bases[self.index].get_complement(),
-        )))
+        Some(self.bases[self.index].get_complement())
     }
 }
