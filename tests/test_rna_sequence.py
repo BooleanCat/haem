@@ -353,3 +353,8 @@ def test_find(
     result: typing.Optional[int],
 ) -> None:
     assert sequence.find(target) == result
+
+
+def test_translate_not_implemented() -> None:
+    with pytest.raises(NotImplementedError):
+        haem.RNASequence().translate()

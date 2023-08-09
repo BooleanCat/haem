@@ -304,6 +304,9 @@ class RNASequence:
     def retro_transcribe(self) -> DNASequence:
         """Reverse transcription of the RNA sequence to a DNA sequence."""
         ...
+    def translate(self) -> AminoAcidSequence:
+        """Not implemented."""
+        ...
     def __invert__(self) -> RNASequence:
         """See `RNASequence.complement`."""
         ...

@@ -1,3 +1,4 @@
+use crate::aminoacidsequence::AminoAcidSequence;
 use crate::dnabase::DNABase;
 use crate::dnasequence::DNASequence;
 use crate::member::MemberOrMembers;
@@ -45,6 +46,12 @@ impl RNASequence {
     #[pyo3(name = "find")]
     fn py_find(&self, base: SequenceLikeInput<RNABase>) -> PyResult<Option<usize>> {
         self.find(base)
+    }
+
+    fn translate(&self) -> PyResult<AminoAcidSequence> {
+        Err(pyo3::exceptions::PyNotImplementedError::new_err(
+            "not implemented",
+        ))
     }
 
     fn __invert__(&self) -> Self {
