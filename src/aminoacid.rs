@@ -3,8 +3,11 @@ use crate::member::Member;
 use crate::rnabase::RNABase;
 use crate::utils::SequenceLikeInput;
 use pyo3::class::basic::CompareOp;
+use pyo3::create_exception;
 use pyo3::prelude::*;
 use std::fmt;
+
+create_exception!(haem, StopTranslation, pyo3::exceptions::PyException);
 
 #[derive(FromPyObject)]
 enum Codon {
@@ -138,9 +141,6 @@ pub enum AminoAcid {
 
     #[pyo3(name = "GLUTAMINE_GLUTAMIC_ACID")]
     GlutamineGlutamicAcid,
-
-    #[pyo3(name = "STOP")]
-    Stop,
 }
 
 #[pymethods]
@@ -181,7 +181,6 @@ impl AminoAcid {
             Self::Any => "xaa",
             Self::Tyrosine => "tyr",
             Self::GlutamineGlutamicAcid => "glx",
-            Self::Stop => "stop",
         }
     }
 
@@ -236,7 +235,6 @@ impl From<&AminoAcid> for char {
             AminoAcid::Any => 'X',
             AminoAcid::Tyrosine => 'Y',
             AminoAcid::GlutamineGlutamicAcid => 'Z',
-            AminoAcid::Stop => '*',
         }
     }
 }
@@ -270,7 +268,6 @@ impl fmt::Display for AminoAcid {
                 Self::Any => "any",
                 Self::Tyrosine => "tyrosine",
                 Self::GlutamineGlutamicAcid => "glutamine/glutamic acid",
-                Self::Stop => "stop",
             }
         )
     }
@@ -304,10 +301,9 @@ impl TryFrom<char> for AminoAcid {
             'X' => Self::Any,
             'Y' => Self::Tyrosine,
             'Z' => Self::GlutamineGlutamicAcid,
-            '*' => Self::Stop,
             _ => {
                 return Err(pyo3::exceptions::PyValueError::new_err(format!(
-                    "invalid amino acid code \"{}\"",
+                    "invalid IUPAC amino acid code \"{}\"",
                     code
                 )))
             }
@@ -467,7 +463,7 @@ impl TryFrom<(&RNABase, &RNABase, &RNABase)> for AminoAcid {
                 RNABase::Adenine | RNABase::Guanine | RNABase::AdenineGuanine,
             )
             | (RNABase::Uracil, RNABase::Guanine | RNABase::AdenineGuanine, RNABase::Adenine) => {
-                Self::Stop
+                return Err(StopTranslation::new_err("stop translation"))
             }
 
             _ => return Err(pyo3::exceptions::PyValueError::new_err("ambiguous codon")),
