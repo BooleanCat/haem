@@ -1,3 +1,4 @@
+use crate::aminoacid::{AminoAcid, StopTranslation};
 use crate::aminoacidsequence::AminoAcidSequence;
 use crate::dnabase::DNABase;
 use crate::dnasequence::DNASequence;
@@ -48,10 +49,46 @@ impl RNASequence {
         self.find(base)
     }
 
-    fn translate(&self) -> PyResult<AminoAcidSequence> {
-        Err(pyo3::exceptions::PyNotImplementedError::new_err(
-            "not implemented",
-        ))
+    fn translate(&self, py: Python<'_>) -> PyResult<AminoAcidSequence> {
+        // Find start codon
+        let start = self
+            .members()
+            .par_windows(3)
+            .map(|codon| AminoAcid::try_from((&codon[0], &codon[1], &codon[2])))
+            .position_first(|member| {
+                member.is_ok() && member.as_ref().unwrap() == &AminoAcid::Methionine
+            });
+
+        if start.is_none() {
+            return Err(pyo3::exceptions::PyValueError::new_err(
+                "no start codon found",
+            ));
+        }
+
+        // Find stop codon
+        let stop = self.members()[start.unwrap()..self.members().len()]
+            .chunks_exact(3)
+            .map(|codon| AminoAcid::try_from((&codon[0], &codon[1], &codon[2])))
+            .position(|member| {
+                member.is_err()
+                    && member
+                        .as_ref()
+                        .unwrap_err()
+                        .is_instance_of::<StopTranslation>(py)
+            });
+
+        if stop.is_none() {
+            return Err(pyo3::exceptions::PyValueError::new_err(
+                "no stop codon found",
+            ));
+        }
+
+        Ok(AminoAcidSequence {
+            amino_acids: self.members()[start.unwrap()..(start.unwrap() + stop.unwrap() * 3)]
+                .par_chunks_exact(3)
+                .map(|codon| AminoAcid::try_from((&codon[0], &codon[1], &codon[2])))
+                .collect::<Result<Vec<_>, _>>()?,
+        })
     }
 
     fn __invert__(&self) -> Self {

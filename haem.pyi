@@ -305,7 +305,13 @@ class RNASequence:
         """Reverse transcription of the RNA sequence to a DNA sequence."""
         ...
     def translate(self) -> AminoAcidSequence:
-        """Not implemented."""
+        """Translate the RNA sequence to an amino acid sequence.
+
+        Translation searches for the first Methionine (AUG) codon and
+        translates until it finds a stop codon.
+
+        A ValueError is raised if no start codon is found, or not stop codon is
+        found following the start codon."""
         ...
     def __invert__(self) -> RNASequence:
         """See `RNASequence.complement`."""

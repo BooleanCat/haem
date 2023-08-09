@@ -355,6 +355,31 @@ def test_find(
     assert sequence.find(target) == result
 
 
-def test_translate_not_implemented() -> None:
-    with pytest.raises(NotImplementedError):
+@pytest.mark.parametrize(
+    "rna_sequence,amino_acid_sequence",
+    [
+        (haem.RNASequence("AUGUAA"), haem.AminoAcidSequence("M")),
+        (haem.RNASequence("AUGUAAA"), haem.AminoAcidSequence("M")),
+        (haem.RNASequence("CAUGUAA"), haem.AminoAcidSequence("M")),
+        (haem.RNASequence("AUGUAAAUG"), haem.AminoAcidSequence("M")),
+        (haem.RNASequence("AUGUGGUAA"), haem.AminoAcidSequence("MW")),
+    ],
+)
+def test_translate(
+    rna_sequence: haem.RNASequence, amino_acid_sequence: haem.AminoAcidSequence
+) -> None:
+    assert rna_sequence.translate() == amino_acid_sequence
+
+
+def test_translate_no_start_codon() -> None:
+    with pytest.raises(ValueError) as excinfo:
         haem.RNASequence().translate()
+
+    assert str(excinfo.value) == "no start codon found"
+
+
+def test_translate_no_stop_codon() -> None:
+    with pytest.raises(ValueError) as excinfo:
+        haem.RNASequence("AUG").translate()
+
+    assert str(excinfo.value) == "no stop codon found"

@@ -71,7 +71,7 @@ impl TryFrom<CodeOrCodon<'_>> for AminoAcid {
 }
 
 #[pyclass(frozen)]
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, PartialEq, Debug)]
 pub enum AminoAcid {
     #[pyo3(name = "ALANINE")]
     Alanine,
