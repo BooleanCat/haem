@@ -13,18 +13,20 @@ jobs:
   test:
     strategy:
       matrix:
-        python-version: ['3.8', '3.9', '3.10', '3.11']
+        python-version: ['3.8', '3.9', '3.10', '3.11', '3.12']
         os: [ubuntu-latest, windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v4
-        with: { python-version: "${{ matrix.python-version }}" }
-      - name: Build & install
-        uses: PyO3/maturin-action@v1
-        with: { args: "--release" }
-      - run: |
+        with:
+          python-version: ${{ matrix.python-version }}
+          allow-prereleases: true
+      - name: Set up poetry
+        run: |
           pip install --upgrade pip
           pip install poetry
-          poetry install --no-root --with=dev
-          make test
+      - run: poetry install --no-root --with=dev
+      - uses: PyO3/maturin-action@v1
+        with: { args: "--release" }
+      - run: make test
