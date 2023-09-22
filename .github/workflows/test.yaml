@@ -27,7 +27,7 @@ jobs:
         with:
           args: --release
       - uses: abatilo/actions-poetry@v2
-        with: { poetry-version: 1.5 }
+        with: { poetry-version: 1.6 }
       - run: |
           poetry install --no-root
           make test
