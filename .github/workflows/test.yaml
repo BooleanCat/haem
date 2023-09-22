@@ -23,8 +23,7 @@ jobs:
       - name: Build & install
         uses: PyO3/maturin-action@v1
         with: { args: "--release" }
-      - uses: abatilo/actions-poetry@v2
-        with: { poetry-version: 1.6 }
       - run: |
-          poetry --no-ansi install --no-root --with=dev
+          pip install poetry
+          poetry install --no-root --with=dev
           make test
