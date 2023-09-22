@@ -7,8 +7,7 @@ on:
   pull_request:
   workflow_dispatch:
 
-permissions:
-  contents: read
+permissions: { contents: read }
 
 jobs:
   test:
@@ -20,23 +19,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-      - uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        with: { "python-version: ${{ matrix.python-version }}" }
       - name: Build & install
         uses: PyO3/maturin-action@v1
-        with:
-          args: --release
+        with: { args: "--release" }
       - uses: abatilo/actions-poetry@v2
         with: { poetry-version: 1.6 }
       - run: |
-          poetry install --no-root --with=dev
+          poetry --no-ansi install --no-root --with=dev
           make test
