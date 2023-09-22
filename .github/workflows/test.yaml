@@ -38,5 +38,5 @@ jobs:
       - uses: abatilo/actions-poetry@v2
         with: { poetry-version: 1.6 }
       - run: |
-          poetry install --no-root
+          poetry install --no-root --with=dev
           make test
