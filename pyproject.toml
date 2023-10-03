@@ -4,7 +4,7 @@ build-backend = "maturin"
 
 [project]
 name = "haem"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 classifiers = [
     "Programming Language :: Rust",
     "Programming Language :: Python :: Implementation :: CPython",
@@ -22,7 +22,7 @@ authors = ["Tom Godkin <tomgodkin@pm.me>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9"
 
 [tool.poetry.group.dev]
 optional = true
