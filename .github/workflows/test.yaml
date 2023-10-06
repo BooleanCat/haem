@@ -3,7 +3,7 @@ name: test
 on:
   push:
     branches: [main]
-    tags: ['*']
+    tags: ["*"]
   pull_request:
   workflow_dispatch:
 
@@ -13,7 +13,7 @@ jobs:
   test:
     strategy:
       matrix:
-        python-version: ['3.9', '3.10', '3.11', '3.12']
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
         os: [ubuntu-latest, windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
@@ -28,9 +28,7 @@ jobs:
             target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-          allow-prereleases: true
+        with: { python-version: "${{ matrix.python-version }}" }
       - name: Set up poetry
         run: |
           pip install --upgrade pip
