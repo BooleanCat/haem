@@ -6,55 +6,24 @@ use pyo3::class::basic::CompareOp;
 use pyo3::prelude::*;
 use std::fmt;
 
-#[pyclass(frozen)]
+#[pyclass(frozen, rename_all = "SCREAMING_SNAKE_CASE")]
 #[derive(Clone, Copy, PartialEq)]
 pub enum DNABase {
-    #[pyo3(name = "ADENINE")]
     Adenine,
-
-    #[pyo3(name = "CYTOSINE")]
     Cytosine,
-
-    #[pyo3(name = "GUANINE")]
     Guanine,
-
-    #[pyo3(name = "THYMINE")]
     Thymine,
-
-    #[pyo3(name = "ADENINE_CYTOSINE")]
     AdenineCytosine,
-
-    #[pyo3(name = "ADENINE_GUANINE")]
     AdenineGuanine,
-
-    #[pyo3(name = "ADENINE_THYMINE")]
     AdenineThymine,
-
-    #[pyo3(name = "CYTOSINE_GUANINE")]
     CytosineGuanine,
-
-    #[pyo3(name = "CYTOSINE_THYMINE")]
     CytosineThymine,
-
-    #[pyo3(name = "GUANINE_THYMINE")]
     GuanineThymine,
-
-    #[pyo3(name = "ADENINE_CYTOSINE_GUANINE")]
     AdenineCytosineGuanine,
-
-    #[pyo3(name = "ADENINE_CYTOSINE_THYMINE")]
     AdenineCytosineThymine,
-
-    #[pyo3(name = "ADENINE_GUANINE_THYMINE")]
     AdenineGuanineThymine,
-
-    #[pyo3(name = "CYTOSINE_GUANINE_THYMINE")]
     CytosineGuanineThymine,
-
-    #[pyo3(name = "ANY")]
     Any,
-
-    #[pyo3(name = "GAP")]
     Gap,
 }
 

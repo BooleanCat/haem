@@ -70,76 +70,31 @@ impl TryFrom<CodeOrCodon<'_>> for AminoAcid {
     }
 }
 
-#[pyclass(frozen)]
+#[pyclass(frozen, rename_all = "SCREAMING_SNAKE_CASE")]
 #[derive(Clone, Copy, PartialEq, Debug)]
 pub enum AminoAcid {
-    #[pyo3(name = "ALANINE")]
     Alanine,
-
-    #[pyo3(name = "ASPARTIC_ACID_ASPARAGINE")]
     AsparticAcidAsparagine,
-
-    #[pyo3(name = "CYSTEINE")]
     Cysteine,
-
-    #[pyo3(name = "ASPARTIC_ACID")]
     AsparticAcid,
-
-    #[pyo3(name = "GLUTAMIC_ACID")]
     GlutamicAcid,
-
-    #[pyo3(name = "PHENYLALANINE")]
     Phenylalanine,
-
-    #[pyo3(name = "GLYCINE")]
     Glycine,
-
-    #[pyo3(name = "HISTIDINE")]
     Histidine,
-
-    #[pyo3(name = "ISOLEUCINE")]
     Isoleucine,
-
-    #[pyo3(name = "LYSINE")]
     Lysine,
-
-    #[pyo3(name = "LEUCINE")]
     Leucine,
-
-    #[pyo3(name = "METHIONINE")]
     Methionine,
-
-    #[pyo3(name = "ASPARAGINE")]
     Asparagine,
-
-    #[pyo3(name = "PROLINE")]
     Proline,
-
-    #[pyo3(name = "GLUTAMINE")]
     Glutamine,
-
-    #[pyo3(name = "ARGININE")]
     Arginine,
-
-    #[pyo3(name = "SERINE")]
     Serine,
-
-    #[pyo3(name = "THREONINE")]
     Threonine,
-
-    #[pyo3(name = "VALINE")]
     Valine,
-
-    #[pyo3(name = "TRYPTOPHAN")]
     Tryptophan,
-
-    #[pyo3(name = "ANY")]
     Any,
-
-    #[pyo3(name = "TYROSINE")]
     Tyrosine,
-
-    #[pyo3(name = "GLUTAMINE_GLUTAMIC_ACID")]
     GlutamineGlutamicAcid,
 }
 
