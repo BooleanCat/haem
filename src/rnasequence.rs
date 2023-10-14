@@ -6,7 +6,6 @@ use crate::member::MemberOrMembers;
 use crate::rnabase::RNABase;
 use crate::sequence::{Sequence, SequenceInput};
 use crate::utils::{IntOrSlice, SequenceLikeInput};
-use pyo3::class::basic::CompareOp;
 use pyo3::prelude::*;
 use rayon::prelude::*;
 
@@ -103,8 +102,8 @@ impl RNASequence {
         self.str()
     }
 
-    fn __richcmp__(&self, other: &Self, op: CompareOp, py: Python<'_>) -> PyObject {
-        self.richcmp(other, op, py)
+    fn __eq__(&self, other: &Self) -> bool {
+        self.eq(other)
     }
 
     fn __bool__(&self) -> bool {

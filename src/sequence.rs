@@ -1,6 +1,5 @@
 use crate::member::MemberOrMembers;
 use crate::utils::{IntOrSlice, SequenceLikeInput, Wrapper};
-use pyo3::class::basic::CompareOp;
 use pyo3::prelude::*;
 use pyo3::pyclass::PyClass;
 use pyo3::types::PyIterator;
@@ -15,16 +14,12 @@ where
     fn members(&self) -> &Vec<T>;
     fn name(&self) -> &str;
 
-    fn richcmp(&self, other: &Self, op: CompareOp, py: Python<'_>) -> PyObject {
-        match op {
-            CompareOp::Eq => (self.members() == other.members()).into_py(py),
-            CompareOp::Ne => (self.members() != other.members()).into_py(py),
-            _ => py.NotImplemented(),
-        }
-    }
-
     fn bool(&self) -> bool {
         !self.members().is_empty()
+    }
+
+    fn eq(&self, other: &Self) -> bool {
+        self.members() == other.members()
     }
 
     fn repr(&self) -> String {
