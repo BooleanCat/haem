@@ -2,7 +2,6 @@ use crate::dnasequence::DNASequence;
 use crate::member::Member;
 use crate::rnabase::RNABase;
 use crate::utils::SequenceLikeInput;
-use pyo3::class::basic::CompareOp;
 use pyo3::prelude::*;
 use std::fmt;
 
@@ -63,10 +62,6 @@ impl DNABase {
 
     pub fn transcribe(&self) -> RNABase {
         self.into()
-    }
-
-    fn __richcmp__(&self, other: &Self, op: CompareOp, py: Python<'_>) -> PyObject {
-        self.richcmp(other, op, py)
     }
 
     fn __bool__(&self) -> bool {

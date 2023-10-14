@@ -2,7 +2,6 @@ use crate::aminoacidsequence::AminoAcidSequence;
 use crate::member::Member;
 use crate::rnabase::RNABase;
 use crate::utils::SequenceLikeInput;
-use pyo3::class::basic::CompareOp;
 use pyo3::create_exception;
 use pyo3::prelude::*;
 use std::fmt;
@@ -141,10 +140,6 @@ impl AminoAcid {
 
     fn __str__(&self) -> String {
         self.to_string()
-    }
-
-    fn __richcmp__(&self, other: &Self, op: CompareOp, py: Python<'_>) -> PyObject {
-        self.richcmp(other, op, py)
     }
 
     fn __bool__(&self) -> bool {

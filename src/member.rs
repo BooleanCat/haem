@@ -1,5 +1,4 @@
 use crate::utils::{SequenceLikeInput, Wrapper};
-use pyo3::class::basic::CompareOp;
 use pyo3::prelude::*;
 use pyo3::pyclass::PyClass;
 use pyo3::types::PyIterator;
@@ -7,7 +6,6 @@ use rayon::prelude::*;
 
 pub trait Member<T> {
     fn add(&self, other: SequenceLikeInput<T>, swap: bool) -> PyResult<Vec<T>>;
-    fn richcmp(&self, other: &Self, op: CompareOp, py: Python<'_>) -> PyObject;
 }
 
 impl<T> Member<T> for T
@@ -30,14 +28,6 @@ where
         }
 
         Ok(members)
-    }
-
-    fn richcmp(&self, other: &Self, op: CompareOp, py: Python<'_>) -> PyObject {
-        match op {
-            CompareOp::Eq => (self == other).into_py(py),
-            CompareOp::Ne => (self != other).into_py(py),
-            _ => py.NotImplemented(),
-        }
     }
 }
 
