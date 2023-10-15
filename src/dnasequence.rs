@@ -25,7 +25,11 @@ impl DNASequence {
     #[getter]
     fn get_complement(&self) -> Self {
         Self {
-            bases: self.bases.par_iter().map(|b| b.get_complement()).collect(),
+            bases: self
+                .bases
+                .par_iter()
+                .map(|base| base.get_complement())
+                .collect(),
         }
     }
 
@@ -35,14 +39,14 @@ impl DNASequence {
         }
     }
 
-    #[pyo3(name = "count", signature = (base, overlap = false))]
-    fn py_count(&self, base: SequenceLikeInput<DNABase>, overlap: bool) -> PyResult<usize> {
-        self.count(base, overlap)
+    #[pyo3(name = "count", signature = (bases, overlap = false))]
+    fn py_count(&self, bases: SequenceLikeInput<DNABase>, overlap: bool) -> PyResult<usize> {
+        self.count(bases, overlap)
     }
 
     #[pyo3(name = "find")]
-    fn py_find(&self, base: SequenceLikeInput<DNABase>) -> PyResult<Option<usize>> {
-        self.find(base)
+    fn py_find(&self, bases: SequenceLikeInput<DNABase>) -> PyResult<Option<usize>> {
+        self.find(bases)
     }
 
     fn __invert__(&self) -> Self {
@@ -83,8 +87,8 @@ impl DNASequence {
 
     fn __getitem__(&self, py: Python, index_or_slice: IntOrSlice) -> PyResult<Py<PyAny>> {
         match self.getitem(index_or_slice)? {
-            MemberOrMembers::Member(member) => Ok(member.into_py(py)),
-            MemberOrMembers::Sequence(sequence) => Ok(Self { bases: sequence }.into_py(py)),
+            MemberOrMembers::Member(base) => Ok(base.into_py(py)),
+            MemberOrMembers::Sequence(bases) => Ok(Self { bases }.into_py(py)),
         }
     }
 
