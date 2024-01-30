@@ -40,13 +40,16 @@ class DNABase:
     def code(self) -> str:
         """One-letter IUPAC code of the DNA base."""
         ...
+
     @property
     def complement(self) -> DNABase:
         """The complementary DNA base."""
         ...
+
     def transcribe(self) -> RNABase:
         """Transcription of the DNA base to a RNA base."""
         ...
+
     def __repr__(self) -> str: ...
     def __str__(self) -> str: ...
     def __eq__(self, other: object) -> bool: ...
@@ -54,12 +57,15 @@ class DNABase:
     def __bool__(self) -> bool:
         """Casting to bool is False for DNABase.GAP and True otherwise."""
         ...
+
     def __invert__(self) -> DNABase:
         """See `DNABase.complement`."""
+
     def __add__(self, other: typing.Union[DNABase, DNASequence, str]) -> DNASequence:
         """Create a new sequence consisting of this base followed by the given
         sequence member(s)."""
         ...
+
     def __radd__(self, other: typing.Union[DNABase, DNASequence, str]) -> DNASequence:
         """Create a new sequence consisting of the given sequence member(s)
         followed by this base."""
@@ -99,13 +105,16 @@ class RNABase:
     def code(self) -> str:
         """One-letter IUPAC code of the RNA base."""
         ...
+
     @property
     def complement(self) -> RNABase:
         """The complementary RNA base."""
         ...
+
     def retro_transcribe(self) -> DNABase:
         """Reverse transcription of the RNA base to a DNA base."""
         ...
+
     def __repr__(self) -> str: ...
     def __str__(self) -> str: ...
     def __eq__(self, other: object) -> bool: ...
@@ -113,12 +122,15 @@ class RNABase:
     def __bool__(self) -> bool:
         """Casting to bool is False for RNABase.GAP and True otherwise."""
         ...
+
     def __invert__(self) -> RNABase:
         """See `RNABase.complement`."""
+
     def __add__(self, other: typing.Union[RNABase, RNASequence, str]) -> RNASequence:
         """Create a new sequence consisting of this base followed by the given
         sequence member(s)."""
         ...
+
     def __radd__(self, other: typing.Union[RNABase, RNASequence, str]) -> RNASequence:
         """Create a new sequence consisting of the given sequence member(s)
         followed by this base."""
@@ -182,10 +194,12 @@ class AminoAcid:
     def code(self) -> str:
         """One-letter IUPAC code of the amino acid."""
         ...
+
     @property
     def short_name(self) -> str:
         """Three-letter IUPAC code of the amino acid."""
         ...
+
     def __repr__(self) -> str: ...
     def __str__(self) -> str: ...
     def __eq__(self, other: object) -> bool: ...
@@ -193,12 +207,14 @@ class AminoAcid:
     def __bool__(self) -> bool:
         """Always true."""
         ...
+
     def __add__(
         self, other: typing.Union[AminoAcid, AminoAcidSequence, str]
     ) -> AminoAcidSequence:
         """Create a new sequence consisting of this amino acid followed by the
         given sequence member(s)."""
         ...
+
     def __radd__(
         self, other: typing.Union[AminoAcid, AminoAcidSequence, str]
     ) -> AminoAcidSequence:
@@ -230,15 +246,19 @@ class DNASequence:
         A ValueError is raised if any DNA code is not valid."""
 
         ...
+
     @property
     def complement(self) -> DNASequence:
         """The complementary DNA sequence."""
+
     def transcribe(self) -> RNASequence:
         """Transcription of the DNA sequence to a RNA sequence."""
         ...
+
     def __invert__(self) -> DNASequence:
         """See `DNASequence.complement`."""
         ...
+
     def __repr__(self) -> str: ...
     def __str__(self) -> str: ...
     def __eq__(self, other: object) -> bool: ...
@@ -246,17 +266,21 @@ class DNASequence:
     def __bool__(self) -> bool:
         """Casting to bool is False for empty sequences and True otherwise."""
         ...
+
     def __add__(self, other: typing.Union[DNABase, DNASequence, str]) -> DNASequence:
         """Create a new sequence consisting of this sequence followed by the
         given sequence member(s)."""
+
     def __radd__(self, other: typing.Union[DNABase, DNASequence, str]) -> DNASequence:
         """Create a new sequence consisting of the given sequence member(s)
         followed by this sequence."""
         ...
+
     def __contains__(self, item: typing.Union[DNABase, DNASequence]) -> bool:
         """Return true if the given DNABase or DNASequence is contained within
         this sequence."""
         ...
+
     def __len__(self) -> int: ...
     def __getitem__(
         self, key: typing.Union[int, slice]
@@ -267,6 +291,7 @@ class DNASequence:
     ) -> int:
         """Count the occurances of a DNABase in the sequence."""
         ...
+
     def find(
         self, target: typing.Union[DNASequence, DNABase, str]
     ) -> typing.Optional[int]:
@@ -298,12 +323,15 @@ class RNASequence:
         A ValueError is raised if any RNA code is not valid."""
 
         ...
+
     @property
     def complement(self) -> RNASequence:
         """The complementary RNA sequence."""
+
     def retro_transcribe(self) -> DNASequence:
         """Reverse transcription of the RNA sequence to a DNA sequence."""
         ...
+
     def translate(self) -> AminoAcidSequence:
         """Translate the RNA sequence to an amino acid sequence.
 
@@ -313,9 +341,11 @@ class RNASequence:
         A ValueError is raised if no start codon is found, or not stop codon is
         found following the start codon."""
         ...
+
     def __invert__(self) -> RNASequence:
         """See `RNASequence.complement`."""
         ...
+
     def __repr__(self) -> str: ...
     def __str__(self) -> str: ...
     def __eq__(self, other: object) -> bool: ...
@@ -323,17 +353,21 @@ class RNASequence:
     def __bool__(self) -> bool:
         """Casting to bool is False for empty sequences and True otherwise."""
         ...
+
     def __add__(self, other: typing.Union[RNABase, RNASequence, str]) -> RNASequence:
         """Create a new sequence consisting of this sequence followed by the
         given sequence member(s)."""
+
     def __radd__(self, other: typing.Union[RNABase, RNASequence, str]) -> RNASequence:
         """Create a new sequence consisting of the given sequence member(s)
         followed by this sequence."""
         ...
+
     def __contains__(self, item: typing.Union[RNABase, RNASequence]) -> bool:
         """Return true if the given RNABase or RNASequence is contained within
         this sequence."""
         ...
+
     def __len__(self) -> int: ...
     def __getitem__(
         self, key: typing.Union[int, slice]
@@ -344,6 +378,7 @@ class RNASequence:
     ) -> int:
         """Count the occurances of a RNABase in the sequence."""
         ...
+
     def find(
         self, target: typing.Union[RNASequence, RNABase, str]
     ) -> typing.Optional[int]:
@@ -376,6 +411,7 @@ class AminoAcidSequence:
         A ValueError is raised if any amino acid code is not valid."""
 
         ...
+
     def __repr__(self) -> str: ...
     def __str__(self) -> str: ...
     def __eq__(self, other: object) -> bool: ...
@@ -383,21 +419,25 @@ class AminoAcidSequence:
     def __bool__(self) -> bool:
         """Casting to bool is False for empty sequences and True otherwise."""
         ...
+
     def __add__(
         self, other: typing.Union[AminoAcid, AminoAcidSequence, str]
     ) -> AminoAcidSequence:
         """Create a new sequence consisting of this sequence followed by the
         given sequence member(s)."""
+
     def __radd__(
         self, other: typing.Union[AminoAcidSequence, AminoAcid, str]
     ) -> AminoAcidSequence:
         """Create a new sequence consisting of the given sequence member(s)
         followed by this sequence."""
         ...
+
     def __contains__(self, item: typing.Union[AminoAcid, AminoAcidSequence]) -> bool:
         """Return true if the given AminoAcid or AminoAcidSequence is contained
         within this sequence."""
         ...
+
     def __len__(self) -> int: ...
     def __getitem__(
         self, key: typing.Union[int, slice]
@@ -410,6 +450,7 @@ class AminoAcidSequence:
     ) -> int:
         """Count the occurances of an AminoAcid in the sequence."""
         ...
+
     def find(
         self, target: typing.Union[AminoAcidSequence, AminoAcid, str]
     ) -> typing.Optional[int]:
