@@ -132,7 +132,7 @@ def test__ne__() -> None:
 
 @pytest.mark.parametrize("op", [operator.gt, operator.ge, operator.lt, operator.le])
 def test_unsupported_comparison(
-    op: typing.Callable[[haem.DNASequence, haem.DNASequence], bool]
+    op: typing.Callable[[haem.DNASequence, haem.DNASequence], bool],
 ) -> None:
     with pytest.raises(TypeError):
         op(haem.DNASequence(), haem.DNASequence())
