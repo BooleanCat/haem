@@ -158,7 +158,7 @@ def test__ne__() -> None:
 
 @pytest.mark.parametrize("op", [operator.gt, operator.ge, operator.lt, operator.le])
 def test_unsupported_comparison(
-    op: typing.Callable[[haem.RNABase, haem.RNABase], bool]
+    op: typing.Callable[[haem.RNABase, haem.RNABase], bool],
 ) -> None:
     with pytest.raises(TypeError):
         op(haem.RNABase.ADENINE, haem.RNABase.CYTOSINE)

@@ -6,6 +6,6 @@ check:
 	cargo fmt --check
 	cargo clippy
 	poetry check
-	poetry run isort . --check
-	poetry run black --check .
+	poetry run ruff check
+	poetry run ruff format --check
 	poetry run mypy --strict .
