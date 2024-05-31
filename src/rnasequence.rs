@@ -17,7 +17,7 @@ pub struct RNASequence {
 #[pymethods]
 impl RNASequence {
     #[new]
-    #[pyo3(signature = (bases = SequenceInput::Str("")))]
+    #[pyo3(signature = (bases = SequenceInput::Seq(vec![])))]
     pub fn __new__(bases: SequenceInput<RNABase>) -> PyResult<Self> {
         Ok(Self {
             bases: bases.try_into()?,

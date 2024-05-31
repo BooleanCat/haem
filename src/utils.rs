@@ -1,4 +1,6 @@
 use pyo3::prelude::*;
+use pyo3::pybacked::PyBackedStr;
+use pyo3::pyclass::PyClass;
 use pyo3::types::PySlice;
 use rayon::prelude::*;
 
@@ -17,13 +19,13 @@ impl<T> Wrapper<T> {
 }
 
 #[derive(FromPyObject)]
-pub enum SequenceLikeInput<'a, T> {
+pub enum SequenceLikeInput<T> {
     Member(T),
     Members(Vec<T>),
-    Codes(&'a str),
+    Codes(PyBackedStr),
 }
 
-impl<T> TryFrom<SequenceLikeInput<'_, T>> for Wrapper<Vec<T>>
+impl<T> TryFrom<SequenceLikeInput<T>> for Wrapper<Vec<T>>
 where
     T: TryFrom<char, Error = PyErr> + Send,
 {
@@ -41,5 +43,22 @@ where
                     .collect::<Result<Vec<_>, _>>()?,
             ),
         })
+    }
+}
+
+impl<T> TryFrom<PyBackedStr> for Wrapper<Vec<T>>
+where
+    T: TryFrom<char, Error = PyErr> + Send + PyClass + Clone,
+{
+    type Error = PyErr;
+
+    fn try_from(value: PyBackedStr) -> PyResult<Self> {
+        Ok(Wrapper(
+            value
+                .as_parallel_string()
+                .par_chars()
+                .map(T::try_from)
+                .collect::<Result<Vec<_>, _>>()?,
+        ))
     }
 }

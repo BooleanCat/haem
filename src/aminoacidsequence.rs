@@ -12,7 +12,7 @@ pub struct AminoAcidSequence {
 #[pymethods]
 impl AminoAcidSequence {
     #[new]
-    #[pyo3(signature = (amino_acids = SequenceInput::Str("")))]
+    #[pyo3(signature = (amino_acids = SequenceInput::Seq(vec![])))]
     pub fn __new__(amino_acids: SequenceInput<AminoAcid>) -> PyResult<Self> {
         Ok(Self {
             amino_acids: amino_acids.try_into()?,

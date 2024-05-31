@@ -18,11 +18,11 @@ use rnasequence::RNASequence;
 use pyo3::prelude::*;
 
 #[pymodule]
-fn haem(py: Python, m: &PyModule) -> PyResult<()> {
+fn haem(py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<RNABase>()?;
     m.add_class::<DNABase>()?;
     m.add_class::<AminoAcid>()?;
-    m.add("StopTranslation", py.get_type::<StopTranslation>())?;
+    m.add("StopTranslation", py.get_type_bound::<StopTranslation>())?;
     m.add_class::<DNASequence>()?;
     m.add_class::<RNASequence>()?;
     m.add_class::<AminoAcidSequence>()?;

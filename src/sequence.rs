@@ -1,6 +1,7 @@
 use crate::member::MemberOrMembers;
 use crate::utils::{IntOrSlice, SequenceLikeInput, Wrapper};
 use pyo3::prelude::*;
+use pyo3::pybacked::PyBackedStr;
 use pyo3::pyclass::PyClass;
 use pyo3::types::PyIterator;
 use rayon::prelude::*;
@@ -58,7 +59,7 @@ where
     fn contains(&self, sequence: SequenceLikeInput<T>) -> PyResult<bool>
     where
         T: TryFrom<char, Error = PyErr> + Clone + Copy,
-        for<'a> Wrapper<Vec<T>>: TryFrom<SequenceLikeInput<'a, T>, Error = PyErr>,
+        for<'a> Wrapper<Vec<T>>: TryFrom<SequenceLikeInput<T>, Error = PyErr>,
     {
         let sequence = Wrapper::try_from(sequence)?.into_inner();
 
@@ -136,7 +137,7 @@ where
     fn count(&self, bases: SequenceLikeInput<T>, overlap: bool) -> PyResult<usize>
     where
         T: TryFrom<char, Error = PyErr> + Clone + Copy,
-        for<'a> Wrapper<Vec<T>>: TryFrom<SequenceLikeInput<'a, T>, Error = PyErr>,
+        for<'a> Wrapper<Vec<T>>: TryFrom<SequenceLikeInput<T>, Error = PyErr>,
     {
         let sequence = Wrapper::try_from(bases)?.into_inner();
 
@@ -168,7 +169,7 @@ where
     fn find(&self, bases: SequenceLikeInput<T>) -> PyResult<Option<usize>>
     where
         T: TryFrom<char, Error = PyErr> + Clone + Copy,
-        for<'a> Wrapper<Vec<T>>: TryFrom<SequenceLikeInput<'a, T>, Error = PyErr>,
+        for<'a> Wrapper<Vec<T>>: TryFrom<SequenceLikeInput<T>, Error = PyErr>,
     {
         let sequence = Wrapper::try_from(bases)?.into_inner();
 
@@ -185,7 +186,7 @@ where
 
 #[derive(FromPyObject)]
 pub enum SequenceInput<'a, T> {
-    Str(&'a str),
+    Str(PyBackedStr),
     Iter(&'a PyIterator),
     Seq(Vec<T>),
     SeqStr(Vec<char>),

@@ -4,6 +4,7 @@ use crate::rnabase::RNABase;
 use crate::utils::SequenceLikeInput;
 use pyo3::create_exception;
 use pyo3::prelude::*;
+use pyo3::pybacked::PyBackedStr;
 use std::fmt;
 
 create_exception!(haem, StopTranslation, pyo3::exceptions::PyException);
@@ -39,16 +40,16 @@ impl TryFrom<(char, char, char)> for AminoAcid {
 }
 
 #[derive(FromPyObject)]
-enum CodeOrCodon<'a> {
+enum CodeOrCodon {
     Code(char),
     Codon(Codon),
-    CodonStr(&'a str),
+    CodonStr(PyBackedStr),
 }
 
-impl TryFrom<CodeOrCodon<'_>> for AminoAcid {
+impl TryFrom<CodeOrCodon> for AminoAcid {
     type Error = PyErr;
 
-    fn try_from(code_or_codon: CodeOrCodon<'_>) -> PyResult<AminoAcid> {
+    fn try_from(code_or_codon: CodeOrCodon) -> PyResult<AminoAcid> {
         Ok(match code_or_codon {
             CodeOrCodon::Code(code) => code.try_into()?,
             CodeOrCodon::Codon(codon) => codon.try_into()?,
