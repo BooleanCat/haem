@@ -125,6 +125,7 @@ impl RNASequence {
         self.len()
     }
 
+    #[allow(deprecated)]
     fn __getitem__(&self, py: Python, index_or_slice: IntOrSlice) -> PyResult<Py<PyAny>> {
         match self.getitem(index_or_slice)? {
             MemberOrMembers::Member(member) => Ok(member.into_py(py)),
