@@ -64,17 +64,20 @@ where
     }
 }
 
-impl<T> TryFrom<&PyIterator> for Wrapper<Vec<T>>
+impl<'py, T> TryFrom<Bound<'py, PyIterator>> for Wrapper<Vec<T>>
 where
     T: TryFrom<char, Error = PyErr> + PyClass + Clone,
 {
     type Error = PyErr;
 
-    fn try_from(iterator: &PyIterator) -> PyResult<Self> {
+    fn try_from(iterator: Bound<'py, PyIterator>) -> PyResult<Self> {
         Ok(Wrapper(
             iterator
                 .map(|member_or_code| {
-                    Ok(Wrapper::try_from(MemberOrCode::extract(member_or_code?)?)?.into_inner())
+                    Ok(
+                        Wrapper::try_from(MemberOrCode::extract_bound(&member_or_code?)?)?
+                            .into_inner(),
+                    )
                 })
                 .collect::<PyResult<_>>()?,
         ))

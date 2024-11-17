@@ -5,7 +5,6 @@ use pyo3::pybacked::PyBackedStr;
 use pyo3::pyclass::PyClass;
 use pyo3::types::PyIterator;
 use rayon::prelude::*;
-use std::os::raw::c_long;
 
 pub trait Sequence<T>
 where
@@ -113,7 +112,7 @@ where
                 Ok(MemberOrMembers::Member(self.members()[index].clone()))
             }
             IntOrSlice::Slice(slice) => {
-                let indices = slice.indices(self.len() as c_long)?;
+                let indices = slice.indices(self.len() as isize)?;
 
                 Ok(MemberOrMembers::Sequence(match indices.step {
                     s if s < 0 => (indices.stop + 1..indices.start + 1)
@@ -185,9 +184,9 @@ where
 }
 
 #[derive(FromPyObject)]
-pub enum SequenceInput<'a, T> {
+pub enum SequenceInput<'py, T> {
     Str(PyBackedStr),
-    Iter(&'a PyIterator),
+    Iter(Bound<'py, PyIterator>),
     Seq(Vec<T>),
     SeqStr(Vec<char>),
 }

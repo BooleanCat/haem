@@ -5,7 +5,7 @@ use crate::utils::SequenceLikeInput;
 use pyo3::prelude::*;
 use std::fmt;
 
-#[pyclass(frozen, rename_all = "SCREAMING_SNAKE_CASE")]
+#[pyclass(eq, eq_int, frozen, rename_all = "SCREAMING_SNAKE_CASE")]
 #[derive(Clone, Copy, PartialEq)]
 pub enum RNABase {
     Adenine,
