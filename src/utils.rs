@@ -5,9 +5,9 @@ use pyo3::types::PySlice;
 use rayon::prelude::*;
 
 #[derive(FromPyObject)]
-pub enum IntOrSlice<'a> {
+pub enum IntOrSlice<'py> {
     Int(isize),
-    Slice(&'a PySlice),
+    Slice(Bound<'py, PySlice>),
 }
 
 pub struct Wrapper<T>(pub T);

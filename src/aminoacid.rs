@@ -70,7 +70,7 @@ impl TryFrom<CodeOrCodon> for AminoAcid {
     }
 }
 
-#[pyclass(frozen, rename_all = "SCREAMING_SNAKE_CASE")]
+#[pyclass(eq, eq_int, frozen, rename_all = "SCREAMING_SNAKE_CASE")]
 #[derive(Clone, Copy, PartialEq, Debug)]
 pub enum AminoAcid {
     Alanine,
