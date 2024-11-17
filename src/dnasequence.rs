@@ -85,11 +85,14 @@ impl DNASequence {
         self.len()
     }
 
-    #[allow(deprecated)]
-    fn __getitem__(&self, py: Python, index_or_slice: IntOrSlice) -> PyResult<Py<PyAny>> {
+    fn __getitem__<'py>(
+        &self,
+        py: Python<'py>,
+        index_or_slice: IntOrSlice,
+    ) -> PyResult<Bound<'py, PyAny>> {
         match self.getitem(index_or_slice)? {
-            MemberOrMembers::Member(base) => Ok(base.into_py(py)),
-            MemberOrMembers::Sequence(bases) => Ok(Self { bases }.into_py(py)),
+            MemberOrMembers::Member(base) => Ok(base.into_pyobject(py)?.into_any()),
+            MemberOrMembers::Sequence(bases) => Ok(Self { bases }.into_pyobject(py)?.into_any()),
         }
     }
 

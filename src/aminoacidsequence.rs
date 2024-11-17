@@ -65,14 +65,18 @@ impl AminoAcidSequence {
         self.len()
     }
 
-    #[allow(deprecated)]
-    fn __getitem__(&self, py: Python, index_or_slice: IntOrSlice) -> PyResult<Py<PyAny>> {
+    fn __getitem__<'py>(
+        &self,
+        py: Python<'py>,
+        index_or_slice: IntOrSlice,
+    ) -> PyResult<Bound<'py, PyAny>> {
         match self.getitem(index_or_slice)? {
-            MemberOrMembers::Member(member) => Ok(member.into_py(py)),
+            MemberOrMembers::Member(member) => Ok(member.into_pyobject(py)?.into_any()),
             MemberOrMembers::Sequence(sequence) => Ok(Self {
                 amino_acids: sequence,
             }
-            .into_py(py)),
+            .into_pyobject(py)?
+            .into_any()),
         }
     }
 }
