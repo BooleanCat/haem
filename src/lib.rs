@@ -8,24 +8,28 @@ mod rnasequence;
 mod sequence;
 mod utils;
 
-use aminoacid::{AminoAcid, StopTranslation};
-use aminoacidsequence::AminoAcidSequence;
-use dnabase::DNABase;
-use dnasequence::DNASequence;
-use rnabase::RNABase;
-use rnasequence::RNASequence;
-
 use pyo3::prelude::*;
 
 #[pymodule]
-fn haem(py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
-    m.add_class::<RNABase>()?;
-    m.add_class::<DNABase>()?;
-    m.add_class::<AminoAcid>()?;
-    m.add("StopTranslation", py.get_type::<StopTranslation>())?;
-    m.add_class::<DNASequence>()?;
-    m.add_class::<RNASequence>()?;
-    m.add_class::<AminoAcidSequence>()?;
+mod haem {
+    #[pymodule_export]
+    use crate::aminoacid::StopTranslation;
 
-    Ok(())
+    #[pymodule_export]
+    use crate::rnabase::RNABase;
+
+    #[pymodule_export]
+    use crate::rnasequence::RNASequence;
+
+    #[pymodule_export]
+    use crate::dnabase::DNABase;
+
+    #[pymodule_export]
+    use crate::dnasequence::DNASequence;
+
+    #[pymodule_export]
+    use crate::aminoacid::AminoAcid;
+
+    #[pymodule_export]
+    use crate::aminoacidsequence::AminoAcidSequence;
 }

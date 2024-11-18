@@ -6,6 +6,7 @@ use crate::member::MemberOrMembers;
 use crate::rnabase::RNABase;
 use crate::sequence::{Sequence, SequenceInput};
 use crate::utils::{IntOrSlice, SequenceLikeInput};
+use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use rayon::prelude::*;
 
@@ -58,35 +59,27 @@ impl RNASequence {
             });
 
         if start.is_none() {
-            return Err(pyo3::exceptions::PyValueError::new_err(
-                "no start codon found",
-            ));
+            return Err(PyValueError::new_err("no start codon found"));
         }
 
         // Find stop codon
         let stop = self.members()[start.unwrap()..self.members().len()]
             .chunks_exact(3)
             .map(|codon| AminoAcid::try_from((&codon[0], &codon[1], &codon[2])))
-            .position(|member| {
-                member.is_err()
-                    && member
-                        .as_ref()
-                        .unwrap_err()
-                        .is_instance_of::<StopTranslation>(py)
+            .position(|member| match member {
+                Ok(_) => false,
+                Err(err) => err.is_instance_of::<StopTranslation>(py),
             });
 
-        if stop.is_none() {
-            return Err(pyo3::exceptions::PyValueError::new_err(
-                "no stop codon found",
-            ));
+        match stop.is_none() {
+            false => Ok(AminoAcidSequence {
+                amino_acids: self.members()[start.unwrap()..(start.unwrap() + stop.unwrap() * 3)]
+                    .par_chunks_exact(3)
+                    .map(|codon| AminoAcid::try_from((&codon[0], &codon[1], &codon[2])))
+                    .collect::<Result<Vec<_>, _>>()?,
+            }),
+            true => Err(PyValueError::new_err("no stop codon found")),
         }
-
-        Ok(AminoAcidSequence {
-            amino_acids: self.members()[start.unwrap()..(start.unwrap() + stop.unwrap() * 3)]
-                .par_chunks_exact(3)
-                .map(|codon| AminoAcid::try_from((&codon[0], &codon[1], &codon[2])))
-                .collect::<Result<Vec<_>, _>>()?,
-        })
     }
 
     fn __invert__(&self) -> Self {

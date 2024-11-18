@@ -23,25 +23,23 @@ where
     }
 
     fn repr(&self) -> String {
-        if self.members().is_empty() {
-            format!("<{}>", self.name())
-        } else {
-            format!(
+        match self.members().is_empty() {
+            true => format!("<{}>", self.name()),
+            false => format!(
                 "<{}: {}>",
                 self.name(),
                 self.members()
                     .par_iter()
                     .map(char::from)
                     .collect::<String>(),
-            )
+            ),
         }
     }
 
     fn str(&self) -> String {
-        if self.len() < 21 {
-            self.members().iter().map(char::from).collect::<String>()
-        } else {
-            format!(
+        match self.len() {
+            length if length < 21 => self.members().iter().map(char::from).collect::<_>(),
+            _ => format!(
                 "{}...{}",
                 self.members()[0..10]
                     .iter()
@@ -51,7 +49,7 @@ where
                     .iter()
                     .map(char::from)
                     .collect::<String>()
-            )
+            ),
         }
     }
 
@@ -62,14 +60,13 @@ where
     {
         let sequence = Wrapper::try_from(sequence)?.into_inner();
 
-        if sequence.is_empty() {
-            return Ok(true);
-        }
-
-        Ok(self
-            .members()
-            .par_windows(sequence.len())
-            .any(|w| w == sequence))
+        Ok(match sequence.is_empty() {
+            true => true,
+            false => self
+                .members()
+                .par_windows(sequence.len())
+                .any(|w| w == sequence),
+        })
     }
 
     fn add(&self, other: SequenceLikeInput<T>, swap: bool) -> PyResult<Vec<T>>
@@ -96,20 +93,20 @@ where
     fn getitem(&self, index_or_slice: IntOrSlice) -> PyResult<MemberOrMembers<T>> {
         match index_or_slice {
             IntOrSlice::Int(index) => {
-                let index = if index < 0 {
-                    self.len() - index.unsigned_abs()
-                } else {
-                    index as usize
+                let index = match index {
+                    index if index < 0 => self.len() - index.unsigned_abs(),
+                    _ => index as usize,
                 };
 
-                if index >= self.len() {
-                    return Err(pyo3::exceptions::PyIndexError::new_err(format!(
+                match index {
+                    index if index < self.len() => {
+                        Ok(MemberOrMembers::Member(self.members()[index].clone()))
+                    }
+                    _ => Err(pyo3::exceptions::PyIndexError::new_err(format!(
                         "{} index out of range",
                         self.name()
-                    )));
+                    ))),
                 }
-
-                Ok(MemberOrMembers::Member(self.members()[index].clone()))
             }
             IntOrSlice::Slice(slice) => {
                 let indices = slice.indices(self.len() as isize)?;
@@ -172,14 +169,13 @@ where
     {
         let sequence = Wrapper::try_from(bases)?.into_inner();
 
-        if self.members().is_empty() || sequence.is_empty() {
-            return Ok(None);
-        }
-
-        Ok(self
-            .members()
-            .par_windows(sequence.len())
-            .position_first(|w| w == sequence))
+        Ok(if self.members().is_empty() || sequence.is_empty() {
+            None
+        } else {
+            self.members()
+                .par_windows(sequence.len())
+                .position_first(|w| w == sequence)
+        })
     }
 }
 
