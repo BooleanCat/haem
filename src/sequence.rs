@@ -123,7 +123,7 @@ where
         self.members().len()
     }
 
-    fn count(&self, sequence: &Vec<T>, overlap: bool) -> PyResult<usize> {
+    fn count(&self, sequence: &[T], overlap: bool) -> PyResult<usize> {
         Ok(match (sequence.len(), overlap) {
             // Special case, empty sequences always return 0.
             (0, _) => 0,
@@ -149,7 +149,7 @@ where
         })
     }
 
-    fn find(&self, sequence: &Vec<T>) -> PyResult<Option<usize>> {
+    fn find(&self, sequence: &[T]) -> PyResult<Option<usize>> {
         Ok(if self.members().is_empty() || sequence.is_empty() {
             None
         } else {
