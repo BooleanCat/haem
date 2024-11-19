@@ -1,5 +1,5 @@
 use crate::member::MemberOrMembers;
-use crate::utils::{IntOrSlice, SequenceLikeInput, Wrapper};
+use crate::utils::{IntOrSlice, Wrapper};
 use pyo3::prelude::*;
 use pyo3::pybacked::PyBackedStr;
 use pyo3::pyclass::PyClass;
@@ -53,11 +53,7 @@ where
         }
     }
 
-    fn contains(&self, sequence: &Vec<T>) -> PyResult<bool>
-    where
-        T: TryFrom<char, Error = PyErr> + Clone + Copy,
-        for<'a> Wrapper<Vec<T>>: TryFrom<SequenceLikeInput<T>, Error = PyErr>,
-    {
+    fn contains(&self, sequence: &Vec<T>) -> PyResult<bool> {
         Ok(match sequence.is_empty() {
             true => true,
             false => self
@@ -69,7 +65,7 @@ where
 
     fn add(&self, other: Vec<T>, swap: bool) -> PyResult<Vec<T>>
     where
-        T: TryFrom<char, Error = PyErr> + Send + Clone,
+        T: Send,
     {
         let mut members = Vec::with_capacity(self.len() + other.len());
 
@@ -127,11 +123,7 @@ where
         self.members().len()
     }
 
-    fn count(&self, sequence: &Vec<T>, overlap: bool) -> PyResult<usize>
-    where
-        T: TryFrom<char, Error = PyErr> + Clone + Copy,
-        for<'a> Wrapper<Vec<T>>: TryFrom<SequenceLikeInput<T>, Error = PyErr>,
-    {
+    fn count(&self, sequence: &Vec<T>, overlap: bool) -> PyResult<usize> {
         Ok(match (sequence.len(), overlap) {
             // Special case, empty sequences always return 0.
             (0, _) => 0,
@@ -157,11 +149,7 @@ where
         })
     }
 
-    fn find(&self, sequence: &Vec<T>) -> PyResult<Option<usize>>
-    where
-        T: TryFrom<char, Error = PyErr> + Clone + Copy,
-        for<'a> Wrapper<Vec<T>>: TryFrom<SequenceLikeInput<T>, Error = PyErr>,
-    {
+    fn find(&self, sequence: &Vec<T>) -> PyResult<Option<usize>> {
         Ok(if self.members().is_empty() || sequence.is_empty() {
             None
         } else {
