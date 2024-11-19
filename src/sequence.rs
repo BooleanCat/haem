@@ -53,13 +53,11 @@ where
         }
     }
 
-    fn contains(&self, sequence: SequenceLikeInput<T>) -> PyResult<bool>
+    fn contains(&self, sequence: &Vec<T>) -> PyResult<bool>
     where
         T: TryFrom<char, Error = PyErr> + Clone + Copy,
         for<'a> Wrapper<Vec<T>>: TryFrom<SequenceLikeInput<T>, Error = PyErr>,
     {
-        let sequence = Wrapper::try_from(sequence)?.into_inner();
-
         Ok(match sequence.is_empty() {
             true => true,
             false => self
@@ -69,21 +67,20 @@ where
         })
     }
 
-    fn add(&self, other: SequenceLikeInput<T>, swap: bool) -> PyResult<Vec<T>>
+    fn add(&self, other: Vec<T>, swap: bool) -> PyResult<Vec<T>>
     where
         T: TryFrom<char, Error = PyErr> + Send + Clone,
     {
-        let sequence = Wrapper::try_from(other)?.into_inner();
-        let mut members = Vec::with_capacity(self.len() + sequence.len());
+        let mut members = Vec::with_capacity(self.len() + other.len());
 
         match swap {
             true => {
-                members.par_extend(sequence);
+                members.par_extend(other);
                 members.par_extend(self.members().to_vec());
             }
             false => {
                 members.par_extend(self.members().to_vec());
-                members.par_extend(sequence);
+                members.par_extend(other);
             }
         }
 
@@ -130,13 +127,11 @@ where
         self.members().len()
     }
 
-    fn count(&self, bases: SequenceLikeInput<T>, overlap: bool) -> PyResult<usize>
+    fn count(&self, sequence: &Vec<T>, overlap: bool) -> PyResult<usize>
     where
         T: TryFrom<char, Error = PyErr> + Clone + Copy,
         for<'a> Wrapper<Vec<T>>: TryFrom<SequenceLikeInput<T>, Error = PyErr>,
     {
-        let sequence = Wrapper::try_from(bases)?.into_inner();
-
         Ok(match (sequence.len(), overlap) {
             // Special case, empty sequences always return 0.
             (0, _) => 0,
@@ -162,13 +157,11 @@ where
         })
     }
 
-    fn find(&self, bases: SequenceLikeInput<T>) -> PyResult<Option<usize>>
+    fn find(&self, sequence: &Vec<T>) -> PyResult<Option<usize>>
     where
         T: TryFrom<char, Error = PyErr> + Clone + Copy,
         for<'a> Wrapper<Vec<T>>: TryFrom<SequenceLikeInput<T>, Error = PyErr>,
     {
-        let sequence = Wrapper::try_from(bases)?.into_inner();
-
         Ok(if self.members().is_empty() || sequence.is_empty() {
             None
         } else {
@@ -185,6 +178,7 @@ pub enum SequenceInput<'py, T> {
     Iter(Bound<'py, PyIterator>),
     Seq(Vec<T>),
     SeqStr(Vec<char>),
+    Member(T),
 }
 
 impl<'a, T> TryFrom<SequenceInput<'a, T>> for Vec<T>
@@ -199,6 +193,7 @@ where
             SequenceInput::Iter(bases) => Wrapper::try_from(bases)?.into_inner(),
             SequenceInput::Seq(bases) => bases,
             SequenceInput::SeqStr(codes) => Wrapper::try_from(codes)?.into_inner(),
+            SequenceInput::Member(base) => vec![base],
         })
     }
 }

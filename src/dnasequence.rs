@@ -3,10 +3,11 @@ use crate::member::MemberOrMembers;
 use crate::rnabase::RNABase;
 use crate::rnasequence::RNASequence;
 use crate::sequence::{Sequence, SequenceInput};
-use crate::utils::{IntOrSlice, SequenceLikeInput};
+use crate::utils::IntOrSlice;
 use pyo3::prelude::*;
 use rayon::prelude::*;
 
+#[derive(FromPyObject)]
 #[pyclass(frozen)]
 pub struct DNASequence {
     pub bases: Vec<DNABase>,
@@ -15,11 +16,9 @@ pub struct DNASequence {
 #[pymethods]
 impl DNASequence {
     #[new]
-    #[pyo3(signature = (bases = SequenceInput::Seq(vec![])))]
-    pub fn __new__(bases: SequenceInput<DNABase>) -> PyResult<Self> {
-        Ok(Self {
-            bases: bases.try_into()?,
-        })
+    #[pyo3(signature = (sequence = DNASequenceInput::Sequence(SequenceInput::Seq(vec![]))))]
+    pub fn __new__(sequence: DNASequenceInput) -> PyResult<Self> {
+        sequence.try_into()
     }
 
     #[getter]
@@ -39,14 +38,14 @@ impl DNASequence {
         }
     }
 
-    #[pyo3(name = "count", signature = (bases, overlap = false))]
-    fn py_count(&self, bases: SequenceLikeInput<DNABase>, overlap: bool) -> PyResult<usize> {
-        self.count(bases, overlap)
+    #[pyo3(name = "count", signature = (sequence, overlap = false))]
+    fn py_count(&self, sequence: DNASequenceInput, overlap: bool) -> PyResult<usize> {
+        self.count(DNASequence::try_from(sequence)?.members(), overlap)
     }
 
     #[pyo3(name = "find")]
-    fn py_find(&self, bases: SequenceLikeInput<DNABase>) -> PyResult<Option<usize>> {
-        self.find(bases)
+    fn py_find(&self, sequence: DNASequenceInput) -> PyResult<Option<usize>> {
+        self.find(DNASequence::try_from(sequence)?.members())
     }
 
     fn __invert__(&self) -> Self {
@@ -69,15 +68,15 @@ impl DNASequence {
         self.bool()
     }
 
-    fn __add__(&self, other: SequenceLikeInput<DNABase>) -> PyResult<Self> {
+    fn __add__(&self, other: DNASequenceInput) -> PyResult<Self> {
         Ok(Self {
-            bases: self.add(other, false)?,
+            bases: self.add(DNASequence::try_from(other)?.members().clone(), false)?,
         })
     }
 
-    fn __radd__(&self, other: SequenceLikeInput<DNABase>) -> PyResult<Self> {
+    fn __radd__(&self, other: DNASequenceInput) -> PyResult<Self> {
         Ok(Self {
-            bases: self.add(other, true)?,
+            bases: self.add(DNASequence::try_from(other)?.members().clone(), true)?,
         })
     }
 
@@ -96,8 +95,8 @@ impl DNASequence {
         }
     }
 
-    fn __contains__(&self, sequence: SequenceLikeInput<DNABase>) -> PyResult<bool> {
-        self.contains(sequence)
+    fn __contains__(&self, sequence: DNASequenceInput) -> PyResult<bool> {
+        self.contains(DNASequence::try_from(sequence)?.members())
     }
 }
 
@@ -110,5 +109,25 @@ impl Sequence<DNABase> for DNASequence {
     #[inline]
     fn name(&self) -> &str {
         "DNASequence"
+    }
+}
+
+#[derive(FromPyObject)]
+pub enum DNASequenceInput<'py> {
+    DNASequence(DNASequence),
+    #[pyo3(transparent)]
+    Sequence(SequenceInput<'py, DNABase>),
+}
+
+impl<'py> TryFrom<DNASequenceInput<'py>> for DNASequence {
+    type Error = PyErr;
+
+    fn try_from(sequence: DNASequenceInput<'py>) -> PyResult<Self> {
+        match sequence {
+            DNASequenceInput::DNASequence(sequence) => Ok(sequence),
+            DNASequenceInput::Sequence(sequence) => Ok(Self {
+                bases: sequence.try_into()?,
+            }),
+        }
     }
 }
