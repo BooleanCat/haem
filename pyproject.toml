@@ -27,7 +27,7 @@ optional = true
 pytest = "^8.3.3"
 mypy = "^1.13.0"
 maturin = "^1.7.4"
-ruff = "^0.7.3"
+ruff = "^0.8.0"
 
 [tool.ruff]
 lint.extend-select = ["I"]
