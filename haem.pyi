@@ -61,12 +61,22 @@ class DNABase:
     def __invert__(self) -> DNABase:
         """See `DNABase.complement`."""
 
-    def __add__(self, other: typing.Union[DNABase, DNASequence, str]) -> DNASequence:
+    def __add__(
+        self,
+        other: typing.Union[
+            DNABase, DNASequence, typing.Iterator[str], typing.Sequence[str], str
+        ],
+    ) -> DNASequence:
         """Create a new sequence consisting of this base followed by the given
         sequence member(s)."""
         ...
 
-    def __radd__(self, other: typing.Union[DNABase, DNASequence, str]) -> DNASequence:
+    def __radd__(
+        self,
+        other: typing.Union[
+            DNABase, DNASequence, str, typing.Iterator[str], typing.Sequence[str], str
+        ],
+    ) -> DNASequence:
         """Create a new sequence consisting of the given sequence member(s)
         followed by this base."""
         ...

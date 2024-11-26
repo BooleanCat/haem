@@ -179,11 +179,19 @@ def test__bool__(base: haem.DNABase, result: bool) -> None:
         (haem.DNABase("A"), haem.DNASequence(), haem.DNASequence("A")),
         (haem.DNABase("A"), "", haem.DNASequence("A")),
         (haem.DNABase("A"), haem.DNASequence("T"), haem.DNASequence("AT")),
+        (haem.DNABase("A"), iter("ACG"), haem.DNASequence("AACG")),
+        (haem.DNABase("A"), ["A", "C", "G"], haem.DNASequence("AACG")),
     ],
 )
 def test__add__(
     left: haem.DNABase,
-    right: typing.Union[haem.DNABase, haem.DNASequence, str],
+    right: typing.Union[
+        haem.DNABase,
+        haem.DNASequence,
+        typing.Iterator[str],
+        typing.Sequence[str],
+        str,
+    ],
     result: haem.DNASequence,
 ) -> None:
     assert left + right == result
@@ -196,6 +204,8 @@ def test__add__(
         (haem.DNASequence(), haem.DNABase("A"), haem.DNASequence("A")),
         ("", haem.DNABase("A"), haem.DNASequence("A")),
         ("T", haem.DNABase("A"), haem.DNASequence("TA")),
+        (iter("ACG"), haem.DNABase("A"), haem.DNASequence("ACGA")),
+        (["A", "C", "G"], haem.DNABase("A"), haem.DNASequence("ACGA")),
     ],
 )
 def test__radd__(
