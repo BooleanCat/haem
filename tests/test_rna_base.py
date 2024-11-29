@@ -179,11 +179,25 @@ def test__bool__(base: haem.RNABase, result: bool) -> None:
         (haem.RNABase.ADENINE, haem.RNASequence(), haem.RNASequence("A")),
         (haem.RNABase.ADENINE, "-", haem.RNASequence("A-")),
         (haem.RNABase.ADENINE, "", haem.RNASequence("A")),
+        (haem.RNABase.ADENINE, iter(["A", "U"]), haem.RNASequence("AAU")),
+        (haem.RNABase.ADENINE, ["A", "A"], haem.RNASequence("AAA")),
+        (
+            haem.RNABase.ADENINE,
+            [haem.RNABase.ADENINE, haem.RNABase.URACIL],
+            haem.RNASequence("AAU"),
+        ),
+        (
+            haem.RNABase.ADENINE,
+            iter([haem.RNABase.ADENINE, haem.RNABase.URACIL]),
+            haem.RNASequence("AAU"),
+        ),
     ],
 )
 def test__add__(
     left: haem.RNABase,
-    right: typing.Union[haem.RNABase, haem.RNASequence, str],
+    right: typing.Union[
+        haem.RNABase, haem.RNASequence, typing.Iterator[str], typing.Sequence[str], str
+    ],
     result: haem.RNASequence,
 ) -> None:
     assert left + right == result
@@ -196,10 +210,24 @@ def test__add__(
         (haem.RNASequence(), haem.RNABase("A"), haem.RNASequence("A")),
         ("C", haem.RNABase("A"), haem.RNASequence("CA")),
         ("", haem.RNABase("A"), haem.RNASequence("A")),
+        (iter(["A", "U"]), haem.RNABase.ADENINE, haem.RNASequence("AUA")),
+        (["A", "A"], haem.RNABase.ADENINE, haem.RNASequence("AAA")),
+        (
+            [haem.RNABase.ADENINE, haem.RNABase.URACIL],
+            haem.RNABase.ADENINE,
+            haem.RNASequence("AUA"),
+        ),
+        (
+            iter([haem.RNABase.ADENINE, haem.RNABase.URACIL]),
+            haem.RNABase.ADENINE,
+            haem.RNASequence("AUA"),
+        ),
     ],
 )
 def test__radd__(
-    left: typing.Union[haem.RNASequence, str],
+    left: typing.Union[
+        haem.RNASequence, str, typing.Iterator[str], typing.Sequence[str]
+    ],
     right: haem.RNABase,
     result: haem.RNASequence,
 ) -> None:

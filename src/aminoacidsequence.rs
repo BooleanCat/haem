@@ -95,7 +95,6 @@ impl Sequence<AminoAcid> for AminoAcidSequence {
 #[derive(FromPyObject)]
 pub enum AminoAcidSequenceInput<'py> {
     AminoAcidSequence(AminoAcidSequence),
-    #[pyo3(transparent)]
     Sequence(SequenceInput<'py, AminoAcid>),
 }
 

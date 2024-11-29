@@ -150,7 +150,6 @@ impl Sequence<RNABase> for RNASequence {
 #[derive(FromPyObject)]
 pub enum RNASequenceInput<'py> {
     RNASequence(RNASequence),
-    #[pyo3(transparent)]
     Sequence(SequenceInput<'py, RNABase>),
 }
 

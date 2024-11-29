@@ -115,7 +115,6 @@ impl Sequence<DNABase> for DNASequence {
 #[derive(FromPyObject)]
 pub enum DNASequenceInput<'py> {
     DNASequence(DNASequence),
-    #[pyo3(transparent)]
     Sequence(SequenceInput<'py, DNABase>),
 }
 

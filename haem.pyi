@@ -64,7 +64,12 @@ class DNABase:
     def __add__(
         self,
         other: typing.Union[
-            DNABase, DNASequence, typing.Iterator[str], typing.Sequence[str], str
+            DNABase,
+            DNASequence,
+            str,
+            typing.Iterator[typing.Union[str | DNABase]],
+            typing.Sequence[typing.Union[str | DNABase]],
+            str,
         ],
     ) -> DNASequence:
         """Create a new sequence consisting of this base followed by the given
@@ -74,7 +79,12 @@ class DNABase:
     def __radd__(
         self,
         other: typing.Union[
-            DNABase, DNASequence, str, typing.Iterator[str], typing.Sequence[str], str
+            DNABase,
+            DNASequence,
+            str,
+            typing.Iterator[typing.Union[str | DNABase]],
+            typing.Sequence[typing.Union[str | DNABase]],
+            str,
         ],
     ) -> DNASequence:
         """Create a new sequence consisting of the given sequence member(s)
@@ -136,12 +146,30 @@ class RNABase:
     def __invert__(self) -> RNABase:
         """See `RNABase.complement`."""
 
-    def __add__(self, other: typing.Union[RNABase, RNASequence, str]) -> RNASequence:
+    def __add__(
+        self,
+        other: typing.Union[
+            RNABase,
+            RNASequence,
+            typing.Iterator[typing.Union[str | RNABase]],
+            typing.Sequence[typing.Union[str | RNABase]],
+            str,
+        ],
+    ) -> RNASequence:
         """Create a new sequence consisting of this base followed by the given
         sequence member(s)."""
         ...
 
-    def __radd__(self, other: typing.Union[RNABase, RNASequence, str]) -> RNASequence:
+    def __radd__(
+        self,
+        other: typing.Union[
+            RNABase,
+            RNASequence,
+            typing.Iterator[typing.Union[str | RNABase]],
+            typing.Sequence[typing.Union[str | RNABase]],
+            str,
+        ],
+    ) -> RNASequence:
         """Create a new sequence consisting of the given sequence member(s)
         followed by this base."""
         ...

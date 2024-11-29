@@ -181,6 +181,16 @@ def test__bool__(base: haem.DNABase, result: bool) -> None:
         (haem.DNABase("A"), haem.DNASequence("T"), haem.DNASequence("AT")),
         (haem.DNABase("A"), iter("ACG"), haem.DNASequence("AACG")),
         (haem.DNABase("A"), ["A", "C", "G"], haem.DNASequence("AACG")),
+        (
+            haem.DNABase.ADENINE,
+            [haem.DNABase.ADENINE, haem.DNABase.THYMINE],
+            haem.DNASequence("AAT"),
+        ),
+        (
+            haem.DNABase.ADENINE,
+            iter([haem.DNABase.ADENINE, haem.DNABase.THYMINE]),
+            haem.DNASequence("AAT"),
+        ),
     ],
 )
 def test__add__(
@@ -206,6 +216,16 @@ def test__add__(
         ("T", haem.DNABase("A"), haem.DNASequence("TA")),
         (iter("ACG"), haem.DNABase("A"), haem.DNASequence("ACGA")),
         (["A", "C", "G"], haem.DNABase("A"), haem.DNASequence("ACGA")),
+        (
+            [haem.DNABase.ADENINE, haem.DNABase.THYMINE],
+            haem.DNABase.ADENINE,
+            haem.DNASequence("ATA"),
+        ),
+        (
+            iter([haem.DNABase.ADENINE, haem.DNABase.THYMINE]),
+            haem.DNABase.ADENINE,
+            haem.DNASequence("ATA"),
+        ),
     ],
 )
 def test__radd__(
