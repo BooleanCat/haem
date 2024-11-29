@@ -2,31 +2,29 @@ use crate::utils::Wrapper;
 use pyo3::prelude::*;
 use pyo3::pyclass::PyClass;
 use pyo3::types::PyIterator;
+use rayon::iter::{once, IntoParallelIterator};
 use rayon::prelude::*;
 
 pub trait Member<T> {
-    fn add(&self, other: &[T], swap: bool) -> PyResult<Vec<T>>;
+    fn add(&self, other: &[T], swap: bool) -> Vec<T>;
 }
 
 impl<T> Member<T> for T
 where
-    T: TryFrom<char, Error = PyErr> + Send + Clone + PartialEq,
+    T: Sync + Send + Clone,
+    for<'a> &'a [T]: IntoParallelIterator<Item = &'a T>,
 {
-    fn add(&self, other: &[T], swap: bool) -> PyResult<Vec<T>> {
-        let mut members = Vec::with_capacity(1 + other.len());
-
+    fn add(&self, other: &[T], swap: bool) -> Vec<T> {
         match swap {
-            true => {
-                members.extend(other.iter().cloned());
-                members.push(self.clone());
-            }
-            false => {
-                members.push(self.clone());
-                members.extend(other.iter().cloned());
-            }
+            true => other
+                .par_iter()
+                .cloned()
+                .chain(once(self.clone()))
+                .collect(),
+            false => once(self.clone())
+                .chain(other.par_iter().cloned())
+                .collect(),
         }
-
-        Ok(members.to_vec())
     }
 }
 

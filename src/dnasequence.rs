@@ -122,11 +122,11 @@ impl<'py> TryFrom<DNASequenceInput<'py>> for DNASequence {
     type Error = PyErr;
 
     fn try_from(sequence: DNASequenceInput<'py>) -> PyResult<Self> {
-        match sequence {
-            DNASequenceInput::DNASequence(sequence) => Ok(sequence),
-            DNASequenceInput::Sequence(sequence) => Ok(Self {
+        Ok(match sequence {
+            DNASequenceInput::DNASequence(sequence) => sequence,
+            DNASequenceInput::Sequence(sequence) => Self {
                 bases: sequence.try_into()?,
-            }),
-        }
+            },
+        })
     }
 }
