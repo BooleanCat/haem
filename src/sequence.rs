@@ -63,24 +63,24 @@ where
         })
     }
 
-    fn add(&self, other: Vec<T>, swap: bool) -> PyResult<Vec<T>>
+    fn add(&self, other: &[T], swap: bool) -> Vec<T>
     where
         T: Send,
+        for<'a> &'a [T]: IntoParallelIterator<Item = &'a T>,
     {
-        let mut members = Vec::with_capacity(self.len() + other.len());
-
         match swap {
-            true => {
-                members.par_extend(other);
-                members.par_extend(self.members().to_vec());
-            }
-            false => {
-                members.par_extend(self.members().to_vec());
-                members.par_extend(other);
-            }
+            true => other
+                .par_iter()
+                .chain(self.members().par_iter())
+                .cloned()
+                .collect(),
+            false => self
+                .members()
+                .par_iter()
+                .chain(other.par_iter())
+                .cloned()
+                .collect(),
         }
-
-        Ok(members)
     }
 
     fn getitem(&self, index_or_slice: IntOrSlice) -> PyResult<MemberOrMembers<T>> {

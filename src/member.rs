@@ -16,14 +16,8 @@ where
 {
     fn add(&self, other: &[T], swap: bool) -> Vec<T> {
         match swap {
-            true => other
-                .par_iter()
-                .cloned()
-                .chain(once(self.clone()))
-                .collect(),
-            false => once(self.clone())
-                .chain(other.par_iter().cloned())
-                .collect(),
+            true => other.par_iter().chain(once(self)).cloned().collect(),
+            false => once(self).chain(other.par_iter()).cloned().collect(),
         }
     }
 }

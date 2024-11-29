@@ -46,13 +46,13 @@ impl AminoAcidSequence {
 
     fn __add__(&self, other: AminoAcidSequenceInput) -> PyResult<Self> {
         Ok(Self {
-            amino_acids: self.add(AminoAcidSequence::try_from(other)?.members().clone(), false)?,
+            amino_acids: self.add(AminoAcidSequence::try_from(other)?.members(), false),
         })
     }
 
     fn __radd__(&self, other: AminoAcidSequenceInput) -> PyResult<Self> {
         Ok(Self {
-            amino_acids: self.add(AminoAcidSequence::try_from(other)?.members().clone(), true)?,
+            amino_acids: self.add(AminoAcidSequence::try_from(other)?.members(), true),
         })
     }
 

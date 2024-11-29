@@ -70,13 +70,13 @@ impl DNASequence {
 
     fn __add__(&self, other: DNASequenceInput) -> PyResult<Self> {
         Ok(Self {
-            bases: self.add(DNASequence::try_from(other)?.members().clone(), false)?,
+            bases: self.add(DNASequence::try_from(other)?.members(), false),
         })
     }
 
     fn __radd__(&self, other: DNASequenceInput) -> PyResult<Self> {
         Ok(Self {
-            bases: self.add(DNASequence::try_from(other)?.members().clone(), true)?,
+            bases: self.add(DNASequence::try_from(other)?.members(), true),
         })
     }
 
