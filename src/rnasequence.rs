@@ -27,33 +27,29 @@ impl RNASequence {
 
     #[getter]
     fn get_complement(&self) -> Self {
-        Self {
-            sequence: self
-                .sequence
-                .par_iter()
-                .map(|b| b.get_complement())
-                .collect(),
-        }
+        self.sequence
+            .par_iter()
+            .map(|b| b.get_complement())
+            .collect::<Vec<_>>()
+            .into()
     }
 
     fn retro_transcribe(&self) -> DNASequence {
-        DNASequence {
-            sequence: self
-                .sequence
-                .par_iter()
-                .map(DNABase::from)
-                .collect::<Vec<_>>(),
-        }
+        self.sequence
+            .par_iter()
+            .map(DNABase::from)
+            .collect::<Vec<_>>()
+            .into()
     }
 
     #[pyo3(name = "count", signature = (sequence, overlap = false))]
     fn py_count(&self, sequence: RNASequenceInput, overlap: bool) -> PyResult<usize> {
-        self.count(RNASequence::try_from(sequence)?.members(), overlap)
+        self.count(&RNASequence::try_from(sequence)?, overlap)
     }
 
     #[pyo3(name = "find")]
     fn py_find(&self, sequence: RNASequenceInput) -> PyResult<Option<usize>> {
-        self.find(RNASequence::try_from(sequence)?.members())
+        self.find(&RNASequence::try_from(sequence)?)
     }
 
     fn translate(&self, py: Python<'_>) -> PyResult<AminoAcidSequence> {
@@ -111,15 +107,11 @@ impl RNASequence {
     }
 
     fn __add__(&self, other: RNASequenceInput) -> PyResult<Self> {
-        Ok(Self {
-            sequence: self.add(RNASequence::try_from(other)?.members(), false),
-        })
+        Ok(self.add(&RNASequence::try_from(other)?, false).into())
     }
 
     fn __radd__(&self, other: RNASequenceInput) -> PyResult<Self> {
-        Ok(Self {
-            sequence: self.add(RNASequence::try_from(other)?.members(), true),
-        })
+        Ok(self.add(&RNASequence::try_from(other)?, true).into())
     }
 
     fn __len__(&self) -> usize {
@@ -134,13 +126,13 @@ impl RNASequence {
         match self.getitem(index_or_slice)? {
             MemberOrMembers::Member(member) => Ok(member.into_pyobject(py)?.into_any()),
             MemberOrMembers::Sequence(sequence) => {
-                Ok(Self { sequence }.into_pyobject(py)?.into_any())
+                Ok(Self::from(sequence).into_pyobject(py)?.into_any())
             }
         }
     }
 
     fn __contains__(&self, sequence: RNASequenceInput) -> PyResult<bool> {
-        self.contains(RNASequence::try_from(sequence)?.members())
+        self.contains(&RNASequence::try_from(sequence)?)
     }
 }
 
@@ -156,9 +148,9 @@ impl<'py> TryFrom<RNASequenceInput<'py>> for RNASequence {
     type Error = PyErr;
 
     fn try_from(sequence: RNASequenceInput<'py>) -> PyResult<Self> {
-        match sequence {
-            RNASequenceInput::RNASequence(sequence) => Ok(sequence),
-            RNASequenceInput::Sequence(sequence) => Ok(Vec::try_from(sequence)?.into()),
-        }
+        Ok(match sequence {
+            RNASequenceInput::RNASequence(sequence) => sequence,
+            RNASequenceInput::Sequence(sequence) => Vec::try_from(sequence)?.into(),
+        })
     }
 }

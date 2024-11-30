@@ -53,7 +53,7 @@ where
         }
     }
 
-    fn contains(&self, sequence: &Vec<T>) -> PyResult<bool> {
+    fn contains(&self, sequence: &[T]) -> PyResult<bool> {
         Ok(match sequence.is_empty() {
             true => true,
             false => self
@@ -178,6 +178,14 @@ macro_rules! impl_sequence {
         impl From<Vec<$member_type>> for $struct_name {
             fn from(sequence: Vec<$member_type>) -> Self {
                 Self { sequence }
+            }
+        }
+
+        impl std::ops::Deref for $struct_name {
+            type Target = [$member_type];
+
+            fn deref(&self) -> &Self::Target {
+                &self.sequence
             }
         }
     };

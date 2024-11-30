@@ -21,12 +21,12 @@ impl AminoAcidSequence {
 
     #[pyo3(name = "count", signature = (sequence, overlap = false))]
     fn py_count(&self, sequence: AminoAcidSequenceInput, overlap: bool) -> PyResult<usize> {
-        self.count(AminoAcidSequence::try_from(sequence)?.members(), overlap)
+        self.count(&AminoAcidSequence::try_from(sequence)?, overlap)
     }
 
     #[pyo3(name = "find")]
     fn py_find(&self, sequence: AminoAcidSequenceInput) -> PyResult<Option<usize>> {
-        self.find(AminoAcidSequence::try_from(sequence)?.members())
+        self.find(&AminoAcidSequence::try_from(sequence)?)
     }
 
     fn __repr__(&self) -> String {
@@ -46,19 +46,15 @@ impl AminoAcidSequence {
     }
 
     fn __add__(&self, other: AminoAcidSequenceInput) -> PyResult<Self> {
-        Ok(self
-            .add(AminoAcidSequence::try_from(other)?.members(), false)
-            .into())
+        Ok(self.add(&AminoAcidSequence::try_from(other)?, false).into())
     }
 
     fn __radd__(&self, other: AminoAcidSequenceInput) -> PyResult<Self> {
-        Ok(self
-            .add(AminoAcidSequence::try_from(other)?.members(), true)
-            .into())
+        Ok(self.add(&AminoAcidSequence::try_from(other)?, true).into())
     }
 
     fn __contains__(&self, sequence: AminoAcidSequenceInput) -> PyResult<bool> {
-        self.contains(AminoAcidSequence::try_from(sequence)?.members())
+        self.contains(&AminoAcidSequence::try_from(sequence)?)
     }
 
     fn __len__(&self) -> usize {

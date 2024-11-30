@@ -24,33 +24,29 @@ impl DNASequence {
 
     #[getter]
     fn get_complement(&self) -> Self {
-        Self {
-            sequence: self
-                .sequence
-                .par_iter()
-                .map(|base| base.get_complement())
-                .collect(),
-        }
+        self.sequence
+            .par_iter()
+            .map(|base| base.get_complement())
+            .collect::<Vec<_>>()
+            .into()
     }
 
     fn transcribe(&self) -> RNASequence {
-        RNASequence {
-            sequence: self
-                .sequence
-                .par_iter()
-                .map(RNABase::from)
-                .collect::<Vec<_>>(),
-        }
+        self.sequence
+            .par_iter()
+            .map(RNABase::from)
+            .collect::<Vec<_>>()
+            .into()
     }
 
     #[pyo3(name = "count", signature = (sequence, overlap = false))]
     fn py_count(&self, sequence: DNASequenceInput, overlap: bool) -> PyResult<usize> {
-        self.count(DNASequence::try_from(sequence)?.members(), overlap)
+        self.count(&DNASequence::try_from(sequence)?, overlap)
     }
 
     #[pyo3(name = "find")]
     fn py_find(&self, sequence: DNASequenceInput) -> PyResult<Option<usize>> {
-        self.find(DNASequence::try_from(sequence)?.members())
+        self.find(&DNASequence::try_from(sequence)?)
     }
 
     fn __invert__(&self) -> Self {
@@ -74,15 +70,11 @@ impl DNASequence {
     }
 
     fn __add__(&self, other: DNASequenceInput) -> PyResult<Self> {
-        Ok(self
-            .add(DNASequence::try_from(other)?.members(), false)
-            .into())
+        Ok(self.add(&DNASequence::try_from(other)?, false).into())
     }
 
     fn __radd__(&self, other: DNASequenceInput) -> PyResult<Self> {
-        Ok(self
-            .add(DNASequence::try_from(other)?.members(), true)
-            .into())
+        Ok(self.add(&DNASequence::try_from(other)?, true).into())
     }
 
     fn __len__(&self) -> usize {
@@ -103,7 +95,7 @@ impl DNASequence {
     }
 
     fn __contains__(&self, sequence: DNASequenceInput) -> PyResult<bool> {
-        self.contains(DNASequence::try_from(sequence)?.members())
+        self.contains(&DNASequence::try_from(sequence)?)
     }
 }
 
