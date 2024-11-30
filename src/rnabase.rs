@@ -26,6 +26,8 @@ pub enum RNABase {
     Gap,
 }
 
+impl Member for RNABase {}
+
 #[pymethods]
 impl RNABase {
     #[new]

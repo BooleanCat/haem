@@ -184,12 +184,7 @@ where
                 .collect::<PyResult<_>>()?,
             SequenceInput::Iter(bases) => bases
                 .into_iter()
-                .map(
-                    |member_or_code| match MemberOrCode::extract_bound(&member_or_code?)? {
-                        MemberOrCode::Code(code) => code.try_into(),
-                        MemberOrCode::Member(member) => Ok(member),
-                    },
-                )
+                .map(|member_or_code| MemberOrCode::extract_bound(&member_or_code?)?.into_member())
                 .collect::<PyResult<_>>()?,
             SequenceInput::Seq(bases) => bases,
             SequenceInput::SeqStr(codes) => codes

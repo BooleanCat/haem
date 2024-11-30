@@ -99,6 +99,8 @@ pub enum AminoAcid {
     GlutamineGlutamicAcid,
 }
 
+impl Member for AminoAcid {}
+
 #[pymethods]
 impl AminoAcid {
     #[new]

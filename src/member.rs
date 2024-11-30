@@ -2,16 +2,12 @@ use pyo3::prelude::*;
 use rayon::iter::{once, IntoParallelIterator};
 use rayon::prelude::*;
 
-pub trait Member<T> {
-    fn add(&self, other: &[T], swap: bool) -> Vec<T>;
-}
-
-impl<T> Member<T> for T
-where
-    T: Sync + Send + Clone,
-    for<'a> &'a [T]: IntoParallelIterator<Item = &'a T>,
-{
-    fn add(&self, other: &[T], swap: bool) -> Vec<T> {
+pub trait Member {
+    fn add(&self, other: &[Self], swap: bool) -> Vec<Self>
+    where
+        Self: Sync + Send + Clone,
+        for<'a> &'a [Self]: IntoParallelIterator<Item = &'a Self>,
+    {
         match swap {
             true => other.par_iter().chain(once(self)).cloned().collect(),
             false => once(self).chain(other.par_iter()).cloned().collect(),
@@ -23,6 +19,18 @@ where
 pub enum MemberOrCode<T> {
     Member(T),
     Code(char),
+}
+
+impl<T> MemberOrCode<T>
+where
+    T: TryFrom<char, Error = PyErr>,
+{
+    pub fn into_member(self) -> PyResult<T> {
+        match self {
+            MemberOrCode::Member(member) => Ok(member),
+            MemberOrCode::Code(code) => code.try_into(),
+        }
+    }
 }
 
 #[derive(FromPyObject)]

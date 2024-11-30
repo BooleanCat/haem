@@ -26,6 +26,8 @@ pub enum DNABase {
     Gap,
 }
 
+impl Member for DNABase {}
+
 #[pymethods]
 impl DNABase {
     #[new]
