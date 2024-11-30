@@ -1,4 +1,4 @@
-use pyo3::{prelude::*, PyClass};
+use pyo3::prelude::*;
 use rayon::iter::{once, IntoParallelIterator};
 use rayon::prelude::*;
 
@@ -23,17 +23,6 @@ where
 pub enum MemberOrCode<T> {
     Member(T),
     Code(char),
-}
-
-impl<'py, T> TryFrom<PyResult<Bound<'py, PyAny>>> for MemberOrCode<T>
-where
-    T: PyClass + Clone,
-{
-    type Error = PyErr;
-
-    fn try_from(result: PyResult<Bound<'py, PyAny>>) -> PyResult<MemberOrCode<T>> {
-        MemberOrCode::extract_bound(&result?)
-    }
 }
 
 #[derive(FromPyObject)]

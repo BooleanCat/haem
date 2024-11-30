@@ -182,16 +182,14 @@ where
                 .par_chars()
                 .map(T::try_from)
                 .collect::<PyResult<_>>()?,
-            // SequenceInput::Iter(bases) => Wrapper::try_from(bases)?.into_inner(),
             SequenceInput::Iter(bases) => bases
                 .into_iter()
-                .map(|item| -> PyResult<MemberOrCode<T>> { MemberOrCode::extract_bound(&item?) })
-                .map(|member_or_code| -> PyResult<T> {
-                    Ok(match member_or_code? {
-                        MemberOrCode::Code(code) => code.try_into()?,
-                        MemberOrCode::Member(member) => member,
-                    })
-                })
+                .map(
+                    |member_or_code| match MemberOrCode::extract_bound(&member_or_code?)? {
+                        MemberOrCode::Code(code) => code.try_into(),
+                        MemberOrCode::Member(member) => Ok(member),
+                    },
+                )
                 .collect::<PyResult<_>>()?,
             SequenceInput::Seq(bases) => bases,
             SequenceInput::SeqStr(codes) => codes
