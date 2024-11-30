@@ -22,23 +22,6 @@ where
     }
 }
 
-impl<T> TryFrom<&str> for Wrapper<Vec<T>>
-where
-    T: TryFrom<char, Error = PyErr> + Send,
-{
-    type Error = PyErr;
-
-    fn try_from(codes: &str) -> PyResult<Self> {
-        Ok(Wrapper(
-            codes
-                .as_parallel_string()
-                .par_chars()
-                .map(T::try_from)
-                .collect::<PyResult<_>>()?,
-        ))
-    }
-}
-
 impl<T> TryFrom<Vec<char>> for Wrapper<Vec<T>>
 where
     T: TryFrom<char, Error = PyErr> + Send,
