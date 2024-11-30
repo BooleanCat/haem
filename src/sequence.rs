@@ -1,5 +1,5 @@
-use crate::member::MemberOrMembers;
-use crate::utils::{IntOrSlice, Wrapper};
+use crate::member::{MemberOrCode, MemberOrMembers};
+use crate::utils::IntOrSlice;
 use pyo3::prelude::*;
 use pyo3::pybacked::PyBackedStr;
 use pyo3::pyclass::PyClass;
@@ -177,10 +177,27 @@ where
 
     fn try_from(bases: SequenceInput<'a, T>) -> PyResult<Self> {
         Ok(match bases {
-            SequenceInput::Str(bases) => Wrapper::try_from(bases)?.into_inner(),
-            SequenceInput::Iter(bases) => Wrapper::try_from(bases)?.into_inner(),
+            SequenceInput::Str(bases) => bases
+                .as_parallel_string()
+                .par_chars()
+                .map(T::try_from)
+                .collect::<PyResult<_>>()?,
+            // SequenceInput::Iter(bases) => Wrapper::try_from(bases)?.into_inner(),
+            SequenceInput::Iter(bases) => bases
+                .into_iter()
+                .map(|item| -> PyResult<MemberOrCode<T>> { MemberOrCode::extract_bound(&item?) })
+                .map(|member_or_code| -> PyResult<T> {
+                    Ok(match member_or_code? {
+                        MemberOrCode::Code(code) => code.try_into()?,
+                        MemberOrCode::Member(member) => member,
+                    })
+                })
+                .collect::<PyResult<_>>()?,
             SequenceInput::Seq(bases) => bases,
-            SequenceInput::SeqStr(codes) => Wrapper::try_from(codes)?.into_inner(),
+            SequenceInput::SeqStr(codes) => codes
+                .into_par_iter()
+                .map(T::try_from)
+                .collect::<PyResult<_>>()?,
             SequenceInput::Member(base) => vec![base],
         })
     }

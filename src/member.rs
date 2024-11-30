@@ -1,7 +1,4 @@
-use crate::utils::Wrapper;
-use pyo3::prelude::*;
-use pyo3::pyclass::PyClass;
-use pyo3::types::PyIterator;
+use pyo3::{prelude::*, PyClass};
 use rayon::iter::{once, IntoParallelIterator};
 use rayon::prelude::*;
 
@@ -22,59 +19,20 @@ where
     }
 }
 
-impl<T> TryFrom<Vec<char>> for Wrapper<Vec<T>>
-where
-    T: TryFrom<char, Error = PyErr> + Send,
-{
-    type Error = PyErr;
-
-    fn try_from(codes: Vec<char>) -> PyResult<Self> {
-        Ok(Wrapper(
-            codes
-                .into_par_iter()
-                .map(T::try_from)
-                .collect::<PyResult<_>>()?,
-        ))
-    }
-}
-
-impl<'py, T> TryFrom<Bound<'py, PyIterator>> for Wrapper<Vec<T>>
-where
-    T: TryFrom<char, Error = PyErr> + PyClass + Clone,
-{
-    type Error = PyErr;
-
-    fn try_from(iterator: Bound<'py, PyIterator>) -> PyResult<Self> {
-        Ok(Wrapper(
-            iterator
-                .map(|member_or_code| {
-                    Ok(
-                        Wrapper::try_from(MemberOrCode::extract_bound(&member_or_code?)?)?
-                            .into_inner(),
-                    )
-                })
-                .collect::<PyResult<_>>()?,
-        ))
-    }
-}
-
 #[derive(FromPyObject)]
 pub enum MemberOrCode<T> {
     Member(T),
     Code(char),
 }
 
-impl<T> TryFrom<MemberOrCode<T>> for Wrapper<T>
+impl<'py, T> TryFrom<PyResult<Bound<'py, PyAny>>> for MemberOrCode<T>
 where
-    T: TryFrom<char, Error = PyErr>,
+    T: PyClass + Clone,
 {
     type Error = PyErr;
 
-    fn try_from(code: MemberOrCode<T>) -> PyResult<Wrapper<T>> {
-        Ok(match code {
-            MemberOrCode::Member(member) => Wrapper(member),
-            MemberOrCode::Code(code) => Wrapper(code.try_into()?),
-        })
+    fn try_from(result: PyResult<Bound<'py, PyAny>>) -> PyResult<MemberOrCode<T>> {
+        MemberOrCode::extract_bound(&result?)
     }
 }
 
