@@ -66,12 +66,12 @@ impl AminoAcidSequence {
         py: Python<'py>,
         index_or_slice: IntOrSlice,
     ) -> PyResult<Bound<'py, PyAny>> {
-        match self.getitem(index_or_slice)? {
-            MemberOrMembers::Member(member) => Ok(member.into_pyobject(py)?.into_any()),
+        Ok(match self.getitem(index_or_slice)? {
+            MemberOrMembers::Member(member) => member.into_pyobject(py)?.into_any(),
             MemberOrMembers::Sequence(sequence) => {
-                Ok(Self::from(sequence).into_pyobject(py)?.into_any())
+                Self::from(sequence).into_pyobject(py)?.into_any()
             }
-        }
+        })
     }
 }
 
