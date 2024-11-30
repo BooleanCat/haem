@@ -2,6 +2,7 @@ use crate::aminoacid::{AminoAcid, StopTranslation};
 use crate::aminoacidsequence::AminoAcidSequence;
 use crate::dnabase::DNABase;
 use crate::dnasequence::DNASequence;
+use crate::impl_sequence;
 use crate::member::MemberOrMembers;
 use crate::rnabase::RNABase;
 use crate::sequence::{Sequence, SequenceInput};
@@ -10,10 +11,10 @@ use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use rayon::prelude::*;
 
+#[pyclass]
 #[derive(FromPyObject)]
-#[pyclass(frozen)]
 pub struct RNASequence {
-    pub bases: Vec<RNABase>,
+    pub sequence: Vec<RNABase>,
 }
 
 #[pymethods]
@@ -27,13 +28,21 @@ impl RNASequence {
     #[getter]
     fn get_complement(&self) -> Self {
         Self {
-            bases: self.bases.par_iter().map(|b| b.get_complement()).collect(),
+            sequence: self
+                .sequence
+                .par_iter()
+                .map(|b| b.get_complement())
+                .collect(),
         }
     }
 
     fn retro_transcribe(&self) -> DNASequence {
         DNASequence {
-            bases: self.bases.par_iter().map(DNABase::from).collect::<Vec<_>>(),
+            sequence: self
+                .sequence
+                .par_iter()
+                .map(DNABase::from)
+                .collect::<Vec<_>>(),
         }
     }
 
@@ -72,7 +81,7 @@ impl RNASequence {
 
         match stop.is_none() {
             false => Ok(AminoAcidSequence {
-                amino_acids: self.members()[start.unwrap()..(start.unwrap() + stop.unwrap() * 3)]
+                sequence: self.members()[start.unwrap()..(start.unwrap() + stop.unwrap() * 3)]
                     .par_chunks_exact(3)
                     .map(|codon| AminoAcid::try_from((&codon[0], &codon[1], &codon[2])))
                     .collect::<Result<Vec<_>, _>>()?,
@@ -103,13 +112,13 @@ impl RNASequence {
 
     fn __add__(&self, other: RNASequenceInput) -> PyResult<Self> {
         Ok(Self {
-            bases: self.add(RNASequence::try_from(other)?.members(), false),
+            sequence: self.add(RNASequence::try_from(other)?.members(), false),
         })
     }
 
     fn __radd__(&self, other: RNASequenceInput) -> PyResult<Self> {
         Ok(Self {
-            bases: self.add(RNASequence::try_from(other)?.members(), true),
+            sequence: self.add(RNASequence::try_from(other)?.members(), true),
         })
     }
 
@@ -125,7 +134,7 @@ impl RNASequence {
         match self.getitem(index_or_slice)? {
             MemberOrMembers::Member(member) => Ok(member.into_pyobject(py)?.into_any()),
             MemberOrMembers::Sequence(sequence) => {
-                Ok(Self { bases: sequence }.into_pyobject(py)?.into_any())
+                Ok(Self { sequence }.into_pyobject(py)?.into_any())
             }
         }
     }
@@ -135,17 +144,7 @@ impl RNASequence {
     }
 }
 
-impl Sequence<RNABase> for RNASequence {
-    #[inline]
-    fn members(&self) -> &Vec<RNABase> {
-        &self.bases
-    }
-
-    #[inline]
-    fn name(&self) -> &str {
-        "RNASequence"
-    }
-}
+impl_sequence!(RNASequence, RNABase, "RNASequence");
 
 #[derive(FromPyObject)]
 pub enum RNASequenceInput<'py> {
@@ -159,9 +158,7 @@ impl<'py> TryFrom<RNASequenceInput<'py>> for RNASequence {
     fn try_from(sequence: RNASequenceInput<'py>) -> PyResult<Self> {
         match sequence {
             RNASequenceInput::RNASequence(sequence) => Ok(sequence),
-            RNASequenceInput::Sequence(sequence) => Ok(Self {
-                bases: sequence.try_into()?,
-            }),
+            RNASequenceInput::Sequence(sequence) => Ok(Vec::try_from(sequence)?.into()),
         }
     }
 }

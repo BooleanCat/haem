@@ -75,15 +75,15 @@ impl DNABase {
     }
 
     fn __add__(&self, other: DNASequenceInput) -> PyResult<DNASequence> {
-        Ok(DNASequence {
-            bases: self.add(DNASequence::try_from(other)?.members(), false),
-        })
+        Ok(self
+            .add(DNASequence::try_from(other)?.members(), false)
+            .into())
     }
 
     fn __radd__(&self, other: DNASequenceInput) -> PyResult<DNASequence> {
-        Ok(DNASequence {
-            bases: self.add(DNASequence::try_from(other)?.members(), true),
-        })
+        Ok(self
+            .add(DNASequence::try_from(other)?.members(), true)
+            .into())
     }
 
     fn __str__(&self) -> String {

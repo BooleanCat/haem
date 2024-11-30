@@ -1,4 +1,5 @@
 use crate::dnabase::DNABase;
+use crate::impl_sequence;
 use crate::member::MemberOrMembers;
 use crate::rnabase::RNABase;
 use crate::rnasequence::RNASequence;
@@ -7,10 +8,10 @@ use crate::utils::IntOrSlice;
 use pyo3::prelude::*;
 use rayon::prelude::*;
 
+#[pyclass]
 #[derive(FromPyObject)]
-#[pyclass(frozen)]
 pub struct DNASequence {
-    pub bases: Vec<DNABase>,
+    pub sequence: Vec<DNABase>,
 }
 
 #[pymethods]
@@ -24,8 +25,8 @@ impl DNASequence {
     #[getter]
     fn get_complement(&self) -> Self {
         Self {
-            bases: self
-                .bases
+            sequence: self
+                .sequence
                 .par_iter()
                 .map(|base| base.get_complement())
                 .collect(),
@@ -34,7 +35,11 @@ impl DNASequence {
 
     fn transcribe(&self) -> RNASequence {
         RNASequence {
-            bases: self.bases.par_iter().map(RNABase::from).collect::<Vec<_>>(),
+            sequence: self
+                .sequence
+                .par_iter()
+                .map(RNABase::from)
+                .collect::<Vec<_>>(),
         }
     }
 
@@ -69,15 +74,15 @@ impl DNASequence {
     }
 
     fn __add__(&self, other: DNASequenceInput) -> PyResult<Self> {
-        Ok(Self {
-            bases: self.add(DNASequence::try_from(other)?.members(), false),
-        })
+        Ok(self
+            .add(DNASequence::try_from(other)?.members(), false)
+            .into())
     }
 
     fn __radd__(&self, other: DNASequenceInput) -> PyResult<Self> {
-        Ok(Self {
-            bases: self.add(DNASequence::try_from(other)?.members(), true),
-        })
+        Ok(self
+            .add(DNASequence::try_from(other)?.members(), true)
+            .into())
     }
 
     fn __len__(&self) -> usize {
@@ -91,7 +96,9 @@ impl DNASequence {
     ) -> PyResult<Bound<'py, PyAny>> {
         match self.getitem(index_or_slice)? {
             MemberOrMembers::Member(base) => Ok(base.into_pyobject(py)?.into_any()),
-            MemberOrMembers::Sequence(bases) => Ok(Self { bases }.into_pyobject(py)?.into_any()),
+            MemberOrMembers::Sequence(sequence) => {
+                Ok(Self::from(sequence).into_pyobject(py)?.into_any())
+            }
         }
     }
 
@@ -100,17 +107,7 @@ impl DNASequence {
     }
 }
 
-impl Sequence<DNABase> for DNASequence {
-    #[inline]
-    fn members(&self) -> &Vec<DNABase> {
-        &self.bases
-    }
-
-    #[inline]
-    fn name(&self) -> &str {
-        "DNASequence"
-    }
-}
+impl_sequence!(DNASequence, DNABase, "DNASequence");
 
 #[derive(FromPyObject)]
 pub enum DNASequenceInput<'py> {
@@ -124,9 +121,7 @@ impl<'py> TryFrom<DNASequenceInput<'py>> for DNASequence {
     fn try_from(sequence: DNASequenceInput<'py>) -> PyResult<Self> {
         Ok(match sequence {
             DNASequenceInput::DNASequence(sequence) => sequence,
-            DNASequenceInput::Sequence(sequence) => Self {
-                bases: sequence.try_into()?,
-            },
+            DNASequenceInput::Sequence(sequence) => Vec::try_from(sequence)?.into(),
         })
     }
 }

@@ -1,13 +1,14 @@
 use crate::aminoacid::AminoAcid;
+use crate::impl_sequence;
 use crate::member::MemberOrMembers;
 use crate::sequence::{Sequence, SequenceInput};
 use crate::utils::IntOrSlice;
 use pyo3::prelude::*;
 
-#[pyclass(frozen)]
+#[pyclass]
 #[derive(FromPyObject)]
 pub struct AminoAcidSequence {
-    pub amino_acids: Vec<AminoAcid>,
+    pub sequence: Vec<AminoAcid>,
 }
 
 #[pymethods]
@@ -45,15 +46,15 @@ impl AminoAcidSequence {
     }
 
     fn __add__(&self, other: AminoAcidSequenceInput) -> PyResult<Self> {
-        Ok(Self {
-            amino_acids: self.add(AminoAcidSequence::try_from(other)?.members(), false),
-        })
+        Ok(self
+            .add(AminoAcidSequence::try_from(other)?.members(), false)
+            .into())
     }
 
     fn __radd__(&self, other: AminoAcidSequenceInput) -> PyResult<Self> {
-        Ok(Self {
-            amino_acids: self.add(AminoAcidSequence::try_from(other)?.members(), true),
-        })
+        Ok(self
+            .add(AminoAcidSequence::try_from(other)?.members(), true)
+            .into())
     }
 
     fn __contains__(&self, sequence: AminoAcidSequenceInput) -> PyResult<bool> {
@@ -71,26 +72,14 @@ impl AminoAcidSequence {
     ) -> PyResult<Bound<'py, PyAny>> {
         match self.getitem(index_or_slice)? {
             MemberOrMembers::Member(member) => Ok(member.into_pyobject(py)?.into_any()),
-            MemberOrMembers::Sequence(sequence) => Ok(Self {
-                amino_acids: sequence,
+            MemberOrMembers::Sequence(sequence) => {
+                Ok(Self::from(sequence).into_pyobject(py)?.into_any())
             }
-            .into_pyobject(py)?
-            .into_any()),
         }
     }
 }
 
-impl Sequence<AminoAcid> for AminoAcidSequence {
-    #[inline]
-    fn members(&self) -> &Vec<AminoAcid> {
-        &self.amino_acids
-    }
-
-    #[inline]
-    fn name(&self) -> &str {
-        "AminoAcidSequence"
-    }
-}
+impl_sequence!(AminoAcidSequence, AminoAcid, "AminoAcidSequence");
 
 #[derive(FromPyObject)]
 pub enum AminoAcidSequenceInput<'py> {
@@ -104,9 +93,7 @@ impl<'py> TryFrom<AminoAcidSequenceInput<'py>> for AminoAcidSequence {
     fn try_from(sequence: AminoAcidSequenceInput<'py>) -> PyResult<Self> {
         match sequence {
             AminoAcidSequenceInput::AminoAcidSequence(sequence) => Ok(sequence),
-            AminoAcidSequenceInput::Sequence(sequence) => Ok(Self {
-                amino_acids: sequence.try_into()?,
-            }),
+            AminoAcidSequenceInput::Sequence(sequence) => Ok(Vec::try_from(sequence)?.into()),
         }
     }
 }

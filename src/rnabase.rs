@@ -76,13 +76,13 @@ impl RNABase {
 
     fn __add__(&self, other: RNASequenceInput) -> PyResult<RNASequence> {
         Ok(RNASequence {
-            bases: self.add(RNASequence::try_from(other)?.members(), false),
+            sequence: self.add(RNASequence::try_from(other)?.members(), false),
         })
     }
 
     fn __radd__(&self, other: RNASequenceInput) -> PyResult<RNASequence> {
         Ok(RNASequence {
-            bases: self.add(RNASequence::try_from(other)?.members(), true),
+            sequence: self.add(RNASequence::try_from(other)?.members(), true),
         })
     }
 

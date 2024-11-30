@@ -5,6 +5,7 @@ mod dnasequence;
 mod member;
 mod rnabase;
 mod rnasequence;
+#[macro_use]
 mod sequence;
 mod utils;
 

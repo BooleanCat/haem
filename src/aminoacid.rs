@@ -152,13 +152,13 @@ impl AminoAcid {
 
     fn __add__(&self, other: AminoAcidSequenceInput) -> PyResult<AminoAcidSequence> {
         Ok(AminoAcidSequence {
-            amino_acids: self.add(AminoAcidSequence::try_from(other)?.members(), false),
+            sequence: self.add(AminoAcidSequence::try_from(other)?.members(), false),
         })
     }
 
     fn __radd__(&self, other: AminoAcidSequenceInput) -> PyResult<AminoAcidSequence> {
         Ok(AminoAcidSequence {
-            amino_acids: self.add(AminoAcidSequence::try_from(other)?.members(), true),
+            sequence: self.add(AminoAcidSequence::try_from(other)?.members(), true),
         })
     }
 }

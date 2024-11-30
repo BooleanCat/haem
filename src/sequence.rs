@@ -160,6 +160,29 @@ where
     }
 }
 
+#[macro_export]
+macro_rules! impl_sequence {
+    ($struct_name:ident, $member_type:ty, $name:expr) => {
+        impl $crate::sequence::Sequence<$member_type> for $struct_name {
+            #[inline]
+            fn members(&self) -> &Vec<$member_type> {
+                &self.sequence
+            }
+
+            #[inline]
+            fn name(&self) -> &str {
+                $name
+            }
+        }
+
+        impl From<Vec<$member_type>> for $struct_name {
+            fn from(sequence: Vec<$member_type>) -> Self {
+                Self { sequence }
+            }
+        }
+    };
+}
+
 #[derive(FromPyObject)]
 pub enum SequenceInput<'py, T> {
     Str(PyBackedStr),
