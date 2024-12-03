@@ -76,12 +76,13 @@ impl RNASequence {
             });
 
         match stop.is_none() {
-            false => Ok(AminoAcidSequence {
-                sequence: self.members()[start.unwrap()..(start.unwrap() + stop.unwrap() * 3)]
+            false => Ok(
+                self.members()[start.unwrap()..(start.unwrap() + stop.unwrap() * 3)]
                     .par_chunks_exact(3)
                     .map(|codon| AminoAcid::try_from((&codon[0], &codon[1], &codon[2])))
-                    .collect::<Result<Vec<_>, _>>()?,
-            }),
+                    .collect::<Result<Vec<_>, _>>()?
+                    .into(),
+            ),
             true => Err(PyValueError::new_err("no stop codon found")),
         }
     }

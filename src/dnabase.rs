@@ -1,7 +1,6 @@
 use crate::dnasequence::{DNASequence, DNASequenceInput};
 use crate::member::Member;
 use crate::rnabase::RNABase;
-use crate::sequence::Sequence;
 use pyo3::prelude::*;
 use std::fmt;
 
@@ -75,15 +74,11 @@ impl DNABase {
     }
 
     fn __add__(&self, other: DNASequenceInput) -> PyResult<DNASequence> {
-        Ok(self
-            .add(DNASequence::try_from(other)?.members(), false)
-            .into())
+        Ok(self.add(&DNASequence::try_from(other)?, false).into())
     }
 
     fn __radd__(&self, other: DNASequenceInput) -> PyResult<DNASequence> {
-        Ok(self
-            .add(DNASequence::try_from(other)?.members(), true)
-            .into())
+        Ok(self.add(&DNASequence::try_from(other)?, true).into())
     }
 
     fn __str__(&self) -> String {

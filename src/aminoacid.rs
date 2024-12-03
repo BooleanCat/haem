@@ -2,7 +2,6 @@ use crate::aminoacidsequence::AminoAcidSequence;
 use crate::aminoacidsequence::AminoAcidSequenceInput;
 use crate::member::Member;
 use crate::rnabase::RNABase;
-use crate::sequence::Sequence;
 use pyo3::create_exception;
 use pyo3::prelude::*;
 use pyo3::pybacked::PyBackedStr;
@@ -152,13 +151,13 @@ impl AminoAcid {
 
     fn __add__(&self, other: AminoAcidSequenceInput) -> PyResult<AminoAcidSequence> {
         Ok(AminoAcidSequence {
-            sequence: self.add(AminoAcidSequence::try_from(other)?.members(), false),
+            sequence: self.add(&AminoAcidSequence::try_from(other)?, false),
         })
     }
 
     fn __radd__(&self, other: AminoAcidSequenceInput) -> PyResult<AminoAcidSequence> {
         Ok(AminoAcidSequence {
-            sequence: self.add(AminoAcidSequence::try_from(other)?.members(), true),
+            sequence: self.add(&AminoAcidSequence::try_from(other)?, true),
         })
     }
 }
