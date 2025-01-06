@@ -1,24 +1,22 @@
+[project]
+name = "haem"
+version = "0.1.0"
+description = "A Python library for working on Bioinformatics problems."
+readme = "README.md"
+authors = [{ name = "Tom Godkin", email = "tomgodkin@pm.me" }]
+classifiers = [
+    "Programming Language :: Rust",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+]
+requires-python = ">= 3.9"
+
 [build-system]
 requires = ["maturin>=1.1,<2.0"]
 build-backend = "maturin"
 
 [tool.maturin]
 features = ["pyo3/extension-module"]
-
-[tool.poetry]
-name = "haem"
-version = "0.1.0"
-description = "A Python library for working on Bioinformatics problems."
-authors = ["Tom Godkin <tomgodkin@pm.me>"]
-readme = "README.md"
-classifiers = [
-    "Programming Language :: Rust",
-    "Programming Language :: Python :: Implementation :: CPython",
-    "Programming Language :: Python :: Implementation :: PyPy",
-]
-
-[tool.poetry.dependencies]
-python = "^3.9"
 
 [tool.poetry.group.dev]
 optional = true
