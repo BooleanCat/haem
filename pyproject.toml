@@ -1,34 +1,27 @@
 [project]
-name = "haem"
-version = "0.1.0"
-description = "A Python library for working on Bioinformatics problems."
-readme = "README.md"
-authors = [{ name = "Tom Godkin", email = "tomgodkin@pm.me" }]
+authors = [{name = "Tom Godkin", email = "tomgodkin@pm.me"}]
 classifiers = [
-    "Programming Language :: Rust",
-    "Programming Language :: Python :: Implementation :: CPython",
-    "Programming Language :: Python :: Implementation :: PyPy",
+  "Programming Language :: Rust",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
 ]
+description = "A Python library for working on Bioinformatics problems."
+name = "haem"
+readme = "README.md"
 requires-python = ">= 3.9"
+version = "0.1.0"
 
 [build-system]
-requires = ["maturin>=1.1,<2.0"]
 build-backend = "maturin"
+requires = ["maturin>=1.1,<2.0"]
 
 [tool.maturin]
 features = ["pyo3/extension-module"]
 
 [tool.poetry.group.dev]
+dependencies = {maturin = "^1.7.7", mypy = "^1.14.1", pytest = "^8.3.3", ruff = "^0.8.0"}
 optional = true
 
-[tool.poetry.group.dev.dependencies]
-pytest = "^8.3.3"
-mypy = "^1.14.1"
-maturin = "^1.7.7"
-ruff = "^0.8.0"
-
-[tool.ruff]
-lint.extend-select = ["I"]
-
-[tool.ruff.lint.isort]
-known-first-party = ["haem"]
+[tool.ruff.lint]
+extend-select = ["I"]
+isort.known-first-party = ["haem"]
