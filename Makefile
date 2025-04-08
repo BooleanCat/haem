@@ -1,11 +1,10 @@
 test: check
-	poetry run maturin develop --release
-	poetry run pytest .
+	uv run maturin develop --release
+	uv run pytest .
 
 check:
 	cargo fmt --check
 	cargo clippy
-	poetry check
-	poetry run ruff check
-	poetry run ruff format --check
-	poetry run mypy --strict .
+	uv run ruff check
+	uv run ruff format --check
+	uv run mypy --strict .

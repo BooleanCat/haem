@@ -18,9 +18,8 @@ requires = ["maturin>=1.1,<2.0"]
 [tool.maturin]
 features = ["pyo3/extension-module"]
 
-[tool.poetry.group.dev]
-dependencies = {maturin = "^1.8", mypy = "^1.14", pytest = "^8.3", ruff = "^0.9"}
-optional = true
+[project.optional-dependencies]
+dev = ["maturin>=1.8", "mypy>=1.14", "pytest>=8.3", "ruff>=0.9"]
 
 [tool.ruff.lint]
 extend-select = ["I"]
