@@ -8,5 +8,5 @@ name = "haem"
 crate-type = ["cdylib"]
 
 [dependencies]
-pyo3 = "0.24"
+pyo3 = "0.25"
 rayon = "1"
