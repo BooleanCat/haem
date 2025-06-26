@@ -132,8 +132,7 @@ impl TryFrom<char> for DNABase {
             '.' | '-' => Self::Gap,
             _ => {
                 return Err(pyo3::exceptions::PyValueError::new_err(format!(
-                    "invalid IUPAC DNA code \"{}\"",
-                    code
+                    "invalid IUPAC DNA code \"{code}\""
                 )))
             }
         })

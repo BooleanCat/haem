@@ -256,8 +256,7 @@ impl TryFrom<char> for AminoAcid {
             'Z' => Self::GlutamineGlutamicAcid,
             _ => {
                 return Err(pyo3::exceptions::PyValueError::new_err(format!(
-                    "invalid IUPAC amino acid code \"{}\"",
-                    code
+                    "invalid IUPAC amino acid code \"{code}\""
                 )))
             }
         })

@@ -132,8 +132,7 @@ impl TryFrom<char> for RNABase {
             '.' | '-' => RNABase::Gap,
             _ => {
                 return Err(pyo3::exceptions::PyValueError::new_err(format!(
-                    "invalid IUPAC RNA code \"{}\"",
-                    code
+                    "invalid IUPAC RNA code \"{code}\""
                 )))
             }
         })
