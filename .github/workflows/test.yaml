@@ -27,7 +27,7 @@ jobs:
             ~/.cargo/git/db/
             target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with: { python-version: "${{ matrix.python-version }}" }
       - uses: astral-sh/setup-uv@v6
         with: { version: "latest" }
