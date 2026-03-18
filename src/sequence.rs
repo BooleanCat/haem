@@ -1,8 +1,6 @@
 use crate::member::{MemberOrCode, MemberOrMembers};
 use crate::utils::IntOrSlice;
 use pyo3::prelude::*;
-use pyo3::pybacked::PyBackedStr;
-use pyo3::pyclass::PyClass;
 use pyo3::types::PyIterator;
 use rayon::prelude::*;
 
@@ -193,7 +191,7 @@ macro_rules! impl_sequence {
 
 #[derive(FromPyObject)]
 pub enum SequenceInput<'py, T> {
-    Str(PyBackedStr),
+    Str(String),
     Iter(Bound<'py, PyIterator>),
     Seq(Vec<T>),
     SeqStr(Vec<char>),
@@ -202,7 +200,7 @@ pub enum SequenceInput<'py, T> {
 
 impl<'a, T> TryFrom<SequenceInput<'a, T>> for Vec<T>
 where
-    T: TryFrom<char, Error = PyErr> + Send + PyClass + Clone,
+    T: TryFrom<char, Error = PyErr> + Send + Clone + for<'b, 'py> pyo3::FromPyObject<'b, 'py>,
 {
     type Error = PyErr;
 
@@ -215,7 +213,10 @@ where
                 .collect::<PyResult<_>>()?,
             SequenceInput::Iter(bases) => bases
                 .into_iter()
-                .map(|member_or_code| MemberOrCode::extract_bound(&member_or_code?)?.into_member())
+                .map(|member_or_code| {
+                    let obj = member_or_code?;
+                    obj.extract::<MemberOrCode<T>>()?.into_member()
+                })
                 .collect::<PyResult<_>>()?,
             SequenceInput::Seq(bases) => bases,
             SequenceInput::SeqStr(codes) => codes

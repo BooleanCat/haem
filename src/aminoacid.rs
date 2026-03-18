@@ -4,7 +4,6 @@ use crate::member::Member;
 use crate::rnabase::RNABase;
 use pyo3::create_exception;
 use pyo3::prelude::*;
-use pyo3::pybacked::PyBackedStr;
 use std::fmt;
 
 create_exception!(haem, StopTranslation, pyo3::exceptions::PyException);
@@ -43,7 +42,7 @@ impl TryFrom<(char, char, char)> for AminoAcid {
 enum CodeOrCodon {
     Code(char),
     Codon(Codon),
-    CodonStr(PyBackedStr),
+    CodonStr(String),
 }
 
 impl TryFrom<CodeOrCodon> for AminoAcid {
@@ -54,6 +53,7 @@ impl TryFrom<CodeOrCodon> for AminoAcid {
             CodeOrCodon::Code(code) => code.try_into()?,
             CodeOrCodon::Codon(codon) => codon.try_into()?,
             CodeOrCodon::CodonStr(codon) if codon.len() == 3 => {
+                // `codon` is an owned String (from Python). Use chars() as before.
                 let bases = codon
                     .chars()
                     .map(RNABase::try_from)
