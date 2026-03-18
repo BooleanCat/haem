@@ -4,7 +4,13 @@ use crate::rnasequence::{RNASequence, RNASequenceInput};
 use pyo3::prelude::*;
 use std::fmt;
 
-#[pyclass(eq, eq_int, frozen, rename_all = "SCREAMING_SNAKE_CASE")]
+#[pyclass(
+    eq,
+    eq_int,
+    frozen,
+    rename_all = "SCREAMING_SNAKE_CASE",
+    from_py_object
+)]
 #[derive(Clone, Copy, PartialEq)]
 pub enum RNABase {
     Adenine,
